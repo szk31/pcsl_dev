@@ -469,11 +469,11 @@
 	margin : 0.2vw 0.6vw 0.6vw;
 	border-radius : 3vw;
 	border : 0.8vw solid White;
-	outline : 0.3vw solid Teal;
+	outline : 0.3vw solid #1F1F1F;
 }
 
 .radio.selected {
-	background-color : DarkBlue;
+	background-color : #1F1F1F;
 }
 
 .radio:not(.selected) {
