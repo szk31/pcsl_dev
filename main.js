@@ -1,19 +1,30 @@
 // display string, refered in entry[].type
-var singer_lookup = {
- 0 :	"reserved",			// 0b 0000 0x 0
- 1 :	"看谷にぃあ",		//    0001    1
- 2 :	"胡桃澤もも",		//    0010    2
- 3 :	"ももにぃあ",		//    0011    3
- 4 :	"逢魔きらら",		//    0100    4
- 5 :	"きらにぃあ",		//    0101    5
- 6 :	"ももきら",			//    0110    6
- 7 :	"ぷちここ",			//    0111    7
- 9 :	"つきみゆこ",		//    1001    9
-10 :	"愛白ふりる",		//    1010    A
-12 :	"小悪熊ちゅい",		//    1100    C
-19 :	"ゆこもも",			//   10011   13
-21 :	"ゆこきら",			//   10101   15
-};
+var singer_lookup = [
+	"reserved",			// 0b 0000 0x 0
+	"看谷にぃあ",		//    0001    1
+	"胡桃澤もも",		//    0010    2
+	"ももにぃあ",		//    0011    3
+	"逢魔きらら",		//    0100    4
+	"きらにぃあ",		//    0101    5
+	"ももきら",			//    0110    6
+	"ぷちここ",			//    0111    7
+	null,
+	"つきみゆこ",		//    1001    9
+	"愛白ふりる",		//    1010    A
+	null,
+	"小悪熊ちゅい",		//    1100    C
+/*
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
+	"ゆこもも",			//   10011   13
+	null,
+	"ゆこきら",			//   10101   15
+*/
+];
 
 // display order of search
 var display_order = [
@@ -54,6 +65,7 @@ var series_lookup = {
 	"ジブリ" : ["ジブリ", "じぶり"],
 	"物語シリーズ" : ["物語シリーズ", "ものがたりしりーず", "ものがたりシリーズ"],
 	"まどマギ" : ["まどマギ", "まどまぎ", "まどか"],
+	"disney" : ["disney", "ディズニー", "でぃずにー", "Disney"]
 };
 
 // indices lookup
@@ -77,7 +89,7 @@ var video_idx = {
 	date : 1
 };
 
-var version = "1.5.1a";
+var version = "1.5.8a";
 
 var key_hash = [
 	"473c05c1ae8349a187d233a02c514ac73fe08ff4418429806a49f7b2fe4ba0b7a36ba95df1d58b8e84a602258af69194", //thereIsNoPassword
@@ -140,7 +152,7 @@ $(window).on("load", async function() {
 			$("body > div").addClass("post_switch");
 			$("body").addClass("post_switch");
 			url_para.delete("key");
-			window.history.replaceState(null, null, "?" + url_para.toString());
+			window.history.replaceState(null, "", url_para.size === 0 ? "" : ("?" + url_para.toString()));
 			return;
 		}
 	}
@@ -172,7 +184,6 @@ $(window).on("load", async function() {
 		}
 		
 		// 2-2. scan for url para
-		key = url_para.get("key");
 		// if key para exist and sha384 hash matches
 		if (key !== "" && await getSHA384Hash(key) === key_hash[0]) {
 			// save to cookie
@@ -240,12 +251,13 @@ $(window).on("load", async function() {
 			ext & 32 ? "" : "chui"
 		];
 		// rep
-		if (url_para.get("page") === ("rep" || "repertoire")) {
+		if (url_para.get("page") === ("rep" || "repertoire") || url_para.get("rfilter") !== (null && "")) {
 			for (var i in member_name) {
 				if (member_name[i] === "") {
 					continue;
 				}
-				$("#filter_" + member_name[i] + "_icon").click();
+				$(".filter_icon.icon_" + member_name[i]).click();
+				$(".filter_icon_extra.icon_" + member_name[i]).click();
 			}
 		}
 		//search
@@ -284,6 +296,39 @@ $(window).on("load", async function() {
 		} else if (song_id >= 1 && song_id < song.length) {
 			$("#input").val(song[song_lookup[song_id]][song_idx.name]);
 			$("#input").blur();
+		}
+	}
+	/*    rep filter
+	 * this read a string of binary number
+	 * the value is exactly the same as rep_anisong and rep_genre
+	 */
+	if (url_para.get("rfilter") !== (null && "")) {
+		if (current_page !== "repertoire") {
+			jump2page("rep");
+		}
+		// extract bits
+		var selected_bits = [];
+		var temp = parseInt(url_para.get("rfilter"));
+		var counter = 0;
+		while (temp) {
+			// test if last bit is 1
+			if (temp % 2) {
+				selected_bits.push(counter);
+			}
+			// remove last bit, add counter
+			temp >>= 1;
+			counter++;
+		}
+		// click all checkbox thats NOT selected
+		for (var i in rep_anisong) {
+			if (!selected_bits.includes(rep_anisong[i][1])) {
+				$("#anisong_" + i).click();
+			}
+		}
+		for (var i in rep_genre) {
+			if (!selected_bits.includes(rep_genre[i][1])) {
+				$("#general_" + i).click();
+			}
 		}
 	}
 	// remove loading screen
@@ -398,26 +443,20 @@ $(function() {
 					}
 				}
 			}
-			// display (combined sum)
-			new_html += "</table><div id=\"memcount_sum_combined\" class=\"memcount_sum\"><div class=\"memcount_sum_icon\"></div>";
-			for (var i = 2; i >= 0; --i) {
-				new_html += (
-					"<div class=\"singer_" + (1 << i) + "\">" + (entry_count_total[0][i] + entry_count_total[1][i]) + "</div>"
-				);
-			}
-			
-			// display (seperated sum)
 			if (key_valid) {
-				new_html += "<div class=\"memcount_sum_seperate memcount_btn\"></div></div><div id=\"memcount_sum_seperated\" class=\"memcount_sum hidden\"><div class=\"memcount_sum_icon col-1 colspan-2\"></div>";
+				new_html += "</table><div id=\"memcount_sum_warpper\" class=\"memcount_sum\"><div class=\"memcount_sum_icon col-1 colspan-2\"></div>";
 				for (var row = 0; row < 2; ++row) {
 					for (var col = 2; col >= 0; --col) {
 						new_html += ("<div class=\"row-" + (row + 1) + " col-" + (4 - col) + " singer_" + ((row ? 8 : 0) + (1 << col)) + "\">" + entry_count_total[row][col] + "</div>");
 					}
 				}
-				new_html += "<div class=\"memcount_sum_combine memcount_btn col-5 colspan-2\"></div>";
+			} else {
+				new_html += "</table><div class=\"memcount_sum\"><div class=\"memcount_sum_icon\"></div>";
+				for (var i = 2; i >= 0; --i) {
+					new_html += ("<div class=\"singer_" + (1 << i) + "\">" + entry_count_total[0][i] + "</div>");
+				}
 			}
-			new_html += "</div>";
-			$("#memcount_content").html(new_html);
+			$("#memcount_content").html(new_html + "</div>");
 			
 			// rep part - load in background
 			memcount_rep_int = setInterval(memcount_load_rep , 1);
@@ -433,49 +472,19 @@ $(function() {
 		});
 	}
 	
-	// memcount - sum - swap - sep->com
-	$(document).on("click", ".memcount_sum_seperate", function() {
-		$("#memcount_sum_seperated").removeClass("hidden");
-		$("#memcount_sum_combined").addClass("hidden");
-	});
-	
-	// memcount - sum - swap - com->sep
-	$(document).on("click", ".memcount_sum_combine", function() {
-		$("#memcount_sum_combined").removeClass("hidden");
-		$("#memcount_sum_seperated").addClass("hidden");
-	});
-	
-	// memcount_rep - sum - swap - sep->com
-	$(document).on("click", ".memcount_rep_sum_seperate", function() {
-		$("#memcount_rep_sum_seperated").removeClass("hidden");
-		$("#memcount_rep_sum_combined").addClass("hidden");
-	});
-	
-	// memcount_rep - sum - swap - com->sep
-	$(document).on("click", ".memcount_rep_sum_combine", function() {
-		$("#memcount_rep_sum_combined").removeClass("hidden");
-		$("#memcount_rep_sum_seperated").addClass("hidden");
-	});
-	
-	// memcount -fog> return, swap content
-	$(document).on("click", "#memcount", function(e) {
-		if ($(e.target).attr("id") === "memcount") {
-			$("#memcount").addClass("hidden");
-			$("#popup_container").addClass("hidden");
-			$(document.body).removeClass("no_scroll");
-			prevent_menu_popup = false;
-		} else {
-			// pressing on the block
-			if (!$(e.target).hasClass("memcount_btn")) {
-				$(".memcount_subblock").toggleClass("hidden");
-			}
+	// memcount swap content
+	$(document).on("click", "#memcount, #memcount_rep", function(e) {
+		if ($(e.target).closest('.popup_frame').length) {
+			$(".memcount_subblock").toggleClass("hidden");
 		}
 	});
 	
-	// information -fog> return
-	$(document).on("click", "#information", function(e) {
-		if ($(e.target).attr("id") === "information") {
-			$("#information").addClass("hidden");
+	// popup - return
+	$(document).on("click", "#popup_container", function(e) {
+		// all popup except rep share
+		if (!($(e.target).closest('.popup_frame').length ||
+			  $(e.target).find("#rep_list:not(.hidden)").length)) {
+			$(".popup_frame").addClass("hidden");
 			$("#popup_container").addClass("hidden");
 			$(document.body).removeClass("no_scroll");
 			prevent_menu_popup = false;
@@ -546,30 +555,6 @@ function init() {
 	
 	// rep
 	var rep_solo_temp = [];
-	function split_to_solo(input) {
-		// hard code is easier
-		switch (input) {
-			case 1 : 
-			case 2 : 
-			case 4 : 
-			case 9 : 
-			case 10 : 
-			case 12 : 
-				return [input];
-				break;
-			case 3 : 
-				return [1, 2];
-				break;
-			case 5 : 
-				return [1, 4];
-				break;
-			case 6 : 
-				return [2, 4];
-				break;
-			case 7 : 
-				return [1, 2, 4];
-		}
-	}
 	
 	// process song names
 	for (var i = 1; i < song.length; ++i) {
@@ -610,9 +595,12 @@ function load_encrpyted_data(key_id) {
 	// update rep display
 	member_display_order = [7, 6, 5, 3, 4, 2, 1, 12, 10, 9];
 	$(".extra").removeClass("hidden");
+	$(".memcount_subblock").removeClass("anti_extra");
 	$(".anti_extra").html("");
 	$(".anti_extra").addClass("hidden");
 	$("#home_key").removeClass("hidden");
+	$("#filter_entry_icon_container").addClass("hidden");
+	$("#filter_entry_icon_extra").removeClass("hidden");
 	// update expire day
 	removeCookie("pcsl_content_key");
 	setCookie("pcsl_content_key", key);
@@ -623,140 +611,49 @@ function memcount_load_rep() {
 	// remove interval
 	clearInterval(memcount_rep_int);
 	
-	// get total sum
-	var rep_count = [],
-		rep_sum = [[], []];
+	// get number for each member
+	var singer_counter = [];
 	for (var i = 0; i < 15; ++i) {
-		rep_count[i] = [];
+		singer_counter[i] = [];
 	}
-	// get all entry data
-	for (var i in entry) {
-		rep_count[entry[i][entry_idx.type]].push(entry[i][entry_idx.song_id]);
-	}
-	// remove duplicate, sort (is sort nessary?)
-	for (var i in rep_count) {
-		if (rep_count[i].length > 0) {
-			rep_count[i] = [...new Set(rep_count[i])].sort((a, b) => a - b);
+	for (var i in rep_hits_solo) {
+		for (var j in rep_hits_solo[i]) {
+			var bits = split_to_solo(rep_hits_solo[i][j]);
+			for (var k in bits) {
+				singer_counter[bits[k]].push(i);
+			}
 		}
 	}
-	
-	// assign solo entries into non-solo entries
-	// im not sure if rep_list is going to work so not using here
-	
-	// *note : this does not take account for song that
-	// DOES NOT exist in all 1, 2 and 4, but DOES exist in 2 or more of 3, 5 and 6
-	
-	for (var repeat = 0; repeat < 2; ++repeat) {
-		for (var i = 0; i < song.length; ++i) {
-			// check which solo array(s) does the song exist in
-			var type  = 0,
-				found = [];
-			for (var j = 0; j < 3; ++j) {
-				if (rep_count[1 << j].includes(i)) {
-					type += 1 << j;
-					found.push(1 << j);
-				}
-			}
-			if (found.length <= 1) {
-				continue;
-			}
-			// found in multiple solo arrays
-			rep_count[type].push(i);
-		}
-		// clone from non-solo to solo
+	// remove duplicates
+	singer_counter.map(x => [...new Set(x)]);
+	var display_number = [
+		singer_counter[4].length,
+		singer_counter[2].length,
+		singer_counter[1].length,
 		
-		// im going to assume i did the right thing here
-		// im not sure if the numbers are correct
+		singer_counter[12].length,
+		singer_counter[10].length,
+		singer_counter[9].length,
 		
-		for (var i = 1; i < 7; ++i) {
-			// remove 7 from 1 to 6
-			for (var inner = 0; inner < rep_count[7].length; ++inner) {
-				var index = rep_count[i].indexOf(rep_count[7][inner]);
-				if (index !== -1) {
-					rep_count[i].splice(index, 1);
-				}
-			}
-		}
-		var target = [3, 5, 6];
-		for (var i in target) {
-			// remove 3 from 1 and 2, 5 from 1 and 4 and 6 from 2 and 4
-			for (var solos = 0; solos < 3; ++solos) {
-				if (!(1 << solos) & target[i]) {
-					continue;
-				}
-				for (var inner = 0; inner < rep_count[target[i]].length; ++inner) {
-					var index = rep_count[(1 << solos)].indexOf(rep_count[target[i]][inner]);
-					if (index !== -1) {
-						rep_count[(1 << solos)].splice(index, 1);
-					}
-				}
-			}
-		}
-		// remove duplicate
-		for (var i in rep_count) {
-			if (rep_count[i].length > 0) {
-				rep_count[i] = [...new Set(rep_count[i])].sort((a, b) => a - b).filter(Number);
-			}
-		}
-		for (var i in rep_count) {
-			rep_sum[repeat][i] = rep_count[i].length;
-		}
-		if (key_valid && repeat === 0) {
-			// is 1st loop
-			// it doesnt hurt if executed 2nd time but
-			for (var i = 0; i < 8; ++i) {
-				rep_count[i] = rep_count[i].concat(rep_count[i + 8]);
-			}
-		}
-	}
-	
-	// print the table
-	var new_html = "<table id=\"memcount_rep_table\"><tr><th></th><th>加算✕</th>" + (key_valid ? "<th class=\"table_empty_column\"></th><th>加算〇</th>" : "") + "</tr>";
-	for (var i in member_display_order) {
-		var mem_id = member_display_order[i];
-		// new row, name
-		new_html += ("<tr class=\"memcount_row singer_" + mem_id + "\"><td><div class=\"memcount_name\">" + singer_lookup[mem_id] + "</div></td>");
-		// first column
-		new_html += ("<td>" + rep_sum[0][mem_id] + "</td>");
-		if (key_valid) {
-			new_html += "<td></td><td" + (mem_id > 8 ? " class=\"memcount_empty\"" : "") + ">" + (mem_id > 8 ? "" : rep_sum[1][mem_id]) + "</td>";
-		}
-		// close row
-		new_html += "</tr>";
-	}
-	// total for each member
-	// get numbers
-	var entry_count_total = [
-		[
-			rep_sum[1][7] + rep_sum[1][6] + rep_sum[1][5] + rep_sum[1][4],
-			rep_sum[1][7] + rep_sum[1][6] + rep_sum[1][3] + rep_sum[1][2],
-			rep_sum[1][7] + rep_sum[1][5] + rep_sum[1][3] + rep_sum[1][1]
-		], [
-			rep_sum[0][7] + rep_sum[0][6] + rep_sum[0][5] + rep_sum[0][4],
-			rep_sum[0][7] + rep_sum[0][6] + rep_sum[0][3] + rep_sum[0][2],
-			rep_sum[0][7] + rep_sum[0][5] + rep_sum[0][3] + rep_sum[0][1],
-			rep_sum[0][12],
-			rep_sum[0][10],
-			rep_sum[0][9]
-		]
+		new Set([...singer_counter[4], ...singer_counter[12]]).size,
+		new Set([...singer_counter[2], ...singer_counter[10]]).size,
+		new Set([...singer_counter[1], ...singer_counter[9]]).size
 	];
-	// display (combined sum)
-	new_html += "</table><div id=\"memcount_rep_sum_combined\" class=\"memcount_sum\"><div class=\"memcount_sum_icon\"></div>";
-	for (var i = 0; i < 3; ++i) {
-		new_html += ("<div class=\"singer_" + (1 << (2 - i)) + "\">" + entry_count_total[0][i] + "</div>");
-	}
 	
-	// display (seperated sum)
-	if (key_valid) {
-		new_html += "<div class=\"memcount_rep_sum_seperate memcount_btn\"></div></div><div id=\"memcount_rep_sum_seperated\" class=\"memcount_sum hidden\"><div class=\"memcount_sum_icon col-1 colspan-2\"></div>";
-		for (var row = 0; row < 2; ++row) {
-			for (var col = 0; col < 3; ++col) {
-				new_html += ("<div class=\"row-" + (row + 1) + " col-" + (col + 2) + " singer_" + ((row ? 8 : 0) + (1 << (2 - col))) + "\">" + entry_count_total[1][row * 3 + col] + "</div>");
-			}
-		}
-		new_html += "<div class=\"memcount_rep_sum_combine memcount_btn col-5 colspan-2\"></div>";
+	var display_lookup = [4, 2, 1, 12, 10, 9, 4, 2, 1];
+	
+	// display
+	var new_html = "";
+	for (var i = 0; i < (key_valid ? 6 : 3); ++i) {
+		new_html += ("<div class=\"memcount_rep_block\"><div class=\"singer_" + display_lookup[i] + "m\">" + singer_lookup[display_lookup[i]] + "</div><div class=\"singer_" + display_lookup[i] + "\">" + display_number[i] + "</div></div>");
 	}
-	new_html += "</div>";
+	if (key_valid) {
+		new_html += ("<div></div><div class=\"memcount_rep_sum\"></div><div></div>");
+		for (var i = 6; i < 9; ++i) {
+			new_html += ("<div class=\"memcount_rep_block_sum memcount_rep_singer_" + display_lookup[i] + "\"><div>" + display_number[i] + "</div></div>");
+		}
+	}
+	$("#memcount_rep_content").toggleClass("extra_content", key_valid === 1);
 	$("#memcount_rep_content").html(new_html);
 }
 
@@ -801,9 +698,9 @@ function copy_of(input) {
 	}
 }
 
-function get_last_sang(id, mask = 7) {
+function get_last_sang(id, mask = [4, 2, 1, 12, 10, 9]) {
 	for (var i = entry_proc[id].length - 1; i >= 0; --i) {
-		if (entry[entry_proc[id][i]][entry_idx.type] & (mask & hard_filter)) {
+		if (mask.some((x) => (x & entry[entry_proc[id][i]][entry_idx.type]) === x)) {
 			return new Date(video[entry[entry_proc[id][i]][entry_idx.video]][video_idx.date]);
 		}
 	}
@@ -835,11 +732,12 @@ function get_date_different(date1, date2 = today) {
 }
 
 // get entry count of all entry and member-only entry that fufills mask
-function get_sang_count(id, mask = 7) {
+function get_sang_count(id, mask = [4, 2, 1, 12, 10, 9]) {
+	
 	var count = 0,
 		mem_count = 0;
 	for (var i in entry_proc[id]) {
-		if (entry[entry_proc[id][i]][entry_idx.type] & (mask & hard_filter)) {
+		if (mask.some((x) => (x & entry[entry_proc[id][i]][entry_idx.type]) === x)) {
 			count++;
 			if (entry[entry_proc[id][i]][entry_idx.note].includes("【メン限")) {
 				mem_count++;
@@ -911,6 +809,31 @@ function jump2page(target) {
 			return -1;
 	}
 	$(window).scrollTop(0);
+}
+
+function split_to_solo(input) {
+	// hard code is easier
+	switch (input) {
+		case 1 : 
+		case 2 : 
+		case 4 : 
+		case 9 : 
+		case 10 : 
+		case 12 : 
+			return [input];
+			break;
+		case 3 : 
+			return [1, 2];
+			break;
+		case 5 : 
+			return [1, 4];
+			break;
+		case 6 : 
+			return [2, 4];
+			break;
+		case 7 : 
+			return [1, 2, 4];
+	}
 }
 
 var copy_popup_is_displaying = false;

@@ -298,14 +298,14 @@
 	color : #E0E7FF;
 }
 
-/* yuco (9) cc : 7.52 */
+/* yuco (9) cc : 4.55 */
 .singer_9 {
-	background-color : #FFC0F9;
-	color : MediumBlue;
+	background-color : #ffcffb;
+	color : #265ebd;
 }
 .singer_9m {
-	background-color : MediumBlue;
-	color : #FFC0F9;
+	background-color : #265ebd;
+	color : #ffcffb;
 }
 /* shiro (10) cc : 4.63 */
 .singer_10 {
@@ -321,14 +321,14 @@
 	background-color : aaaaaa;
 	color : bbbbbb;
 }
-/* chui (12) cc : 5.17 */
+/* chui (12) cc : 5.31 */
 .singer_12 {
-	background-color : #C4E2FA;
-	color : #814B41;
+	background-color : #ffd3ca;
+	color : #7a36a6;
 }
 .singer_12m {
-	background-color : #814B41;
-	color : #C4E2FA;
+	background-color : #7a36a6;
+	color : #ffd3ca;
 }
 /* reserved (13) cc : N/A */
 .singer_13 {

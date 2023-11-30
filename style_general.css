@@ -20,8 +20,9 @@
 }
 
 .icon_yuco {
-	content : url("https://yt3.googleusercontent.com/EQIvOcnF0onnRN1-FkMgd0jg6eNkBVWiwCUVEXHhXPUyjlHtWxPbxc3cCdrdLqnz9DFKdpg2Lg");
+	content : url("https://yt3.ggpht.com/LogzFFIu3u3gwpc18hhQ6n0273gGGThWTMF41lSOdA5zLKkPn8MURz3v08ervFHdfcdHhcc9Ow");
 }
+
 :root {
 	--default-bgcolour    : LightSlateGrey;
 	--default-txcolour    : White;
@@ -100,6 +101,7 @@
 	
 }
 
+/* overall section ~start~ */
 
 html, body {
 	padding : 0px;
@@ -152,8 +154,6 @@ input[type=text]:focus {
 
 .red_text {
 	color : Red !important;
-	-webkit-text-stroke : 0.144vw White;
-	text-stroke : 0.144vw White;
 }
 
 #v_screen {
@@ -279,7 +279,53 @@ body.post_switch {
 /* overall section ~end~ */
 
 /* singer colour section */
+.icon_kirara_bg {
+	background-color : #670000;
+}
 
+.icon_momo_bg {
+	background-color : DarkMagenta;
+}
+
+.icon_nia_bg {
+	background-color : DarkBlue;
+}
+
+.icon_chui_bg {
+	background-color : #7a36a6;
+}
+
+.icon_shiro_bg {
+	background-color : #CC2455;
+}
+
+.icon_yuco_bg {
+	background-color : MediumBlue;
+}
+
+.icon_kirara_frame {
+	background-color : #AC424A;
+}
+
+.icon_momo_frame {
+	background-color : #FDCCD3;
+}
+
+.icon_nia_frame {
+	background-color : #C2CAF3;
+}
+
+.icon_chui_frame {
+	background-color : #8C8596;
+}
+
+.icon_shiro_frame {
+	background-color : #E3807C;
+}
+
+.icon_yuco_frame {
+	background-color : #9E7CE9;
+}
 /* singer colour section end*/
 
 /* menu section */
@@ -363,39 +409,75 @@ body.post_switch {
 	top : 10vw;
 	height : calc(100% - 10vw);
 	width : 100%;
+	background-color : rgba(31, 31, 31, 0.5);
+	z-index : 1;
+}
+
+/* info section */
+#information {
+	position : absolute;
+	left : 50%;
+	top : 50%;
+	transform: translate(-50%, -50%);
+	width : 70vw;
+	height : 48vh;
+	font-size : 4vw;
+	background-color : DarkSlateBlue;
+	color : AliceBlue;
+	text-align : center;
+	border : 0.5vw solid SlateBlue;
+	border-radius : 2vw;
+	z-index : 10;
+}
+
+#information>div {
+	position : absolute;
+	bottom : 3vh;
+	width : 100%;
+	left : 50%;
+	transform: translate(-50%, 0);
+}
+
+#info_bug-report {
+	margin-top : 2vh;
+}
+
+#info_github {
+	margin-top : 2.5vh;
 }
 
 /* mem count section */
-#memcount {
-	top : 0;
-	position : absolute;
-	width : 100%;
-	height : 100%;
-	background-color : rgba(31, 31, 31, 0.5);
-}
-
-#memcount h3 {
+#memcount h3,
+#memcount_rep h3{
 	font-size : 6vw;
 	margin-block : 0.4em;
 }
 
-#memcount_defog,
-#memcount_rep_defog {
+#memcount,
+#memcount_rep {
 	position : absolute;
 	left : 50%;
 	top : 50%;
 	transform: translate(-50%, -50%);
 	width : 84vw;
-	height : calc(12vh + 100vw);
-	background-color : MediumPurple;
-	color : Snow;
+	background-color : DarkSlateBlue;
+	color : AliceBlue;
 	text-align : center;
-	border: none;
+	border: 0.5vw solid SlateBlue;
 	border-radius: 2vw;
 }
 
-#memcount_table,
-#memcount_rep_table {
+#memcount.anti_extra,
+#memcount_rep.anti_extra {
+	height : calc(12vh + 75vw);
+}
+
+#memcount:not(.anti_extra),
+#memcount_rep:not(.anti_extra) {
+	height : calc(12vh + 100vw);
+}
+
+#memcount_table {
 	margin-left: auto;
 	margin-right: auto;
 	background-color : AliceBlue;
@@ -405,13 +487,8 @@ body.post_switch {
 	font-size : 4vw;
 }
 
-#memcount_table th,
-#memcount_rep_table th:not(.table_empty_column) {
+#memcount_table th {
 	min-width : 13.6vw;
-}
-
-#memcount_rep_table th.table_empty_column {
-	min-width : 8vw;
 }
 
 .memcount_row>td {
@@ -458,55 +535,103 @@ body.post_switch {
 	height : 6vw;
 }
 
-.memcount_sum_seperate,
-.memcount_rep_sum_seperate {
-	content : url("icon/arrow_seperate.png");
-	width : 6vw;
-	height : 6vw;
-}
-
-.memcount_sum_combine,
-.memcount_rep_sum_combine {
-	content : url("icon/arrow_combine.png");
-	width : 6vw;
-	height : 6vw;
-}
-
-#memcount_sum_seperated div:not(.colspan-2),
-#memcount_rep_sum_seperated div:not(.colspan-2) {
+#memcount_sum_warpper div:not(.colspan-2) {
 	transform: translate(0, -3.8vw);
 }
 
-/* info section */
-#information {
-	top : 0;
-	position : absolute;
-	width : 100%;
-	height : 100%;
-	background-color : rgba(31, 31, 31, 0.5);
+#memcount_rep_content.extra_content {
+	display : grid;
+	grid-template-columns: 1fr 1fr 1fr;
 }
 
-#info_defog {
+#memcount_rep_content:not(.extra_content) {
 	position : absolute;
-	left : 50%;
-	top : 50%;
-	transform: translate(-50%, -50%);
-	width : 70vw;
-	height : 40vh;
-	background-color : MediumPurple;
-	color : Snow;
-	font-size : 4vw;
-	text-align : center;
-	border: none;
-	border-radius: 2vw;
+	left : 30%;
+	top : 15%;
+	width : 40%;
 }
 
-#info_defog>div {
-	position : absolute;
-	bottom : 3vh;
-	width : 100%;
-	left : 50%;
-	transform: translate(-50%, 0);
+#memcount_rep_content:not(.extra_content) .memcount_rep_block {
+	width : 90%;
+	block-size : fit-content;
+	margin : auto;
+	font-size : 3.8vw;
+	font-weight : 550;
+	padding : 2.5vh 0;
+}
+
+#memcount_rep_content.extra_content .memcount_rep_block {
+	width : 90%;
+	block-size : fit-content;
+	margin : auto;
+	font-size : 3.8vw;
+	font-weight : 550;
+	padding : 4vh 0;
+}
+
+.memcount_rep_block>div {
+	padding : 1vw;
+}
+
+.memcount_rep_block>div:first-child {
+	border-radius : 1.8vw 1.8vw 0 0;
+}
+
+.memcount_rep_block>div:last-child {
+	border-radius : 0 0 1.8vw 1.8vw;
+}
+
+.memcount_rep_block_sum>div {
+	padding : 1vw;
+	border-radius : 1.8vw;
+}
+
+.memcount_rep_sum {
+	content : url("icon/sigma.png");
+	width : 6vw;
+	height : 6vw;
+	block-size : fit-content;
+	margin : auto;
+	padding : 0;
+}
+
+.memcount_rep_block_sum {
+	font-size : 4.2vw;
+	font-weight : 600;
+	padding : 5%;
+	border-radius : 1.8vw;
+	margin : 5%;
+	width : 80%;
+}
+
+.memcount_rep_singer_4 {
+	background: linear-gradient(158deg, LightCoral 0 30%, #ffd3ca 70% 100%);
+}
+
+.memcount_rep_singer_4>div {
+	background: linear-gradient(158deg, #670000 0 30%, #7a36a6 70% 100%);
+	-webkit-background-clip: text;
+	color: transparent;
+}
+
+.memcount_rep_singer_2 {
+	background: linear-gradient(158deg, LightPink 0 30%, #FFF0AB 70% 100%);
+}
+
+.memcount_rep_singer_2>div {
+	background: linear-gradient(158deg, DarkMagenta 0 30%, #CC2455 70% 100%);
+	-webkit-background-clip: text;
+	color: transparent;
+}
+
+.memcount_rep_singer_1 {
+	background: linear-gradient(158deg, PaleTurquoise 0 30%, #ffcffb 70% 100%);
+}
+
+.memcount_rep_singer_1>div {
+	background: linear-gradient(158deg, DarkBlue 0 30%, #265ebd 70% 100%);
+	-webkit-background-clip: text;
+	color: transparent;
 }
 
 #copy_popup {
@@ -562,7 +687,7 @@ body.post_switch {
 
 
 
-.twitter, .youtube, .deleted, .google_sheets {
+.twitter, .youtube, .deleted, .google_sheets, .google_forms, .github {
 	color : White;
 	border: none;
 	border-radius: 2vw;
@@ -586,6 +711,16 @@ body.post_switch {
 
 .google_sheets {
 	background-color : #00AC47;
+}
+
+.google_forms {
+	background-color : #7248B9;
+	border : 0.8vw solid MediumSlateBlue;
+}
+
+.github {
+	background-color : Black;
+	border : 0.8vw solid MediumSlateBlue;
 }
 
 .ext_link {

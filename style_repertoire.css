@@ -117,22 +117,6 @@
 	margin : 0.2vw 3vw 0.2vw 1.2vw;
 }
 
-.filter_singer_group_container {
-	padding : 3vw 0 0 1vw;
-	width : 29vw;
-}
-
-.filter_singer_group_container .filter_singer_group {
-	display : grid;
-	grid-template-columns: 25% 70%;
-}
-
-.filter_singer_group_container .filter_singer_group>.attr_name {
-	display : flex;
-	margin : 0 4vw 0 0.4vw;
-	vertical-align : top;
-}
-
 .filter_singer_group_extra {
 	display : grid;
 	width : 80%;
@@ -179,7 +163,11 @@
 
 .rep_song_singer {
 	display : grid;
-	grid-template-columns: 33.3% 33.3% 33.3%;
+	grid-template-columns : 33.3% 33.3% 33.3%;
+}
+
+.rep_singer_2rows {
+	margin-top : -1.1vw;
 }
 
 .rep_song_singer div {
@@ -207,8 +195,8 @@
 }
 
 .rep_song_chui {
-	background-color : #C4E2FA;
-	border : max(2px, 0.4vw) solid #814B41;
+	background-color : #ffd3ca;
+	border : max(2px, 0.4vw) solid #7a36a6;
 }
 
 .rep_song_shiro {
@@ -217,8 +205,8 @@
 }
 
 .rep_song_yuco {
-	background-color : #FFC0F9;
-	border : max(2px, 0.4vw) solid MediumBlue;
+	background-color : #ffcffb;
+	border : max(2px, 0.4vw) solid #265ebd;
 }
 
 .rep_extra_info {
@@ -226,26 +214,19 @@
 }
 
 #rep_list {
-	top : 0;
 	position : absolute;
-	width : 100%;
-	height : 100%;
-	background-color : rgba(31, 31, 31, 0.5);
-}
-
-#rep_list_defog {
-	position : absolute;
-	left : 4vw;
-	top : 6vh;
+	left : 50%;
+	top : 50%;
+	transform: translate(-50%, -50%);
 	width : 92vw;
 	height : auto;
-	background-color : MediumPurple;
+	background-color : DarkSlateBlue;
 	font-size : 4vw;
-	border: none;
+	border: 0.5vw solid SlateBlue;
 	border-radius: 2vw;
 	overflow-y : auto;
 	text-align : center;
-	color : Snow;
+	color : AliceBlue;
 }
 
 .rep_list_title_container {
@@ -311,7 +292,7 @@
 
 #rep_list_content {
 	overflow-y : auto;
-	background-color : LavenderBlush;
+	background-color : SlateBlue;
 	border-radius : 2vw;
 	border : none;
 	margin : 0vw 2vw;
@@ -324,7 +305,7 @@
 	height : 1em;
 	line-height : 1em;
 	overflow : hidden;
-	color : Navy;
+	color : AliceBlue;
 	text-align : left;
 	padding : 1.6vw 0.4vw;
 }
@@ -338,9 +319,15 @@
 	margin : 2vw 0vw;
 }
 
+#list_artist_cb {
+	margin : auto 1.2vw;
+}
+
 .rep_list_control .twitter {
-	left : 70%;
-	transform: translate(50%, 0);
+	display : flex;
+	justify-content : center;
+	align-items : center;
+	transform: translate(62.5%, 0);
 }
 
 .rep_list_control>.disabled {
@@ -358,7 +345,7 @@
 	width : 6vw;
 	height : 6vw;
 	content : url("icon/copy.png");
-	background-color : GhostWhite;
+	background-color : MediumSlateBlue;
 	border-radius : 0.8vw;
 }
 
@@ -469,11 +456,11 @@
 	margin : 0.2vw 0.6vw 0.6vw;
 	border-radius : 3vw;
 	border : 0.8vw solid White;
-	outline : 0.3vw solid #1F1F1F;
+	outline : 0.3vw solid Teal;
 }
 
 .radio.selected {
-	background-color : #1F1F1F;
+	background-color : DarkBlue;
 }
 
 .radio:not(.selected) {

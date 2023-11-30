@@ -5,6 +5,7 @@
 .home_title {
 	margin-top : 15vw;
 	text-align : center;
+	font-size : 6vw;
 }
 
 .home_member_block, .home_general_block {
@@ -61,47 +62,31 @@
 	text-align : center;
 }
 
-#home_key_stat {
-	margin : 6vw auto;
-	font-size : 4vw;
-	color : LimeGreen;
-	font-weight : bold;
-	text-align : center;
-	text-shadow: #000 0px 0px 0.8vw;
-	-webkit-font-smoothing: antialiased;
-}
-
 #home_key_reset {
-	background-color : Red;
+	background-color : Crimson;
 	color : White;
 	border-radius : 2vw;
 	width : 16vw;
-	margin : 0 auto;
+	margin : 6vh auto 10vh auto;
 	padding : 2vw;
 	font-size : 3.6vw;
 	font-weight : bold;
 	text-align : center;
-	margin-bottom : 20vw;
 }
 
 #remove_key {
-	top : 10vw;
-	height : 100%;
-	background-color : rgba(0, 0, 0, 0.5);
-}
-
-#remove_key_defog {
 	position : fixed;
 	left : 50%;
 	top : 50%;
 	transform: translate(-50%, -50%);
 	width : 80vw;
 	height : 30vh;
-	background-color : MediumPurple;
-	border-radius : 3.2vw;
-	color : GhostWhite;
+	background-color : DarkSlateBlue;
 	font-weight : bold;
 	text-align : center;
+	color : AliceBlue;
+	border-radius : 2vw;
+	border: 0.5vw solid SlateBlue;
 }
 
 #remove_key_text {
@@ -123,18 +108,17 @@
 	display : flex;
 	justify-content : center;
 	align-items : center;
-	border-top : 0.8vw solid #c4b0eb;
+	border-top : 0.8vw solid SlateBlue;
 	font-size : 4.8vw;
 }
 
 #remove_key_nah {
-	border-right : 0.4vw solid #c4b0eb;
-	background-color : #679b99;
-	border-bottom-left-radius : 3.2vw;
+	border-right : 0.4vw solid SlateBlue;
+	border-bottom-left-radius : 2vw;
 }
 
 #remove_key_yes {
-	border-left : 0.4vw solid #c4b0eb;
-	background-color : #b9498e;
-	border-bottom-right-radius : 3.2vw;
+	border-left : 0.4vw solid SlateBlue;
+	background-color : DarkRed;
+	border-bottom-right-radius : 2vw;
 }

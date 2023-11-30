@@ -13,10 +13,10 @@
 		<script type="text/javascript" src="data_0.js"></script>
 		<script type="text/javascript" src="data_1.js"></script>
 		<!-- script -->
-		<script type="text/javascript" src="scr_min.js"></script>
-		<!--script type="text/javascript" src="main.js"></script>
+		<!--script type="text/javascript" src="scr_min.js"></script-->
+		<script type="text/javascript" src="main.js"></script>
 		<script type="text/javascript" src="search.js"></script>
-		<script type="text/javascript" src="rep.js"></script-->
+		<script type="text/javascript" src="rep.js"></script>
 		<!-- css -->
 		<!--link rel="stylesheet" href="style_min.css"-->
 		<link rel="stylesheet" href="style_general.css">
@@ -47,27 +47,6 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400;700&display=swap" rel="stylesheet">
-		<!-- preloading icons -->
-		<link rel="prefetch" href="icon/arrow.png">
-		<link rel="prefetch" href="icon/arrow_combine.png">
-		<link rel="prefetch" href="icon/arrow_seperate.png">
-		<link rel="prefetch" href="icon/cbx_check.png">
-		<link rel="prefetch" href="icon/cbx_cross.png">
-		<link rel="prefetch" href="icon/cbx_minus.png">
-		<link rel="prefetch" href="icon/cbx_switch.png">
-		<link rel="prefetch" href="icon/copy.png">
-		<link rel="prefetch" href="icon/cross.png">
-		<link rel="prefetch" href="icon/info.png">
-		<link rel="prefetch" href="icon/link.png">
-		<link rel="prefetch" href="icon/list.png">
-		<link rel="prefetch" href="icon/menu.png">
-		<link rel="prefetch" href="icon/random.png">
-		<link rel="prefetch" href="icon/share.png">
-		<link rel="prefetch" href="icon/sigma.png">
-		<link rel="prefetch" href="icon/target.png">
-		<link rel="prefetch" href="icon/to_top.png">
-		<link rel="prefetch" href="icon/to_yt.png">
-		<link rel="prefetch" href="icon/trash.png">
 	</head>
     <body oncontextmenu="return false;">
 		<iframe id="v_screen" frameBorder="0"></iframe>
@@ -162,13 +141,12 @@
 				</div>
 			</div>
 			<div class="home_general_block">
-				<div class="home_general_title">PC用</div>
+				<div class="home_general_title">database</div>
 				<div class="home_general_content">
 					<a href="https://docs.google.com/spreadsheets/d/1DSU1xBxXEZodMQCCu7hWsvdxWt-K0biXI5tt5_RD_DQ/" class="google_sheets" target="_blank">Google Sheets</a>
 				</div>
 			</div>
 			<div id="home_key" class="hidden">
-				<div id="home_key_stat">キー入力済み</div>
 				<div id="home_key_reset">キー削除</div>
 			</div>
 		</div>
@@ -263,12 +241,12 @@
 			<div id="filter_container">
 				<div id="filter_entry">
 					<div id="filter_entry_title" class="filter_title">
-						<div id="filter_entry_title_name" class="filter_title_name">既存</div>
+						<div id="filter_entry_title_name" class="filter_title_name">メンバー/既存</div>
 						<div id="filter_entry_close" class="filter_close closed"></div>
 					</div>
 					<div id="filter_entry_content" class="hidden">
-						<div id="filter_entry_icon_container" class="filter_subblock_content ">
-							<p class="filter_subblock_title">既存選択</p>
+						<div id="filter_entry_icon_container" class="filter_subblock_content anti_extra">
+							<p class="filter_subblock_title">メンバー/既存選択</p>
 							<div class="icon_kirara_frame filter_icon_bg">
 								<span class="icon_kirara filter_icon selected"></span>
 							</div>
@@ -278,19 +256,9 @@
 							<div class="icon_nia_frame filter_icon_bg">
 								<span class="icon_nia filter_icon selected"></span>
 							</div>
-							<div class="filter_singer_group_container">
-								<label id="filter_icon_union" class="filter_singer_group">
-									<div id="singer_union" class="radio singer_checkbox selected"></div>
-									<div class="attr_name">部分一致</div>
-								</label>
-								<label id="filter_icon_inter" class="filter_singer_group">
-									<div id="singer_inter" class="radio singer_checkbox"></div>
-									<div class="attr_name">完全一致</div>
-								</label>
-							</div>
 						</div>
 						<div id="filter_entry_icon_extra" class="filter_subblock_content hidden">
-							<p class="filter_subblock_title">既存選択</p>
+							<p class="filter_subblock_title">メンバー/既存選択</p>
 							<div class="icon_kirara_frame filter_icon_bg_extra">
 								<span class="icon_kirara filter_icon_extra selected"></span>
 							</div>
@@ -308,16 +276,6 @@
 							</div>
 							<div class="icon_yuco_frame filter_icon_bg_extra">
 								<span class="icon_yuco filter_icon_extra selected"></span>
-							</div>
-							<div class="filter_singer_group_extra">
-								<label id="filter_icon_union" class="filter_singer_group">
-									<div id="singer_union" class="radio singer_checkbox selected"></div>
-									<div class="attr_name">部分一致</div>
-								</label>
-								<label id="filter_icon_inter" class="filter_singer_group">
-									<div id="singer_inter" class="radio singer_checkbox"></div>
-									<div class="attr_name">完全一致</div>
-								</label>
 							</div>
 						</div>
 					</div>
@@ -393,7 +351,11 @@
 								<div id="general_cha" class="checkbox genre_general_checkbox selected"></div>
 								<div class="genre_name">キャラソン</div>
 							</label>
-							<label id="genre_container_general_other" class="filter_genre_general_item row-5 col-2">
+							<label id="genre_container_general_dis" class="filter_genre_general_item row-5 col-2">
+								<div id="general_dis" class="checkbox genre_general_checkbox selected"></div>
+								<div class="genre_name">ディズニー</div>
+							</label>
+							<label id="genre_container_general_other" class="filter_genre_general_item row-5 col-3">
 								<div id="general_other" class="checkbox genre_general_checkbox selected"></div>
 								<div class="genre_name">その他</div>
 							</label>
@@ -460,7 +422,7 @@
 				<div id="menu2page_container">
 					<div id="menu2page_home" class="menu2page menu2page_selected">ホーム</div>
 					<div id="menu2page_search" class="menu2page">曲検索</div>
-					<div id="menu2page_repertoire" class="menu2page">レパートリー一覧</div>
+					<div id="menu2page_repertoire" class="menu2page">レパートリー</div>
 				</div>
 				<div id="menu_bottom">
 					<div id="menu_line"></div>
@@ -470,68 +432,60 @@
 			</div>
 		</div>
 		<div id="popup_container" class="hidden">
-			<div id="information" class="hidden">
-				<div id="info_defog">
-					<h3>詳細情報</h3>
-					version : <span id="info_version"></span><br />
-					last update : <span id="info_last-update"></span><br />
-					<div>
-						Creator : shizuku3158<br />
-						<a href="https://www.twitter.com/8513ukuzihs" id="info_twitter" target="_blank" class="twitter">twitter</a>
+			<div id="information" class="popup_frame hidden">
+				<h3>詳細情報</h3>
+				version : <span id="info_version"></span><br />
+				last update : <span id="info_last-update"></span><br />
+				<div>
+					Creator : shizuku3158<br />
+					<div id="info_bug-report">
+						<a href="https://forms.gle/YSmBFgWRmpfRmJd6A" target="_blank" class="google_forms">不具合報告</a>
+					</div>
+					<div id="info_github">
+						<a href="https://github.com/szk31/pcsl/blob/main/README.md" target="_blank" class="github">使い方</a>
 					</div>
 				</div>
 			</div>
-			<div id="rep_list" class="hidden">
-				<div id="rep_list_defog">
-					<div class="rep_list_title_container">
-						<div class="rep_list_delete_container row-1 col-1">
-							<div class="rep_list_delete hidden"></div>
-						</div>
-						<h3 class="row-1 col-2">リクエスト</h3>
-						<div class="rep_list_wc_container row-1 col-3">
-							<div class="rep_list_wordcount"></div>
-						</div>
+			<div id="rep_list" class="popup_frame hidden">
+				<div class="rep_list_title_container">
+					<div class="rep_list_delete_container row-1 col-1">
+						<div class="rep_list_delete hidden"></div>
 					</div>
-					<div id="rep_list_container">
-						<div id="rep_list_leftbar" class="hidden"></div>
-						<div id="rep_list_content" class="scrollbar"></div>
+					<h3 class="row-1 col-2">リクエスト</h3>
+					<div class="rep_list_wc_container row-1 col-3">
+						<div class="rep_list_wordcount"></div>
 					</div>
-					<div class="rep_list_control grid_block-2">
-						<div id="rep_list_artist" class="row-1 col-1 rep_item">
-							<div id="list_artist_cb" class="checkbox selected"></div>
-							<div class="sort_name">アーティスト名</div>
-						</div>
-						<div id="rep_list_edit" class="row-1 col-2">編集</div>
-						<div id="rep_list_close" class="row-2 col1">閉じる</div>
-						<div id="rep_share_rap" class="row-2 col-2">
-							<div id="rep_compose_tweet" class="twitter col-1">ツイート</div>
-							<div id="rep_copy" class="col-2"></div>
-						</div>
+				</div>
+				<div id="rep_list_container">
+					<div id="rep_list_leftbar" class="hidden"></div>
+					<div id="rep_list_content" class="scrollbar"></div>
+				</div>
+				<div class="rep_list_control grid_block-2">
+					<div id="rep_list_artist" class="row-1 col-1 rep_item">
+						<div id="list_artist_cb" class="checkbox selected"></div>
+						<div class="sort_name">アーティスト名</div>
+					</div>
+					<div id="rep_list_edit" class="row-1 col-2">編集</div>
+					<div id="rep_list_close" class="row-2 col1">閉じる</div>
+					<div id="rep_share_rap" class="row-2 col-2">
+						<div id="rep_compose_tweet" class="twitter col-1">ツイート</div>
+						<div id="rep_copy" class="col-2"></div>
 					</div>
 				</div>
 			</div>
-			<div id="memcount" class="hidden">
-				<div id="memcount_defog" class="memcount_subblock">
-					<h3>メンバー別曲数</h3>
-					<div id="memcount_content"></div>
-				</div>
-				<div id="memcount_rep_defog" class="memcount_subblock hidden">
-					<h3>レパートリー曲数</h3>
-					<div id="memcount_rep_content"></div>
-				</div>
+			<div id="memcount" class="popup_frame memcount_subblock anti_extra hidden">
+				<h3>メンバー別曲数</h3>
+				<div id="memcount_content"></div>
 			</div>
-			<div id="tag_selector" class="hidden">
-				<div id="tag_selector_defog">
-					<!-- nah i bet no one uses this, or sees this -->
-				</div>
+			<div id="memcount_rep" class="popup_frame memcount_subblock anti_extra hidden">
+				<h3>レパートリー曲数</h3>
+				<div id="memcount_rep_content"></div>
 			</div>
-			<div id="remove_key" class="hidden">
-				<div id="remove_key_defog">
-					<div id="remove_key_text">本当にキーを削除しますか？</div>
-					<div id="remove_key_options">
-						<div id="remove_key_nah">削除しない</div>
-						<div id="remove_key_yes">削除する</div>
-					</div>
+			<div id="remove_key" class="popup_frame hidden">
+				<div id="remove_key_text">キーを削除しますか？</div>
+				<div id="remove_key_options">
+					<div id="remove_key_nah">削除しない</div>
+					<div id="remove_key_yes">削除する</div>
 				</div>
 			</div>
 		</div>
