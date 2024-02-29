@@ -146,12 +146,17 @@ if (getCookie("is_mobile") === "") {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
+	var key;
+	function decrypt(input) {
+		return content_level ? CryptoJS.AES.decrypt(input, key).toString(CryptoJS.enc.Utf8) : input;
+	}
+
 	// check if loading inner sector
 	if (is_mobile || (!is_mobile && window.innerHeight / window.innerWidth > 1.5)) {
-		// check url para forst
+		// check url para first
 		var url_para = new URLSearchParams(window.location.search);
-		var key = url_para.get("key");
-
+		key = url_para.get("key");
+		var load_from_cookie = true;
 		var content_level = 0;
 		// level 2 cookie
 		if (await getSHA384Hash(getCookie("pcsl_content_key")) === key_hash[1]) {
@@ -161,6 +166,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		// level 2 url para
 		else if (key !== "" && await getSHA384Hash(key) === key_hash[1]) {
 			content_level = 2;
+			load_from_cookie = false;
 		}
 		// level 1 cookie
 		else if (await getSHA384Hash(getCookie("pcsl_content_key")) === key_hash[0]) {
@@ -170,10 +176,21 @@ document.addEventListener('DOMContentLoaded', async function() {
 		// level 1 url para
 		else if (key !== "" && await getSHA384Hash(key) === key_hash[0]) {
 			content_level = 1;
+			load_from_cookie = false;
 		}
 		key_valid = content_level;
 		// load data
-		fetch(`data_${content_level}.txt`)
+		var local_version_hash = localStorage.getItem("pcsl_version_hash");
+		//  data version is up to date             key did not update
+		if (local_version_hash === version_hash && !load_from_cookie) {
+			// good to use old data
+			var ls_data = localStorage.getItem("pcsl_data").split("\n");
+			video = JSON.parse(decrypt(ls_data[0]));
+			entry = JSON.parse(decrypt(ls_data[0]));
+			process_data();
+		} else {
+			// need to refresh data
+			fetch(`data_${content_level}.txt`)
 			.then(response => {
 				if (!response.ok) {
 					// well idk, reload? maybe?
@@ -182,17 +199,17 @@ document.addEventListener('DOMContentLoaded', async function() {
 				return response.text();
 			})
 			.then(data => {
-				function decrypt(input) {
-					return content_level ? CryptoJS.AES.decrypt(input, key).toString(CryptoJS.enc.Utf8) : input;
-				}
-				
 				const objs = data.split("\n");
 				video = JSON.parse(decrypt(objs[0]));
 				entry = JSON.parse(decrypt(objs[1]));
-			})
-			.then(() => {
+
+				// save to local storage
+				localStorage.setItem("pcsl_data", data);
+				localStorage.setItem("pcsl_version_hash", version_hash);
 				process_data();
 			});
+		}
+		
 		// changing thing if content key
 		if (content_level) {
 			member_display_order = [7, 6, 5, 3, 4, 2, 1, 12, 10, 9];
