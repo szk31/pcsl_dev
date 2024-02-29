@@ -89,7 +89,9 @@ var video_idx = {
 	date : 1
 };
 
-var version = "1.5.8a";
+var video, entry;
+
+var version = "pre1.6.0";
 
 var key_hash = [
 	"473c05c1ae8349a187d233a02c514ac73fe08ff4418429806a49f7b2fe4ba0b7a36ba95df1d58b8e84a602258af69194", //thereIsNoPassword
@@ -114,8 +116,8 @@ var max_display = 100;
 // if on, display private entries despite not accessable
 var do_display_hidden = true;
 
-// if the previous input should be cleared when user tap input box
-var do_clear_input = false;
+// if the previous input should be selected when user tap input box
+var do_select_input = true;
 
 // if random requirement is ignored (input being blank)
 var do_random_anyway = false;
@@ -135,80 +137,87 @@ var memcount_rep_int;
 // pre-process song names
 var processed_song_name = [""];
 
-$(window).on("load", async function() {
-	var url_para = new URLSearchParams(window.location.search);
-	if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-		// on mobile, do nothing
-	} else {
-		// check screen ratio
-		// and hope nobody use some super-duper long screen
-		if (window.innerHeight / window.innerWidth < 1.3) {
-			// bad screen ratio, open new window
-			$("#v_screen").addClass("post_switch");
-			$("#v_screen").height("100%");
-			$("#v_screen").width(0.5625 * window.innerHeight);
-			$("#v_screen").attr("src", "index.html" + window.location.search);
-			// hide original page
-			$("body > div").addClass("post_switch");
-			$("body").addClass("post_switch");
-			url_para.delete("key");
-			window.history.replaceState(null, "", url_para.size === 0 ? "" : ("?" + url_para.toString()));
-			return;
+var is_mobile = getCookie("is_mobile");
+if (getCookie("is_mobile") === "") {
+	is_mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+	setCookie("is_mobile", is_mobile);
+} else {
+	is_mobile = is_mobile === "true";
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+	// check if loading inner sector
+	if (is_mobile || (!is_mobile && window.innerHeight / window.innerWidth > 1.5)) {
+		// check url para forst
+		var url_para = new URLSearchParams(window.location.search);
+		var key = url_para.get("key");
+
+		var content_level = 0;
+		// level 2 cookie
+		if (await getSHA384Hash(getCookie("pcsl_content_key")) === key_hash[1]) {
+			content_level = 2;
+			key = getCookie("pcsl_content_key");
+		}
+		// level 2 url para
+		else if (key !== "" && await getSHA384Hash(key) === key_hash[1]) {
+			content_level = 2;
+		}
+		// level 1 cookie
+		else if (await getSHA384Hash(getCookie("pcsl_content_key")) === key_hash[0]) {
+			content_level = 1;
+			key = getCookie("pcsl_content_key");
+		}
+		// level 1 url para
+		else if (key !== "" && await getSHA384Hash(key) === key_hash[0]) {
+			content_level = 1;
+		}
+		key_valid = content_level;
+		// load data
+		fetch(`data_${content_level}.txt`)
+			.then(response => {
+				if (!response.ok) {
+					// well idk, reload? maybe?
+					console.log(`failed to load data_${content_level}.txt`);
+				}
+				return response.text();
+			})
+			.then(data => {
+				function decrypt(input) {
+					return content_level ? CryptoJS.AES.decrypt(input, key).toString(CryptoJS.enc.Utf8) : input;
+				}
+				
+				const objs = data.split("\n");
+				video = JSON.parse(decrypt(objs[0]));
+				entry = JSON.parse(decrypt(objs[1]));
+			})
+			.then(() => {
+				process_data();
+			});
+		// changing thing if content key
+		if (content_level) {
+			member_display_order = [7, 6, 5, 3, 4, 2, 1, 12, 10, 9];
+			$(".extra").removeClass("hidden");
+			$(".memcount_subblock").removeClass("anti_extra");
+			$(".anti_extra").html("");
+			$(".anti_extra").addClass("hidden");
+			$("#home_key").removeClass("hidden");
+			$("#filter_entry_icon_container").addClass("hidden");
+			$("#filter_entry_icon_extra").removeClass("hidden");
+			// update expire day
+			removeCookie("pcsl_content_key");
+			setCookie("pcsl_content_key", key);
 		}
 	}
-	do {
-		// 1.   private key
-		// 1-1. if have valid key in cookie
-		if (await getSHA384Hash(getCookie("pcsl_content_key")) === key_hash[1]) {
-			load_encrpyted_data(1);
-			break;
-		}
-		
-		// 1-2. scan for url para
-		var key = url_para.get("key");
-		// if key para exist and sha384 hash matches
-		if (key !== "" && await getSHA384Hash(key) === key_hash[1]) {
-			// save to cookie
-			setCookie("pcsl_content_key", key);
-			url_para.delete("key");
-			window.history.replaceState(null, null, "?" + url_para.toString());
-			load_encrpyted_data(1);
-			break;
-		}
-		
-		// 2.   public key
-		// 2-1. scan for public key in cookie
-		if (await getSHA384Hash(getCookie("pcsl_content_key")) === key_hash[0]) {
-			load_encrpyted_data(0);
-			break;
-		}
-		
-		// 2-2. scan for url para
-		// if key para exist and sha384 hash matches
-		if (key !== "" && await getSHA384Hash(key) === key_hash[0]) {
-			// save to cookie
-			setCookie("pcsl_content_key", key);
-			url_para.delete("key");
-			window.history.replaceState(null, null, "?" + url_para.toString());
-			load_encrpyted_data(0);
-			break;
-		}
-		// wrong key or no key in cookie, delete anyway
-		removeCookie("pcsl_content_key");
-		// remove extra to prevent ID crash
-		$(".extra").html("");
-	} while (0);
-	
-	// remove encryped data
-	entry_enc = [null, null];
-	video_enc = [null, null];
-	
+});
+
+function process_data() {
+	var url_para = new URLSearchParams(window.location.search);
 	// get settings from cookie
 	if (getCookie("pcsl_settings_display") === "") {
 		// cookie not set
 		setCookie("pcsl_settings_display", 100);
 		setCookie("pcsl_settings_hidden" , 1);
-		setCookie("pcsl_settings_clear"  , 0);
+		setCookie("pcsl_settings_select" , 1);
 		setCookie("pcsl_settings_random" , 0);
 		setCookie("pcsl_settings_share"  , 0);
 	} else {
@@ -333,6 +342,20 @@ $(window).on("load", async function() {
 	}
 	// remove loading screen
 	$("#loading_overlay").addClass("hidden");
+}
+
+$(window).on("load", async function() {
+	if (!is_mobile && window.innerHeight / window.innerWidth < 1.5) {
+		// bad screen ratio, open new window
+		$("#v_screen").addClass("post_switch");
+		$("#v_screen").height("100%");
+		$("#v_screen").width(0.5625 * window.innerHeight);
+		$("#v_screen").attr("src", "index.html" + window.location.search);
+		// hide original page
+		$("body > div").addClass("post_switch");
+		$("body").addClass("post_switch");
+		return;
+	}
 });
 
 $(function() {

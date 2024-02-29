@@ -1,6 +1,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
+		<meta name="theme-color" content="#6E24B7" />
 		<meta name="HandheldFriendly" content="true" />
 		<meta name="MobileOptimized" content="320" />
 		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no" />
@@ -10,8 +11,7 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 		<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 		<!-- data -->
-		<script type="text/javascript" src="data_0.js"></script>
-		<script type="text/javascript" src="data_1.js"></script>
+		<script type="text/javascript" src="data.js"></script>
 		<!-- script -->
 		<!--script type="text/javascript" src="scr_min.js"></script-->
 		<script type="text/javascript" src="main.js"></script>
@@ -220,9 +220,9 @@
 						<div id="search_options_btn_displayHidden" class="checkbox search_options_checkbox selected"></div>
 						<div class="attr_name">非公開動画表示</div>
 					</label>
-					<label id="search_options_reset" class="search_option_group4 row-2 col-1">
-						<div id="search_options_btn_reset" class="checkbox search_options_checkbox"></div>
-						<div class="attr_name">入力リセット</div>
+					<label id="search_options_select" class="search_option_group4 row-2 col-1">
+						<div id="search_options_btn_select" class="checkbox search_options_checkbox selected"></div>
+						<div class="attr_name">入力自動選択</div>
 					</label>
 					<label id="search_options_randomAnyway" class="search_option_group4 row-2 col-2">
 						<div id="search_options_btn_randomAnyway" class="checkbox search_options_checkbox"></div>

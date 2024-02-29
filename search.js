@@ -25,6 +25,8 @@ var auto_display_max;
 // flag : is loading songs from rep selected
 var is_searching_from_rep = false;
 
+var search_input_focused = false;
+
 $(function() {
 	// nav - random
 	$(document).on("click", "#nav_search_random", function() {
@@ -101,6 +103,7 @@ $(function() {
 		// search - input - submit
 		$(document).on("blur", "#input", function() {
 			$("#search_auto").addClass("hidden");
+			search_input_focused = false;
 			is_searching_from_rep ? is_searching_from_rep = 0 : $("#nav_share").toggleClass("disabled", !is_searching_from_rep);
 			search();
 		});
@@ -113,9 +116,20 @@ $(function() {
 		});
 		
 		// search - input::focus -> reset, auto complete
-		$(document).on("focus", "#input", function(e) {
-			if (do_clear_input || loading === "!bulk_load_flag") {
-				$(e.target).val("");
+		$(document).on("click", "#input", function() {
+			if (search_input_focused) {
+				return;
+			}
+			search_input_focused = true;
+			if (do_select_input) {
+				var pass = this;
+				setTimeout(function() {
+					pass.setSelectionRange(0, $(pass).val().length);
+				}, 0);
+				return;
+			}
+			if (loading === "!bulk_load_flag") {
+				$(this).val("");
 				$("#nav_search_random").removeClass("disabled");
 				$("#nav_share").addClass("disabled");
 			}
@@ -218,9 +232,9 @@ $(function() {
 					update_display();
 					setCookie("pcsl_settings_hidden" , do_display_hidden ? 1 : 0);
 					break;
-				case "reset" :
-					do_clear_input ^= 1;
-					setCookie("pcsl_settings_clear" , do_clear_input ? 1 : 0);
+				case "select" :
+					do_select_input ^= 1;
+					setCookie("pcsl_settings_select" , do_select_input ? 1 : 0);
 					break;
 				case "randomAnyway" :
 					do_random_anyway ^= 1;
