@@ -181,8 +181,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 		key_valid = content_level;
 		// load data
 		var local_version_hash = localStorage.getItem("pcsl_version_hash");
+		console.log(`local_ver: ${local_version_hash}\ndata_ver: ${version_hash}\nload_from_cookie: ${load_from_cookie}`);
 		//  data version is up to date             key did not update
-		if (local_version_hash === version_hash && !load_from_cookie) {
+		if (local_version_hash === version_hash && load_from_cookie) {
 			// good to use old data
 			var ls_data = localStorage.getItem("pcsl_data").split("\n");
 			video = JSON.parse(decrypt(ls_data[0]));
