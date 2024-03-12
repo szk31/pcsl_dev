@@ -1,5 +1,6 @@
 #home_section {
 	margin-top : 10vw;
+	padding-bottom: 1vw;
 }
 
 .home_title {
@@ -12,7 +13,7 @@
 	margin : 2vw 4vw;
 	padding : 2vw;
 	border-radius : 2vw;
-	border : .4vw solid color-mix(in srgb, currentColor 72%, White);
+	border : .4vw solid color-mix(in srgb, currentColor 72%, var(--base-back));
 	
 	display : grid;
 	grid-template-columns: 30% 70%;
@@ -54,8 +55,8 @@
 .home_general_block {
 	margin-top : 6vw;
 	padding-top : 2.4vw;
-	background-color : HoneyDew;
-	color : MidnightBlue;
+	background-color : var(--filter-back-alt);
+	color : var(--filter-text);
 }
 
 .home_general_content {

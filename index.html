@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="ja-JP">
 	<head>
 		<meta charset="UTF-8">
@@ -9,7 +10,7 @@
 		<link rel="icon" type="image/png" href="icon/icon.png">
 		<!-- using libraries -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
-		<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+		<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
 		<!-- data -->
 		<script type="text/javascript" src="data.js"></script>
 		<script type="text/javascript" src="version_hash.js"></script>
@@ -24,14 +25,17 @@
 		<link rel="stylesheet" href="style_home.css">
 		<link rel="stylesheet" href="style_search.css">
 		<link rel="stylesheet" href="style_repertoire.css">
+		<link rel="preload" as="image" href="icon/kirara.webp">
+		<link rel="preload" as="image" href="icon/momo.webp">
+		<link rel="preload" as="image" href="icon/nia.webp">
 		<style>
 			#loading_overlay {
 				position : fixed;
 				top : 0;
 				width : 100%;
 				height : 100%;
-				background-color : Black;
-				z-index : 2147483646;
+				background-color : rgba(0, 0, 0, 0.666);
+				z-index : 99;
 			}
 
 			#loading_text {
@@ -39,6 +43,7 @@
 				color : White;
 				font-size : 20px;
 				font-weight : bold;
+
 				left : 50%;
 				top : 50%;
 				transform: translate(-50%, -50%);
@@ -209,36 +214,11 @@
 						<div class="attr_name">古い順&nbsp;(⇌新しい順)</div>
 					</label>
 				</div>
-				<div class="search_options_title">その他</div>
-				<div class="search_options_underline"></div>
-				<div class="search_options_subblock search_grid_2">
-					<label id="search_options_count" class="row-1 col-1">
-						<div class="search_options_count_text attr_name">
-							最大表示数：<input id="search_options_count_input" type="tel" inputmode="numeric" value="100">
-						</div>
-					</label>
-					<label id="search_options_displayHidden" class="search_option_group4 row-1 col-2">
-						<div id="search_options_btn_displayHidden" class="checkbox search_options_checkbox selected"></div>
-						<div class="attr_name">非公開動画表示</div>
-					</label>
-					<label id="search_options_select" class="search_option_group4 row-2 col-1">
-						<div id="search_options_btn_select" class="checkbox search_options_checkbox selected"></div>
-						<div class="attr_name">入力自動選択</div>
-					</label>
-					<label id="search_options_randomAnyway" class="search_option_group4 row-2 col-2">
-						<div id="search_options_btn_randomAnyway" class="checkbox search_options_checkbox"></div>
-						<div class="attr_name">ランダム条件無視</div>
-					</label>
-					<label id="search_options_shareWeb" class="search_option_group4 row-3 rowspan-2">
-						<div id="search_options_btn_shareWeb" class="checkbox search_options_checkbox"></div>
-						<div class="attr_name">共有のとき検索用URL付き</div>
-					</label>
-				</div>
 			</div>
 			<span id="search_display"></span>
 		</div>
 		<div id="repertoire_section" class="section_container hidden">
-			<input id="rep_input" type="text" placeholder="曲名で検索" autocomplete="off">
+			<input id="rep_input" type="text" placeholder="曲名/読みで検索" autocomplete="off">
 			<div id="filter_container">
 				<div id="filter_entry">
 					<div id="filter_entry_title" class="filter_title">
@@ -310,6 +290,7 @@
 								<div class="genre_name">その他</div>
 							</label>
 						</div>
+						<div class="general_vertical_space"></div>
 						<div id="filter_genre_general_container" class="filter_subblock_content grid_block-3">
 							<p class="filter_subblock_title row-1 rowspan-3">ジャンル別</p>
 							<label id="genre_container_general_all" class="filter_genre_general_item row-2 col-1">
@@ -365,7 +346,7 @@
 				</div>
 				<div id="filter_sort">
 					<div id="filter_sort_title" class="filter_title">
-						<div id="filter_sort_title_name" class="filter_title_name">並び順/表示</div>
+						<div id="filter_sort_title_name" class="filter_title_name">並び順</div>
 						<div id="filter_sort_close" class="filter_close closed"></div>
 					</div>
 					<div id="filter_sort_content" class="hidden">
@@ -397,21 +378,6 @@
 								<div id="sort_name_selected" class="sort_name">選択済み優先</div>
 							</label>
 						</div>
-						<div id="filter_display_container" class="filter_subblock_content grid_block-3_type2">
-							<p class="filter_subblock_title row-1 rowspan-2">表示アイテム</p>
-							<label id="display_container_attrdata" class="filter_display_item row-2 col-1">
-								<div id="display_attrdata" class="radio display_checkbox"></div>
-								<div class="display_name">属性情報</div>
-							</label>
-							<label id="display_container_release" class="filter_display_item row-2 col-2">
-								<div id="display_release" class="radio display_checkbox"></div>
-								<div class="display_name">リリース日付</div>
-							</label>
-							<label id="display_container_none" class="filter_display_item row-2 col-3">
-								<div id="display_none" class="radio display_checkbox selected"></div>
-								<div class="display_name">なし</div>
-							</label>
-						</div>
 					</div>
 				</div>
 			</div>
@@ -427,6 +393,7 @@
 				</div>
 				<div id="menu_bottom">
 					<div id="menu_line"></div>
+					<div id="menu_setting"><span id="menu_setting_icon"></span>設定</div>
 					<div id="menu_count"><span id="menu_count_icon"></span>メンバー別合計</div>
 					<div id="menu_info"><span id="menu_info_icon"></span>詳細情報</div>
 				</div>
@@ -444,6 +411,57 @@
 					</div>
 					<div id="info_github">
 						<a href="https://github.com/szk31/pcsl/blob/main/README.md" target="_blank" class="github">使い方</a>
+					</div>
+				</div>
+			</div>
+			<div id="settings" class="popup_frame hidden">
+				<div id="settings_inner">
+					<div class="settings_title">設定</div>
+					<div class="settings_inner_title">全般</div>
+					<div class="settings_option">
+						<div>表示色</div>
+						<div class="three_way">
+							<div id="three_way_light">L</div>
+							<div id="three_way_mixed">M</div>
+							<div id="three_way_dark">D</div>
+						</div>
+					</div>
+					<div class="settings_inner_title">曲検索</div>
+					<div class="settings_option">
+						<div>非公開動画表示</div>
+						<div id="setting_hidden" class="two_way">
+							<div class="selected">表示</div>
+							<div>非表示</div>
+						</div>
+					</div>
+					<div class="settings_option">
+						<div>入力自動選択</div>
+						<div id="setting_select" class="two_way">
+							<div class="selected">する</div>
+							<div>しない</div>
+						</div>
+					</div>
+					<div class="settings_option">
+						<div>ランダムボタン表示</div>
+						<div id="setting_random" class="two_way">
+							<div>表示</div>
+							<div class="selected">非表示</div>
+						</div>
+					</div>
+					<div class="settings_option">
+						<div class="setting_req_random">ランダム条件無視</div>
+						<div id="setting_ignore" class="two_way setting_req_random">
+							<div>する</div>
+							<div class="selected">しない</div>
+						</div>
+					</div>
+					<div class="settings_inner_title">レパートリー</div>
+					<div class="settings_option">
+						<div>リリース日付表示</div>
+						<div id="setting_release" class="two_way">
+							<div>表示</div>
+							<div class="selected">非表示</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -493,7 +511,7 @@
 		<div id="copy_popup" class="hidden">クリップボードに<br />保存しました</div>
 		<div id="search_auto" class="hidden"></div>
 		<div id="loading_overlay">
-			<div id="loading_text">Loading...</div>
+			<div id="loading_text">Loading page...</div>
 		</div>
     </body>
 </html>

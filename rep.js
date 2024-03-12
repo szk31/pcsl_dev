@@ -21,7 +21,6 @@ var attr_idx = [
 var rep_list = [];
 // singer selection
 var rep_singer = [1, 1, 1, 1, 1, 1];
-var rep_part_singer = [1, 1, 1, 1, 1, 1];
 
 // anisong selection
 var rep_anisong = {
@@ -44,14 +43,16 @@ var rep_genre = {
 	dis : [1, 14],
 	other : [1, 0]
 };
+// songs no longer have karaoke available
+var oke_gone = [
+	"ノーザンクロス"
+];
 // sort method
 var rep_sort = "50";
 // sort order
 var rep_sort_asd = true;
 // if display selected first
 var rep_display_selected_first = false;
-// display info
-var rep_info = "none";
 // editing list - selected song
 var rep_edit_selected = -1;
 /* rep_edit_selected :
@@ -140,7 +141,6 @@ $(function() {
 					return;
 			}
 			rep_singer[f] ^= 1;
-			rep_part_singer[f] ^= 1;
 			$(this).toggleClass("selected");
 			rep_search(true);
 		});
@@ -253,19 +253,6 @@ $(function() {
 			rep_display_selected_first ^= 1;
 			$(".sort3_checkbox").toggleClass("selected", rep_display_selected_first);
 			// update
-			rep_display();
-		});
-		
-		// filter - display
-		$(document).on("click", ".filter_display_item", function() {
-			var e = $(this).attr("id").replace(/(display_container_)/, "");
-			// check if clicking on the same item
-			if (rep_info === e) {
-				return;
-			}
-			$(".display_checkbox").removeClass("selected");
-			$("#display_" + e).addClass("selected");
-			rep_info = e;
 			rep_display();
 		});
 		
@@ -580,7 +567,7 @@ function rep_search(force = false) {
 	rep_display();
 }
 
-var reb_display_inter;
+var rep_display_inter;
 
 function rep_display() {
 	if (rep_display_selected_first) {
@@ -661,7 +648,8 @@ function rep_display() {
 	// actual displaying
 	rep_loading_progress = 0;
 	rep_display_loop();
-	reb_display_inter = setInterval(rep_display_loop, 10);
+	clearInterval(rep_display_inter);
+	rep_display_inter = setInterval(rep_display_loop, 10);
 }
 
 var rep_loading_progress = 0;
@@ -672,11 +660,13 @@ function rep_display_loop() {
 		// sang count
 		var sang_count = get_sang_count(rep_hits[i], selected_member);
 		// container div
-		var new_html = "<div class=\"rep_song_container" + (rep_selected.includes(rep_hits[i]) ? " selected" : "") + ((sang_count[0] > 0) && (sang_count[0] === sang_count[1]) ? " rep_mem_only" : "") + "\" id=\"rep_song_" + rep_hits[i] + "\">";
+		var new_html = "<div class=\"rep_song_container" + (rep_selected.includes(rep_hits[i]) ? " selected" : "") + ((sang_count[0] > 0) && (sang_count[0] === sang_count[1]) ? " rep_mem_only" : "") + "\" id=\"rep_song_" + rep_hits[i] + "\"><div class=\"rep_song_row1\">";
 		// title
 		new_html += ("<div class=\"rep_song_title\">" + song[rep_hits[i]][song_idx.name] + " / " + song[rep_hits[i]][song_idx.artist] + "</div>");
+		// bad karaoke
+		new_html += ("<div class=\"rep_song_nooke\">" + (oke_gone.includes(song[rep_hits[i]][song_idx.name]) ? "オケ消滅" : "") + "</div>");
 		// info line1
-		new_html += "<div class=\"rep_song_info grid_block-4\">";
+		new_html += "</div><div class=\"rep_song_info grid_block-4\">";
 		// last sang
 		var last_sang = get_last_sang(rep_hits[i], selected_member);
 		var delta_last = last_sang === 0 ? -1 : get_date_different(last_sang);
@@ -686,32 +676,18 @@ function rep_display_loop() {
 		// type
 		new_html += ("<div class=\"rep_song_singer" + (key_valid ? " rep_singer_2rows" : "") + "\"><div class=\"" + (rep_hits_solo[rep_hits[i]].includes(4) ? "rep_song_kirara" : "rep_song_empty") + "\"></div><div class=\"" + (rep_hits_solo[rep_hits[i]].includes(2) ? "rep_song_momo" : "rep_song_empty") + "\"></div><div class=\"" + (rep_hits_solo[rep_hits[i]].includes(1) ? "rep_song_nia" : "rep_song_empty") + "\"></div>" + (key_valid ? ("<div class=\"" + (rep_hits_solo[rep_hits[i]].includes(12) ? "rep_song_chui" : "rep_song_empty") + "\"></div><div class=\"" + (rep_hits_solo[rep_hits[i]].includes(10) ? "rep_song_shiro" : "rep_song_empty") + "\"></div><div class=\"" + (rep_hits_solo[rep_hits[i]].includes(9) ? "rep_song_yuco" : "rep_song_empty") + "\"></div>") : "") + "</div>");
 		// extra info
-		switch (rep_info) {
-			case "release" : 
-				new_html += ("<div class=\"rep_extra_info\"> (" + display_date(to8601(song[rep_hits[i]][song_idx.release])) + ")</div>");
-				break;
-			case "attrdata" : 
-				var attr_count = {asm : 0, gui : 0, aca : 0};
-				for (var j in entry_proc[rep_hits[i]]) {
-					// only get attr if the entry satisfy selected singer
-					if (selected_member.includes(entry[entry_proc[rep_hits[i]][j]][entry_idx.type])) {
-						attr_count[get_attr(entry_proc[rep_hits[i]][j])]++;
-					}
-				}
-				new_html += ("<div class=\"rep_extra_info grid_block-3\"><div class=\"row-1 col-1\">" + (attr_count.asm > 0 ? "A弾" + attr_count.asm : "") + "</div><div class=\"row-1 col-2\">" + (attr_count.gui > 0 ? "弾" + attr_count.gui : "") + "</div><div class=\"row-1 col-3\">" + (attr_count.aca > 0 ? "アカ" + attr_count.aca : "") + "</div></div>");
-			case "none" :
-				// do nothing
-				new_html += "<div></div>";
-			default : 
-				// error
-				break;
+		if (do_show_release) {
+			new_html += ("<div class=\"rep_extra_info\"> (" + display_date(to8601(song[rep_hits[i]][song_idx.release])) + ")</div>");
+		} else {
+			new_html += "<div></div>";
 		}
 		$("#rep_display").append(new_html + "</div></div>");
 	}
 	// call itself again if not finished
 	rep_loading_progress += 20;
 	if (rep_loading_progress >= rep_hits.length) {
-		clearInterval(reb_display_inter);
+		clearInterval(rep_display_inter);
+		$("#rep_display").append("<div class=\"general_vertical_space\"></div>")
 	}
 }
 

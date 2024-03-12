@@ -94,7 +94,7 @@ $(function() {
 		
 		// search - input - autocomplete - selection
 		$(document).on("mousedown", ".auto_panel", function() {
-			var e = $(this).attr("id");
+			var e = to_non_html($(this).attr("id"));
 			// set input
 			$("#input").val(e);
 			// input on blur fires after this so no need to run search here
@@ -126,9 +126,8 @@ $(function() {
 				setTimeout(function() {
 					pass.setSelectionRange(0, $(pass).val().length);
 				}, 0);
-				return;
 			}
-			if (loading === "!bulk_load_flag") {
+			else if (loading === "!bulk_load_flag") {
 				$(this).val("");
 				$("#nav_search_random").removeClass("disabled");
 				$("#nav_share").addClass("disabled");
@@ -198,53 +197,6 @@ $(function() {
 			(search_sort_asd ? "古い順&nbsp;(⇌新しい順)" : "新しい順&nbsp;(⇌古い順)") : 
 			(search_sort_asd ? "正順&nbsp;(⇌逆順)" : "逆順&nbsp;(⇌正順)"));
 			update_display();
-		});
-		
-		// search - options - others - max display - input
-		$(document).on("input", "#search_options_count_input", function() {
-			max_count_update(this);
-		});
-		
-		// search - options - others - max display
-		$(document).on("blur", "#search_options_count_input", function() {
-			// check min max
-			var e = Math.min(400, Math.max(1, parseInt($("#search_options_count_input").val())));
-			$("#search_options_count_input").val(e);
-			max_display = e;
-			update_display();
-			setCookie("pcsl_settings_display", e);
-		});
-		
-		// search - options - others - max display - blur
-		$(document).on("keydown", function(e) {
-			if (e.keyCode === 13) {
-				$("#search_options_count_input").blur();
-			}
-		});
-		
-		// search - options - others
-		$(document).on("click", ".search_option_group4", function() {
-			var btn_id = $(this).attr("id").replace(/(search_options_)/, "");
-			$("#search_options_btn_" + btn_id).toggleClass("selected");
-			switch (btn_id) {
-				case "displayHidden" :
-					do_display_hidden ^= 1;
-					update_display();
-					setCookie("pcsl_settings_hidden" , do_display_hidden ? 1 : 0);
-					break;
-				case "select" :
-					do_select_input ^= 1;
-					setCookie("pcsl_settings_select" , do_select_input ? 1 : 0);
-					break;
-				case "randomAnyway" :
-					do_random_anyway ^= 1;
-					$("#nav_search_random").toggleClass("disabled", searching_song_name ? (do_random_anyway ? false : loading !== "") : true);
-					setCookie("pcsl_settings_random" , do_random_anyway ? 1 : 0);
-					break;
-				case "shareWeb" :
-					do_share_web ^= 1;
-					setCookie("pcsl_settings_share" , do_random_anyway ? 1 : 0);
-			}
 		});
 		
 		// search - song - hide_song
@@ -356,6 +308,18 @@ function auto_search() {
 				continue;
 			}
 			var f = song[i][song_idx.name].toLowerCase().indexOf(e);
+			// special notation in reading
+			if (f === -1) {
+				// get reading first space position
+				var space_pos = song[i][song_idx.reading].indexOf(" ");
+				if (space_pos > 0) {
+					//  position of searching string
+					if (song[i][song_idx.reading].indexOf(e) > space_pos) {
+						// hit
+						f = 1;
+					}
+				}	
+			}
 			switch (f) {
 				case  0 : // found, from beginning
 					if (entry_proc[i].length > 0) {
@@ -397,11 +361,11 @@ function auto_search() {
 			song_name = song[auto_exact[i]][song_idx.name];
 			auto_display = bold(song_name, e);
 		}
-		new_html += ("<div id=\"" + song_name + "\" class=\"auto_panel" + (auto_display_count === 0 ? " auto_first" : "") + "\"><div class=\"auto_reading\">" + auto_reading + "</div><div class=\"auto_display\">" + auto_display + "</div></div>");
+		new_html += ("<div id=\"" + to_html(song_name) + "\" class=\"auto_panel" + (auto_display_count === 0 ? " auto_first" : "") + "\"><div class=\"auto_reading\">" + auto_reading + "</div><div class=\"auto_display\">" + auto_display + "</div></div>");
 		auto_display_count++;
 	}
 	for (var i in auto_other) {
-		new_html += ("<div id=\"" + song[auto_other[i]][song_idx.name] + "\" class=\"auto_panel" + (auto_display_count === 0 ? " auto_first" : "") + "\"><div class=\"auto_reading\"></div><div class=\"auto_display\">" + bold(song[auto_other[i]][song_idx.name], e) + "</div></div>");
+		new_html += ("<div id=\"" + to_html(song[auto_other[i]][song_idx.name]) + "\" class=\"auto_panel" + (auto_display_count === 0 ? " auto_first" : "") + "\"><div class=\"auto_reading\"></div><div class=\"auto_display\">" + bold(song[auto_other[i]][song_idx.name], e) + "</div></div>");
 		
 		if (++auto_display_count >= auto_display_max) {
 			break;
@@ -632,7 +596,7 @@ function update_display(force = false) {
 				"</div>" + 
 				(no_note ? "" : ("<div class=\"entry_note\">" + note + "</div>")) + "</a>" + 
 			"</div>");
-			if (++displayed >= max_display) {
+			if (++displayed >= 400) {	// hardcoded max_display
 				i = 200;
 				break;
 			}
@@ -658,7 +622,7 @@ function update_display(force = false) {
 		new_html += "<div class=\"search_no_result\">歌記録なし";
 	} while (0);
 	
-	$("#search_display").html(new_html + "</div>");
+	$("#search_display").html(new_html + "</div><div class=\"general_vertical_space\"></div>");
 	// check all hiden songs
 	for (var i = 0; i < hide_song.length; ++i) {
 		// if song havnt been loaded, remove from hide list

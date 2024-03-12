@@ -3,24 +3,25 @@
 }
 
 #rep_input {
-    width: 96vw;
-    padding: 1vw 1vw;
+    width: 92vw;
+    padding: 0 1.8vw;
     margin: 1.5vw 2vw 0 2vw;
     height: 10vw;
     font-size: 5vw;
-	border-radius : 1.2vw;
+	border-radius : 2vw;
 }
 
 #filter_container>div {
 	height : auto;
 	width : 92vw;
 	margin : 2.4vw 2vw;
-	padding : 2vw;
-	border-radius : 1.2vw;
-	background-color : PaleGreen;
+	padding : 1.6vw;
+	border-radius : 1.6vw;
+	background-color : var(--filter-back);
 	font-size : 3.2vw;
-	color : Black;
+	color : var(--filter-text);
 	font-weight : bold;
+	border: 0.36vw solid var(--filter-border);
 }
 
 .filter_title {
@@ -28,8 +29,11 @@
 }
 
 .filter_title_name {
+	padding-left: 1.2vw;
 	flex-grow : 1;
 	font-size : 4.4vw;
+	display: flex;
+	align-items: center;
 }
 
 .filter_close {
@@ -38,6 +42,7 @@
 	height : 6vw;
 	align-items : center;
 	margin: 5px 5px 5px 0;
+	filter: var(--black-icon);
 }
 
 .filter_close.closed {
@@ -45,21 +50,18 @@
 }
 
 .filter_subblock_title {
-	border-bottom : 0.5vw solid Black;
-	width : 80vw;
-	margin : 2vw 0vw;
+	border-bottom : 0.5vw solid var(--filter-text);
+	width : 84vw;
+	margin : 1.2vw 0 2vw 0;
 	padding-left : 3.6vw;
 	font-size : 3.6vw;
 }
 
 .filter_subblock_content {
-	background-color : #DFDFDF;
+	background-color : var(--filter-back-alt);
 	border-radius : 1.4vw;
 	padding : 1.5vw;
-	margin-bottom : 1vw;
 }
-
-
 
 #filter_entry_icon_container,
 #filter_entry_icon_extra {
@@ -134,20 +136,26 @@
 	margin : 1.5vw 3.2vw;
 	padding : .8vw 1.2vw .2vw 1.2vw;
 	border-radius : 0.8vw;
-	border : 0.8vw solid rgba(0, 0, 0, 0);
-	outline : .2vw solid #b2a58f;
+	border : 0.6vw solid var(--trnsp);
+	outline : .2vw solid var(--song-border);
+	color: var(--song-text);
 }
 
 .rep_song_container.selected {
-	border : 0.8vw solid DarkMagenta;
+	border : 0.6vw solid var(--song-selected);
 }
 
 .rep_song_container.rep_mem_only {
-	background-color : PeachPuff;
+	background-color : var(--song-display-alt);
 }
 
 .rep_song_container:not(.rep_mem_only) {
-	background-color : LightYellow;
+	background-color : var(--song-display);
+}
+
+.rep_song_row1 {
+	display: grid;
+	grid-template-columns: 100% 20%;
 }
 
 .rep_song_title {
@@ -157,8 +165,14 @@
 	overflow-inline : hidden;
 }
 
+.rep_song_nooke {
+	position: absolute;
+	right: 6vw;
+	color: red;
+}
+
 .rep_song_info {
-	margin-top : 0.4vw;
+	margin-top : 0.8vw;
 }
 
 .rep_song_singer {
@@ -180,37 +194,37 @@
 }
 
 .rep_song_kirara {
-	background-color : LightCoral;
-	border : max(2px, 0.4vw) solid #670000;
+	background-color : var(--s-krr-back);
+	border : max(2px, 0.4vw) solid var(--s-krr-text);
 }
 
 .rep_song_momo {
-	background-color : LightPink;
-	border : max(2px, 0.4vw) solid DarkMagenta;
+	background-color : var(--s-momo-back);
+	border : max(2px, 0.4vw) solid var(--s-momo-text);
 }
 
 .rep_song_nia {
-	background-color : PaleTurquoise;
-	border : max(2px, 0.4vw) solid DarkBlue;
+	background-color : var(--s-nia-back);
+	border : max(2px, 0.4vw) solid var(--s-nia-text);
 }
 
 .rep_song_chui {
-	background-color : #ffd3ca;
-	border : max(2px, 0.4vw) solid #7a36a6;
+	background-color : var(--s-chui-back);
+	border : max(2px, 0.4vw) solid var(--s-chui-text);
 }
 
 .rep_song_shiro {
-	background-color : #FFF0AB;
-	border : max(2px, 0.4vw) solid #CC2455;
+	background-color : var(--s-siro-back);
+	border : max(2px, 0.4vw) solid var(--s-siro-text);
 }
 
 .rep_song_yuco {
-	background-color : #ffcffb;
-	border : max(2px, 0.4vw) solid #265ebd;
+	background-color : var(--s-yuco-back);
+	border : max(2px, 0.4vw) solid var(--s-yuco-text);
 }
 
 .rep_extra_info {
-	margin-left : 1vw;
+	margin-left : 4vw;
 }
 
 #rep_list {
@@ -220,13 +234,13 @@
 	transform: translate(-50%, -50%);
 	width : 92vw;
 	height : auto;
-	background-color : DarkSlateBlue;
+	background-color : var(--dialog-back);
 	font-size : 4vw;
-	border: 0.5vw solid SlateBlue;
+	border: 0.5vw solid var(--dialog-border);
 	border-radius: 2vw;
 	overflow-y : auto;
 	text-align : center;
-	color : AliceBlue;
+	color : var(--dialog-text);
 }
 
 .rep_list_title_container {
@@ -292,7 +306,7 @@
 
 #rep_list_content {
 	overflow-y : auto;
-	background-color : SlateBlue;
+	background-color : var(--dialog-back-alt);
 	border-radius : 2vw;
 	border : none;
 	margin : 0vw 2vw;
@@ -305,9 +319,12 @@
 	height : 1em;
 	line-height : 1em;
 	overflow : hidden;
-	color : AliceBlue;
 	text-align : left;
 	padding : 1.6vw 0.4vw;
+}
+
+[theme=light] #rep_list_content>div {
+	color: var(--dialog-back);
 }
 
 .rep_list_control {
@@ -345,7 +362,7 @@
 	width : 6vw;
 	height : 6vw;
 	content : url("icon/copy.png");
-	background-color : MediumSlateBlue;
+	background-color : var(--dialog-text);
 	border-radius : 0.8vw;
 }
 
@@ -366,7 +383,7 @@
 }
 
 .grid_block-4 {
-	grid-template-columns: 18% 32% 10% 40%;
+	grid-template-columns: 20% 35% 10% 35%;
 }
 
 .grid_block-3_type2 {
@@ -455,14 +472,14 @@
 	height : 3vw;
 	margin : 0.2vw 0.6vw 0.6vw;
 	border-radius : 3vw;
-	border : 0.8vw solid White;
-	outline : 0.3vw solid Teal;
+	border : 0.8vw solid var(--radio-border);
+	outline : 0.3vw solid var(--radio-outline);
 }
 
 .radio.selected {
-	background-color : DarkBlue;
+	background-color : var(--radio-back);
 }
 
 .radio:not(.selected) {
-	background-color : White;
+	background-color : var(--radio-border);
 }

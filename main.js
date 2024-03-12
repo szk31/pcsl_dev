@@ -1,3 +1,4 @@
+//"use strict";
 // display string, refered in entry[].type
 var singer_lookup = [
 	"reserved",			// 0b 0000 0x 0
@@ -91,8 +92,7 @@ var video_idx = {
 
 var video, entry;
 
-var version = "pre1.6.0";
-
+var version = "1.6.3";
 var key_hash = [
 	"473c05c1ae8349a187d233a02c514ac73fe08ff4418429806a49f7b2fe4ba0b7a36ba95df1d58b8e84a602258af69194", //thereIsNoPassword
 	"3f01e53f1bcee58f6fb472b5d2cf8e00ce673b13599791d8d2d4ddcde3defbbb4e0ab7bc704538080d704d87d79d0410"
@@ -128,6 +128,12 @@ var hard_filter = 0b111;
 // do add the link to this website when sharing
 var do_share_web = false;
 
+// show search random icon
+var do_show_random = false;
+
+// show rep-song release date
+var do_show_release = false;
+
 // ram for searching (entry_processed)
 var entry_proc = [];
 
@@ -137,132 +143,181 @@ var memcount_rep_int;
 // pre-process song names
 var processed_song_name = [""];
 
-var is_mobile = getCookie("is_mobile");
-if (getCookie("is_mobile") === "") {
-	is_mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-	setCookie("is_mobile", is_mobile);
-} else {
-	is_mobile = is_mobile === "true";
+// theme
+{
+	var theme = localStorage.getItem("theme");
+	if (theme === null) {
+		theme = "mixed";
+		localStorage.setItem("theme", "mixed");
+	}
+	document.documentElement.setAttribute("theme", theme);
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
+	// change settings selected theme
+	$(`#three_way_${localStorage.getItem("theme")}`).addClass("selected");
+
 	var key;
 	function decrypt(input) {
 		return content_level ? CryptoJS.AES.decrypt(input, key).toString(CryptoJS.enc.Utf8) : input;
 	}
-
 	// check if loading inner sector
-	if (is_mobile || (!is_mobile && window.innerHeight / window.innerWidth > 1.5)) {
-		// check url para first
-		var url_para = new URLSearchParams(window.location.search);
-		key = url_para.get("key");
-		var load_from_cookie = true;
-		var content_level = 0;
-		// level 2 cookie
-		if (await getSHA384Hash(getCookie("pcsl_content_key")) === key_hash[1]) {
-			content_level = 2;
-			key = getCookie("pcsl_content_key");
-		}
-		// level 2 url para
-		else if (key !== "" && await getSHA384Hash(key) === key_hash[1]) {
-			content_level = 2;
-			load_from_cookie = false;
-		}
-		// level 1 cookie
-		else if (await getSHA384Hash(getCookie("pcsl_content_key")) === key_hash[0]) {
-			content_level = 1;
-			key = getCookie("pcsl_content_key");
-		}
-		// level 1 url para
-		else if (key !== "" && await getSHA384Hash(key) === key_hash[0]) {
-			content_level = 1;
-			load_from_cookie = false;
-		}
-		key_valid = content_level;
-		// load data
-		var local_version_hash = localStorage.getItem("pcsl_version_hash");
-		//  data version is up to date             key did not update
-		if (local_version_hash === version_hash && load_from_cookie) {
-			// good to use old data
-			var ls_data = localStorage.getItem("pcsl_data").split("\n");
-			video = JSON.parse(decrypt(ls_data[0]));
-			entry = JSON.parse(decrypt(ls_data[0]));
-			process_data();
-		} else {
-			// need to refresh data
-			fetch(`data_${content_level}.txt`)
-			.then(response => {
-				if (!response.ok) {
-					// well idk, reload? maybe?
-					console.log(`failed to load data_${content_level}.txt`);
-				}
-				return response.text();
-			})
-			.then(data => {
-				const objs = data.split("\n");
-				video = JSON.parse(decrypt(objs[0]));
-				entry = JSON.parse(decrypt(objs[1]));
+	
+	if (window.innerHeight / window.innerWidth < 1.5) {
+		// bad screen ratio, open new window
+		$("#v_screen").addClass("post_switch");
+		$("#v_screen").height("100%");
+		$("#v_screen").width(0.5625 * window.innerHeight);
+		$("#v_screen").attr("src", "index.html" + window.location.search);
+		// hide original page
+		$("body > div").addClass("post_switch");
+		$("body").addClass("post_switch");
+		return;
+	}
 
-				// save to local storage
-				localStorage.setItem("pcsl_data", data);
-				localStorage.setItem("pcsl_version_hash", version_hash);
-				process_data();
-			});
-		}
-		
-		// changing thing if content key
-		if (content_level) {
-			member_display_order = [7, 6, 5, 3, 4, 2, 1, 12, 10, 9];
-			$(".extra").removeClass("hidden");
-			$(".memcount_subblock").removeClass("anti_extra");
-			$(".anti_extra").html("");
-			$(".anti_extra").addClass("hidden");
-			$("#home_key").removeClass("hidden");
-			$("#filter_entry_icon_container").addClass("hidden");
-			$("#filter_entry_icon_extra").removeClass("hidden");
-			// update expire day
-			removeCookie("pcsl_content_key");
-			setCookie("pcsl_content_key", key);
-		}
+	// check url para first
+	var url_para = new URLSearchParams(window.location.search);
+	key = url_para.get("key");
+	var load_from_storage = true;
+	var content_level = 0;
+	// swicth to local storage if needed
+	if (getCookie("pcsl_content_key") !== "") {
+		localStorage.setItem("pcsl_key", getCookie("pcsl_content_key"));
+		removeCookie("pcsl_content_key");
+	}
+	// level 2 storage
+	if (await getSHA384Hash(localStorage.getItem("pcsl_key")) === key_hash[1]) {
+		content_level = 2;
+		key = localStorage.getItem("pcsl_key");
+	}
+	// level 2 url para
+	else if (key !== "" && await getSHA384Hash(key) === key_hash[1]) {
+		content_level = 2;
+		load_from_storage = false;
+	}
+	// level 1 storage
+	else if (await getSHA384Hash(localStorage.getItem("pcsl_key")) === key_hash[0]) {
+		content_level = 1;
+		key = localStorage.getItem("pcsl_key");
+	}
+	// level 1 url para
+	else if (key !== "" && await getSHA384Hash(key) === key_hash[0]) {
+		content_level = 1;
+		load_from_storage = false;
+	}
+	key_valid = content_level ? 1 : 0;
+	// load data
+	var local_version_hash = localStorage.getItem("pcsl_version_hash");
+	//  data version is up to date             key did not update
+	if (local_version_hash === version_hash && load_from_storage) {
+		// good to use old data
+		var ls_data = localStorage.getItem("pcsl_data").split("\n");
+		video = JSON.parse(decrypt(ls_data[0]));
+		entry = JSON.parse(decrypt(ls_data[1]));
+		process_data();
+	} else {
+		// need to refresh data
+		$("#loading_text").html("Downloading data...");
+		fetch(`data_${content_level}.txt`)
+		.then(response => {
+			if (!response.ok) {
+				console.log(`failed to load data_${content_level}.txt`);
+				$("#loading_text").html("Failed to download data.<br />Please reload to try again.<br /><br />Contact site administrator<br />if this problem persists.");
+			}
+			return response.text();
+		})
+		.then(data => {
+			const objs = data.split("\n");
+			video = JSON.parse(decrypt(objs[0]));
+			entry = JSON.parse(decrypt(objs[1]));
+
+			// save to local storage
+			localStorage.setItem("pcsl_data", data);
+			localStorage.setItem("pcsl_version_hash", version_hash);
+			process_data();
+		});
+	}
+	
+	// changing thing if key valid
+	if (key_valid) {
+		member_display_order = [7, 6, 5, 3, 4, 2, 1, 12, 10, 9];
+		$(".extra").removeClass("hidden");
+		$(".memcount_subblock").removeClass("anti_extra");
+		$(".anti_extra").html("");
+		$(".anti_extra").addClass("hidden");
+		$("#home_key").removeClass("hidden");
+		$("#filter_entry_icon_container").addClass("hidden");
+		$("#filter_entry_icon_extra").removeClass("hidden");
 	}
 });
 
 function process_data() {
+	$("#loading_text").html("Processing data...");
 	var url_para = new URLSearchParams(window.location.search);
-	// get settings from cookie
-	if (getCookie("pcsl_settings_display") === "") {
-		// cookie not set
-		setCookie("pcsl_settings_display", 100);
-		setCookie("pcsl_settings_hidden" , 1);
-		setCookie("pcsl_settings_select" , 1);
-		setCookie("pcsl_settings_random" , 0);
-		setCookie("pcsl_settings_share"  , 0);
-	} else {
-		max_display       = parseInt(getCookie("pcsl_settings_display"));
+	// remove key
+	url_para.delete("key");
+	window.history.pushState(null, null, `${document.location.href.split('?')[0]}${url_para.size ? `?${url_para}` : ""}`)
+	
+	// switch from cookie to local storage
+	if (getCookie("pcsl_settings_display") !== "") {
+		// old user, not switched
 		do_display_hidden = (getCookie("pcsl_settings_hidden")) === "1";
-		do_clear_input    = (getCookie("pcsl_settings_clear")) === "1";
+		do_select_input   = (getCookie("pcsl_settings_clear")) === "1";
 		do_random_anyway  = (getCookie("pcsl_settings_random")) === "1";
 		do_share_web      = (getCookie("pcsl_settings_share")) === "1";
 		
-		// update display
-		$("#search_options_count_input").val(max_display);
-		$("#search_options_btn_displayHidden").toggleClass("selected", do_display_hidden);
-		$("#search_options_btn_reset").toggleClass("selected", do_clear_input);
-		$("#search_options_btn_randomAnyway").toggleClass("selected", do_random_anyway);
-		$("#search_options_btn_shareWeb").toggleClass("selected", do_share_web);
+		localStorage.setItem("pcsl_s_showHidden", getCookie("pcsl_settings_hidden"));
+		localStorage.setItem("pcsl_s_selecInput", getCookie("pcsl_settings_clear"));
+		localStorage.setItem("pcsl_s_showRandom", "0");
+		localStorage.setItem("pcsl_s_ignoreRule", getCookie("pcsl_settings_random"));
+		localStorage.setItem("pcsl_s_showReleas", "0");
+
+		// remove cookies
+		removeCookie("pcsl_settings_hidden");
+		removeCookie("pcsl_settings_clear");
+		removeCookie("pcsl_settings_random");
+		
+		removeCookie("is_mobile");
+		removeCookie("pcsl_settings_display");
+		removeCookie("pcsl_settings_select");
+		removeCookie("pcsl_settings_share");
+	}
+	else if (localStorage.getItem("pcsl_s_showHidden") === null) {
+		// new user
+		localStorage.setItem("pcsl_s_showHidden", "1");
+		localStorage.setItem("pcsl_s_selecInput", "1");
+		localStorage.setItem("pcsl_s_showRandom", "0");
+		localStorage.setItem("pcsl_s_ignoreRule", "0");
+		localStorage.setItem("pcsl_s_showReleas", "0");
+	} else {
+		// read from local storage
+		do_display_hidden = localStorage.getItem("pcsl_s_showHidden") === "1";
+		do_select_input    = localStorage.getItem("pcsl_s_selecInput") === "1";
+		do_show_random    = localStorage.getItem("pcsl_s_showRandom") === "1";
+		do_random_anyway  = localStorage.getItem("pcsl_s_ignoreRule") === "1";
+		do_show_release   = localStorage.getItem("pcsl_s_showReleas") === "1";
 	}
 	
-	// processing url para
-	if (url_para.get("hfilter") !== (null && "")) {
-		// get url para and store
-		hard_filter = parseInt(url_para.get("hfilter"));
-		setCookie("pcsl_settings_hfilter", hard_filter, 400);
-	} else if (getCookie("pcsl_settings_hfilter") !== ""){
-		// read from cookie and renew
-		hard_filter = parseInt(getCookie("pcsl_settings_hfilter"));
-		removeCookie("pcsl_settings_hfilter");
-		setCookie("pcsl_settings_hfilter", hard_filter, 400);
+	// switch display in settings according to saved settings
+	if (!do_display_hidden) {
+		$("#setting_hidden>div").toggleClass("selected");
 	}
+	if (!do_select_input) {
+		$("#setting_select>div").toggleClass("selected");
+	}
+	if (do_show_random) {
+		$("#setting_random>div").toggleClass("selected");
+	}
+	if (do_random_anyway) {
+		$("#setting_ignore>div").toggleClass("selected");
+	}
+	if (do_show_release) {
+		$("#setting_release>div").toggleClass("selected");
+	}
+	$("#nav_search_random").addClass("blank", !do_show_random);
+	$(".setting_req_random").toggleClass("disabled", !do_show_random);
+
+	// processing url para
 	init();
 	if (url_para.get("sfilter") !== (null && "")) {
 		// extract member data
@@ -282,8 +337,7 @@ function process_data() {
 				if (member_name[i] === "") {
 					continue;
 				}
-				$(".filter_icon.icon_" + member_name[i]).click();
-				$(".filter_icon_extra.icon_" + member_name[i]).click();
+				$(`.filter_icon${key_valid ? "_extra" : ""}.icon_` + member_name[i]).click();
 			}
 		}
 		//search
@@ -358,22 +412,9 @@ function process_data() {
 		}
 	}
 	// remove loading screen
+	$("#loading_text").html("Loading Complete.<br />You can't see this tho");
 	$("#loading_overlay").addClass("hidden");
 }
-
-$(window).on("load", async function() {
-	if (!is_mobile && window.innerHeight / window.innerWidth < 1.5) {
-		// bad screen ratio, open new window
-		$("#v_screen").addClass("post_switch");
-		$("#v_screen").height("100%");
-		$("#v_screen").width(0.5625 * window.innerHeight);
-		$("#v_screen").attr("src", "index.html" + window.location.search);
-		// hide original page
-		$("body > div").addClass("post_switch");
-		$("body").addClass("post_switch");
-		return;
-	}
-});
 
 $(function() {
 	{ // nav
@@ -395,10 +436,15 @@ $(function() {
 			if (prevent_menu_popup) {
 				return;
 			}
-			$("html,body").animate({
-				scrollTop: 0
-			}, "fast");
-			
+			var scrollTop = $("html,body").scrollTop();
+			var delta = scrollTop / 33;
+			function frame() {
+				scrollTop -= delta;
+				$("html,body").scrollTop(scrollTop);
+				if (scrollTop <= 0)
+					clearInterval(id)
+			}
+			var id = setInterval(frame, 1);
 			if (current_page === "repertoire" && rep_display_selected_first) {
 				rep_display();
 			}
@@ -429,6 +475,16 @@ $(function() {
 			$(document.body).removeClass("no_scroll");
 		});
 		
+		// menu - setting
+		$(document).on("click", "#menu_setting", function() {
+			// hide / show things
+			$("#popup_container").removeClass("hidden");
+			$("#settings").removeClass("hidden");
+			$("#menu_container").addClass("hidden");
+			$("#nav_menu").removeClass("menu_opened");
+			prevent_menu_popup = true;
+		});
+
 		// menu - mem_count
 		$(document).on("click", "#menu_count", function() {
 			// hide / show things
@@ -512,6 +568,49 @@ $(function() {
 		});
 	}
 	
+	{ // settings
+		// general - display_theme
+		$(document).on("click", ".three_way>div", function() {
+			var selected = $(this).attr("id").replace("three_way_", "");
+			document.documentElement.setAttribute("theme", selected);
+			localStorage.setItem("theme", selected);
+			$(".three_way>div").removeClass("selected");
+			$(this).addClass("selected");
+		});
+
+		$(document).on("click", ".two_way:not(.disabled)", function() {
+			$(this).children().toggleClass("selected");
+			switch (this.id) {
+				case "setting_hidden":
+					do_display_hidden ^= 1;
+					localStorage.setItem("pcsl_s_showHidden", do_display_hidden ? "1" : "0");
+					break;
+				case "setting_select":
+					do_select_input ^= 1;
+					localStorage.setItem("pcsl_s_selecInput", do_select_input ? "1" : "0");
+					break;
+				case "setting_random":
+					do_show_random ^= 1;
+					$("#nav_search_random").toggleClass("blank", do_show_random);
+					localStorage.setItem("pcsl_s_showRandom", do_show_random ? "1" : "0");
+					$(".setting_req_random").toggleClass("disabled", !do_show_random);
+					break;
+				case "setting_ignore":
+					do_random_anyway ^= 1;
+					$("#nav_search_random").toggleClass("disabled", searching_song_name ? (do_random_anyway ? false : loading !== "") : true);
+					localStorage.setItem("pcsl_s_ignoreRule", do_random_anyway ? "1" : "0");
+					break;
+				case "setting_release":
+					do_show_release ^= 1;
+					localStorage.setItem("pcsl_s_showReleas", do_show_release ? "1" : "0");
+					if (current_page === "repertoire") {
+						rep_display();
+					}
+					break;
+			}
+		})
+	}
+
 	// memcount swap content
 	$(document).on("click", "#memcount, #memcount_rep", function(e) {
 		if ($(e.target).closest('.popup_frame').length) {
@@ -544,6 +643,7 @@ $(function() {
 	// key reset - yes
 	$(document).on("click", "#remove_key_yes", function() {
 		removeCookie("pcsl_content_key");
+		localStorage.clear();
 		window.location = window.location.href.split("?")[0];
 	});
 	
@@ -622,28 +722,6 @@ function init() {
 		}
 		rep_hits_solo[i] = [...new Set(rep_hits_solo[i])].filter(Number);
 	}
-}
-
-// decrypt data and replace
-function load_encrpyted_data(key_id) {
-	key_valid = 1;
-	// get key value
-	var key = getCookie("pcsl_content_key");
-	// decrypt data then delete enc data
-	entry = JSON.parse(CryptoJS.AES.decrypt(entry_enc[key_id], key).toString(CryptoJS.enc.Utf8));
-	video = JSON.parse(CryptoJS.AES.decrypt(video_enc[key_id], key).toString(CryptoJS.enc.Utf8));
-	// update rep display
-	member_display_order = [7, 6, 5, 3, 4, 2, 1, 12, 10, 9];
-	$(".extra").removeClass("hidden");
-	$(".memcount_subblock").removeClass("anti_extra");
-	$(".anti_extra").html("");
-	$(".anti_extra").addClass("hidden");
-	$("#home_key").removeClass("hidden");
-	$("#filter_entry_icon_container").addClass("hidden");
-	$("#filter_entry_icon_extra").removeClass("hidden");
-	// update expire day
-	removeCookie("pcsl_content_key");
-	setCookie("pcsl_content_key", key);
 }
 
 // memcount - loading rep part in background
@@ -787,20 +865,6 @@ function get_sang_count(id, mask = [4, 2, 1, 12, 10, 9]) {
 	return [count, mem_count];
 }
 
-function get_attr(id) {
-	var e = entry[id][entry_idx.note];
-	if (e.includes("ASMR弾き語り")) {
-		return "asm";
-	}
-	if (e.includes("弾き語り")) {
-		return "gui";
-	}
-	if (e.includes("アカペラ")) {
-		return "aca";
-	}
-	return "oke";
-}
-
 function jump2page(target) {
 	target = target === "rep" ? "repertoire" : target;
 	current_page = target;
@@ -890,6 +954,14 @@ function copy_popup() {
 	}, 1500);
 }
 
+function to_html(input) {
+	return input.replaceAll(`"`, `&quot;`).replaceAll(`'`, `&apos;`);
+}
+
+function to_non_html(input) {
+	return input.replaceAll(`&quot;`, `"`).replaceAll(`&apos;`, `'`);
+}
+
 // from : https://stackoverflow.com/a/67600346/20897145
 const getSHA384Hash = async (input) => {
 	const textAsBuffer = new TextEncoder().encode(input);
@@ -902,13 +974,6 @@ const getSHA384Hash = async (input) => {
 };
 
 // from w3school
-function setCookie(cname, cvalue, exdays = 400) {
-	const d = new Date();
-	d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-	let expires = "expires="+d.toUTCString();
-	document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}
-
 function getCookie(cname) {
 	let name = cname + "=";
 	let ca = document.cookie.split(';');
