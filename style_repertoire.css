@@ -11,7 +11,7 @@
 	border-radius : 2vw;
 }
 
-#filter_container>div {
+#filter_container {
 	height : auto;
 	width : 92vw;
 	margin : 2.4vw 2vw;
@@ -52,14 +52,14 @@
 .filter_subblock_title {
 	border-bottom : 0.5vw solid var(--filter-text);
 	width : 84vw;
-	margin : 1.2vw 0 2vw 0;
-	padding-left : 3.6vw;
+	margin : 0.6vw 0 1vw 0;
+	padding-left : 3.2vw;
 	font-size : 3.6vw;
 }
 
 .filter_subblock_content {
 	background-color : var(--filter-back-alt);
-	border-radius : 1.4vw;
+	border-radius : 2.4vw;
 	padding : 1.5vw;
 }
 
@@ -71,30 +71,30 @@
 }
 
 .filter_icon_bg {
-	margin : 0vw 1.2vw;
+	margin : 0 1.2vw;
 	border-width :  0.5vw;
-	border-radius : 6vw;
+	border-radius : 4vw;
 	width : 17vw;
 	height : 17vw;
 }
 
 .filter_icon {
 	padding : 0.5vw;
-	border-radius : 6vw;
+	border-radius : 4vw;
 	width : 16vw;
 	height : 16vw;
 }
 
 .filter_icon_bg_extra {
 	margin : 0.5vw;
-	border-radius : 4vw;
+	border-radius : 3.6vw;
 	width : 13.8vw;
 	height : 13.8vw;
 }
 
 .filter_icon_extra {
 	padding : 0.4vw;
-	border-radius : 4vw;
+	border-radius : 3.6vw;
 	width : 13vw;
 	height : 13vw;
 }
@@ -113,10 +113,11 @@
 .filter_sort_item,
 .filter_sort2_item,
 .filter_sort3_item,
-.filter_display_item,
 .rep_item {
 	display : flex;
-	margin : 0.2vw 3vw 0.2vw 1.2vw;
+	align-items: center;
+	padding-left: 1.2vw;
+	height: 6vw;
 }
 
 .filter_singer_group_extra {
@@ -128,6 +129,11 @@
 .filter_singer_group_extra .filter_singer_group {
 	display : grid;
 	grid-template-columns: 20% 70%;
+}
+
+.genre_name,
+.sort_name {
+	padding-left: 0.8vw;
 }
 
 .rep_song_container {
@@ -446,7 +452,10 @@
 .switch {
 	width : 5vw;
 	height : 5vw;
-	margin : 0vw 0.6vw 1.2vw;
+	margin : 0.6vw;
+
+	display: flex;
+	align-content: center;
 }
 
 .checkbox.selected {
@@ -468,12 +477,15 @@
 }
 
 .radio {
+	margin : 0.6vw;
 	width : 3vw;
 	height : 3vw;
-	margin : 0.2vw 0.6vw 0.6vw;
 	border-radius : 3vw;
 	border : 0.8vw solid var(--radio-border);
 	outline : 0.3vw solid var(--radio-outline);
+
+	display: flex;
+	align-items: center;
 }
 
 .radio.selected {

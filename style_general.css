@@ -1,4 +1,6 @@
 :root {
+	--post-switch: rgb(175, 196, 196);
+
 	--base-back: rgb(242, 238, 245);
 	--base-text: black;
 	--menu-back: rgb(229, 224, 232);
@@ -70,6 +72,8 @@
 }
 
 [theme="dark"] {
+	--post-switch: rgb(13, 0, 32);
+
 	--base-back: rgb(23, 26, 29);
 	--base-text: rgb(210, 204, 222);
 	--menu-back: rgb(39, 38, 41);
@@ -138,6 +142,8 @@
 }
 
 [theme="mixed"] {
+	--post-switch: DarkSlateGrey;
+
 	--base-back: #778899;
 	--base-text: Black;
 	--menu-back: #696969;
@@ -183,6 +189,10 @@ html, body {
 
 body:not(.post_switch) {
 	height: auto;
+}
+
+body:not(.allow_reload) {
+	overscroll-behavior-y: contain;
 }
 
 html {
@@ -243,7 +253,7 @@ input[type=text], textarea {
 body.post_switch {
 	display : flex;
 	justify-content : center;
-	background-color : DarkSlateGrey;
+	background-color : var(--post-switch);
 }
 
 #navbar {
@@ -774,7 +784,7 @@ body.post_switch {
 }
 
 .settings_title {
-	padding: 3vw;
+	margin-top: 2vw;
 	font-size: 5.2vw;
 	font-weight: 600;
 }

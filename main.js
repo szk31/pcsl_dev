@@ -9,22 +9,11 @@ var singer_lookup = [
 	"きらにぃあ",		//    0101    5
 	"ももきら",			//    0110    6
 	"ぷちここ",			//    0111    7
-	null,
-	"つきみゆこ",		//    1001    9
+	"つきみゆこ",		//    1001    8
+	9,10,11,12,13,14,15,
 	"愛白ふりる",		//    1010    A
-	null,
+	17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
 	"小悪熊ちゅい",		//    1100    C
-/*
-	null,
-	null,
-	null,
-	null,
-	null,
-	null,
-	"ゆこもも",			//   10011   13
-	null,
-	"ゆこきら",			//   10101   15
-*/
 ];
 
 // display order of search
@@ -92,7 +81,7 @@ var video_idx = {
 
 var video, entry;
 
-var version = "1.6.3";
+var version = "1.6.5";
 var key_hash = [
 	"473c05c1ae8349a187d233a02c514ac73fe08ff4418429806a49f7b2fe4ba0b7a36ba95df1d58b8e84a602258af69194", //thereIsNoPassword
 	"3f01e53f1bcee58f6fb472b5d2cf8e00ce673b13599791d8d2d4ddcde3defbbb4e0ab7bc704538080d704d87d79d0410"
@@ -110,9 +99,6 @@ var current_page = "home";
 var key_valid = 0;
 
 /* setting section */
-// max display song count
-var max_display = 100;
-
 // if on, display private entries despite not accessable
 var do_display_hidden = true;
 
@@ -122,17 +108,14 @@ var do_select_input = true;
 // if random requirement is ignored (input being blank)
 var do_random_anyway = false;
 
-// hidden hard filter
-var hard_filter = 0b111;
-
-// do add the link to this website when sharing
-var do_share_web = false;
-
 // show search random icon
 var do_show_random = false;
 
 // show rep-song release date
 var do_show_release = false;
+
+// copy song name when long press on rep song name
+var do_longPress_copy = true;
 
 // ram for searching (entry_processed)
 var entry_proc = [];
@@ -143,12 +126,11 @@ var memcount_rep_int;
 // pre-process song names
 var processed_song_name = [""];
 
-// theme
-{
+{	// theme
 	var theme = localStorage.getItem("theme");
 	if (theme === null) {
 		theme = "mixed";
-		localStorage.setItem("theme", "mixed");
+		localStorage.setItem("theme", theme);
 	}
 	document.documentElement.setAttribute("theme", theme);
 }
@@ -194,6 +176,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 	else if (key !== "" && await getSHA384Hash(key) === key_hash[1]) {
 		content_level = 2;
 		load_from_storage = false;
+		localStorage.setItem("pcsl_key", key);
 	}
 	// level 1 storage
 	else if (await getSHA384Hash(localStorage.getItem("pcsl_key")) === key_hash[0]) {
@@ -204,6 +187,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 	else if (key !== "" && await getSHA384Hash(key) === key_hash[0]) {
 		content_level = 1;
 		load_from_storage = false;
+		localStorage.setItem("pcsl_key", key);
 	}
 	key_valid = content_level ? 1 : 0;
 	// load data
@@ -248,6 +232,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 		$("#home_key").removeClass("hidden");
 		$("#filter_entry_icon_container").addClass("hidden");
 		$("#filter_entry_icon_extra").removeClass("hidden");
+	} else {
+		// remove things thats not needed
+		$(".extra").html("");
+		$(".extra").attr("class", "");
+		part_filter = [1, 1, 1, 0, 0, 0];
 	}
 });
 
@@ -264,13 +253,13 @@ function process_data() {
 		do_display_hidden = (getCookie("pcsl_settings_hidden")) === "1";
 		do_select_input   = (getCookie("pcsl_settings_clear")) === "1";
 		do_random_anyway  = (getCookie("pcsl_settings_random")) === "1";
-		do_share_web      = (getCookie("pcsl_settings_share")) === "1";
 		
 		localStorage.setItem("pcsl_s_showHidden", getCookie("pcsl_settings_hidden"));
 		localStorage.setItem("pcsl_s_selecInput", getCookie("pcsl_settings_clear"));
 		localStorage.setItem("pcsl_s_showRandom", "0");
 		localStorage.setItem("pcsl_s_ignoreRule", getCookie("pcsl_settings_random"));
 		localStorage.setItem("pcsl_s_showReleas", "0");
+		localStorage.setItem("pcsl_s_LPressCopy", "1")
 
 		// remove cookies
 		removeCookie("pcsl_settings_hidden");
@@ -289,13 +278,15 @@ function process_data() {
 		localStorage.setItem("pcsl_s_showRandom", "0");
 		localStorage.setItem("pcsl_s_ignoreRule", "0");
 		localStorage.setItem("pcsl_s_showReleas", "0");
+		localStorage.setItem("pcsl_s_LPressCopy", "1")
 	} else {
 		// read from local storage
 		do_display_hidden = localStorage.getItem("pcsl_s_showHidden") === "1";
-		do_select_input    = localStorage.getItem("pcsl_s_selecInput") === "1";
+		do_select_input   = localStorage.getItem("pcsl_s_selecInput") === "1";
 		do_show_random    = localStorage.getItem("pcsl_s_showRandom") === "1";
 		do_random_anyway  = localStorage.getItem("pcsl_s_ignoreRule") === "1";
 		do_show_release   = localStorage.getItem("pcsl_s_showReleas") === "1";
+		do_longPress_copy = localStorage.getItem("pcsl_s_LPressCopy") === "1";
 	}
 	
 	// switch display in settings according to saved settings
@@ -314,12 +305,15 @@ function process_data() {
 	if (do_show_release) {
 		$("#setting_release>div").toggleClass("selected");
 	}
+	if (!do_longPress_copy) {
+		$("#setting_copy>div").toggleClass("selected");
+	}
 	$("#nav_search_random").addClass("blank", !do_show_random);
 	$(".setting_req_random").toggleClass("disabled", !do_show_random);
 
 	// processing url para
 	init();
-	if (url_para.get("sfilter") !== (null && "")) {
+	if (url_para.get("sfilter") !== null) {
 		// extract member data
 		var ext = parseInt(url_para.get("sfilter"));
 		// bit and = true => default 
@@ -332,7 +326,7 @@ function process_data() {
 			ext & 32 ? "" : "chui"
 		];
 		// rep
-		if (url_para.get("page") === ("rep" || "repertoire") || url_para.get("rfilter") !== (null && "")) {
+		if (url_para.get("page") === ("rep" || "repertoire") || url_para.get("rfilter") !== null) {
 			for (var i in member_name) {
 				if (member_name[i] === "") {
 					continue;
@@ -341,7 +335,7 @@ function process_data() {
 			}
 		}
 		//search
-		if (url_para.get("page") === "search" || url_para.get("search") !== (null && "")) {
+		if (url_para.get("page") === "search" || url_para.get("search") !== null) {
 			for (var i in member_name) {
 				if (member_name[i].length) {
 					$(".singer_icon.icon_" + member_name[i]).click();
@@ -350,12 +344,12 @@ function process_data() {
 		}
 	}
 	var target_page = url_para.get("page");
-	if (target_page !== ("home" || null)) {
+	if (target_page !== "home") {
 		if (jump2page(target_page) === -1) {
 			jump2page("home");
 		}
 	}
-	if (url_para.get("search") !== (null && "")) {
+	if (url_para.get("search") !== null) {
 		if (current_page !== "search") {
 			jump2page("search");
 		}
@@ -382,7 +376,7 @@ function process_data() {
 	 * this read a string of binary number
 	 * the value is exactly the same as rep_anisong and rep_genre
 	 */
-	if (url_para.get("rfilter") !== (null && "")) {
+	if (url_para.get("rfilter") !== null) {
 		if (current_page !== "repertoire") {
 			jump2page("rep");
 		}
@@ -414,6 +408,7 @@ function process_data() {
 	// remove loading screen
 	$("#loading_text").html("Loading Complete.<br />You can't see this tho");
 	$("#loading_overlay").addClass("hidden");
+	$("body").removeClass("allow_reload");
 }
 
 $(function() {
@@ -576,6 +571,9 @@ $(function() {
 			localStorage.setItem("theme", selected);
 			$(".three_way>div").removeClass("selected");
 			$(this).addClass("selected");
+			// set post-switch bg colour
+			// does not account for cross origin, not needed anyways
+			parent.refresh_bgColour();
 		});
 
 		$(document).on("click", ".two_way:not(.disabled)", function() {
@@ -607,6 +605,9 @@ $(function() {
 						rep_display();
 					}
 					break;
+				case "setting_copy":
+					do_longPress_copy ^= 1;
+					localStorage.setItem("pcsl_s_LPressCopy", do_longPress_copy ? "1" : "0");
 			}
 		})
 	}
@@ -642,8 +643,8 @@ $(function() {
 	
 	// key reset - yes
 	$(document).on("click", "#remove_key_yes", function() {
-		removeCookie("pcsl_content_key");
-		localStorage.clear();
+		localStorage.setItem("pcsl_version_hash", "");
+		localStorage.setItem("pcsl_key", "");
 		window.location = window.location.href.split("?")[0];
 	});
 	
@@ -684,7 +685,7 @@ function init() {
 		entry_proc[i] = [];
 	}
 	for (var i = 0; i < entry.length; ++i) {
-		if (entry[i][entry_idx.type] & hard_filter) {
+		if (entry[i][entry_idx.type]) {
 			entry_proc[entry[i][0]].push(i);
 		}
 	}
@@ -705,15 +706,9 @@ function init() {
 	for (var i = 0; i < song.length; ++i) {
 		rep_list[i] = 0;
 		for (var j in entry_proc[i]) {
-			// check if all singer bits are filled
-			if ((rep_list[i] & 7) === 7) {
-				break;
-			}
 			// or is faster than checking then add (i think)
 			rep_list[i] |= entry[entry_proc[i][j]][entry_idx.type];
 		}
-		// remove the non-singer bit, not needed.
-		rep_list[i] &= ~8;
 		
 		rep_solo_temp[i] = [...new Set(entry_proc[i])];
 		rep_hits_solo[i] = [];
@@ -731,7 +726,7 @@ function memcount_load_rep() {
 	
 	// get number for each member
 	var singer_counter = [];
-	for (var i = 0; i < 15; ++i) {
+	for (var i = 0; i < 33; ++i) {
 		singer_counter[i] = [];
 	}
 	for (var i in rep_hits_solo) {
@@ -749,21 +744,21 @@ function memcount_load_rep() {
 		singer_counter[2].length,
 		singer_counter[1].length,
 		
-		singer_counter[12].length,
-		singer_counter[10].length,
-		singer_counter[9].length,
+		singer_counter[32].length,
+		singer_counter[16].length,
+		singer_counter[8].length,
 		
-		new Set([...singer_counter[4], ...singer_counter[12]]).size,
-		new Set([...singer_counter[2], ...singer_counter[10]]).size,
-		new Set([...singer_counter[1], ...singer_counter[9]]).size
+		new Set([...singer_counter[4], ...singer_counter[32]]).size,
+		new Set([...singer_counter[2], ...singer_counter[16]]).size,
+		new Set([...singer_counter[1], ...singer_counter[8]]).size
 	];
 	
-	var display_lookup = [4, 2, 1, 12, 10, 9, 4, 2, 1];
+	var display_lookup = [4, 2, 1, 32, 16, 8, 4, 2, 1];
 	
 	// display
 	var new_html = "";
 	for (var i = 0; i < (key_valid ? 6 : 3); ++i) {
-		new_html += ("<div class=\"memcount_rep_block\"><div class=\"singer_" + display_lookup[i] + "m\">" + singer_lookup[display_lookup[i]] + "</div><div class=\"singer_" + display_lookup[i] + "\">" + display_number[i] + "</div></div>");
+		new_html += ("<div class=\"memcount_rep_block\"><div class=\"singer_" + display_lookup[i] + "m memcount_rep_name\">" + singer_lookup[display_lookup[i]] + "</div><div class=\"singer_" + display_lookup[i] + "\">" + display_number[i] + "</div></div>");
 	}
 	if (key_valid) {
 		new_html += ("<div></div><div class=\"memcount_rep_sum\"></div><div></div>");
@@ -816,7 +811,7 @@ function copy_of(input) {
 	}
 }
 
-function get_last_sang(id, mask = [4, 2, 1, 12, 10, 9]) {
+function get_last_sang(id, mask = [4, 2, 1, 32, 16, 8]) {
 	for (var i = entry_proc[id].length - 1; i >= 0; --i) {
 		if (mask.some((x) => (x & entry[entry_proc[id][i]][entry_idx.type]) === x)) {
 			return new Date(video[entry[entry_proc[id][i]][entry_idx.video]][video_idx.date]);
@@ -850,7 +845,7 @@ function get_date_different(date1, date2 = today) {
 }
 
 // get entry count of all entry and member-only entry that fufills mask
-function get_sang_count(id, mask = [4, 2, 1, 12, 10, 9]) {
+function get_sang_count(id, mask = [4, 2, 1, 32, 16, 8]) {
 	
 	var count = 0,
 		mem_count = 0;
@@ -918,25 +913,18 @@ function jump2page(target) {
 function split_to_solo(input) {
 	// hard code is easier
 	switch (input) {
-		case 1 : 
-		case 2 : 
-		case 4 : 
-		case 9 : 
-		case 10 : 
-		case 12 : 
-			return [input];
-			break;
 		case 3 : 
 			return [1, 2];
-			break;
 		case 5 : 
 			return [1, 4];
-			break;
 		case 6 : 
 			return [2, 4];
-			break;
 		case 7 : 
 			return [1, 2, 4];
+		case 12:
+			return [4, 8];
+		default:
+			return [input];
 	}
 }
 
@@ -991,4 +979,8 @@ function getCookie(cname) {
 
 function removeCookie(cname) {
 	document.cookie = cname + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+}
+
+function refresh_bgColour() {
+	document.documentElement.setAttribute("theme", localStorage.getItem("theme"));
 }
