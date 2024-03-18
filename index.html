@@ -61,7 +61,6 @@
 			<div id="nav_control_group">
 				<div id="nav_dummy"></div>
 				<div id="nav_search_random" class="hidden"></div>
-				<div id="nav_bulk_search" class="hidden disabled"></div>
 				<div id="nav_share" class="hidden disabled"></div>
 				<div id="nav_to_top"></div>
 			</div>
@@ -216,11 +215,11 @@
 		<div id="repertoire_section" class="section_container hidden">
 			<input id="rep_input" type="text" placeholder="曲名/読みで検索" autocomplete="off">
 			<div id="filter_container">
-				<div id="filter_entry_title" class="filter_title">
-					<div id="filter_entry_title_name" class="filter_title_name">フィルタ/並び順</div>
-					<div id="filter_entry_close" class="filter_close closed"></div>
+				<div id="filter_title">
+					<div id="filter_title_name">フィルタ/並び順</div>
+					<div id="filter_close" class="closed"></div>
 				</div>
-				<div id="filter_entry_content" class="hidden">
+				<div id="filter_content" class="hidden">
 					<div id="filter_entry_icon_container" class="filter_subblock_content anti_extra">
 						<p class="filter_subblock_title">メンバー</p>
 						<div class="icon_kirara_frame filter_icon_bg">
@@ -436,33 +435,51 @@
 							<div>しない</div>
 						</div>
 					</div>
+					<div class="settings_option">
+						<div>入力自動選択</div>
+						<div id="setting_rep_select" class="two_way">
+							<div class="selected">する</div>
+							<div>しない</div>
+						</div>
+					</div>
 				</div>
 			</div>
-			<div id="rep_list" class="popup_frame hidden">
-				<div class="rep_list_title_container">
-					<div class="rep_list_delete_container row-1 col-1">
-						<div class="rep_list_delete hidden"></div>
-					</div>
-					<h3 class="row-1 col-2">リクエスト</h3>
-					<div class="rep_list_wc_container row-1 col-3">
-						<div class="rep_list_wordcount"></div>
-					</div>
+			<div id="rep_share" class="popup_frame hidden">
+				<div class="rep_share_title">選択した曲を…</div>
+				<div id="rep_share_search" class="rep_share_option">
+					<span class="rep_share_icon"></span>
+					<span class="rep_share_text">曲検索</span>
 				</div>
-				<div id="rep_list_container">
-					<div id="rep_list_leftbar" class="hidden"></div>
-					<div id="rep_list_content" class="scrollbar"></div>
+				<div id="rep_share_tweet" class="rep_share_option">
+					<span class="rep_share_icon"></span>
+					<span class="rep_share_text">Twitterで共有</span>
 				</div>
-				<div class="rep_list_control grid_block-2">
-					<div id="rep_list_artist" class="row-1 col-1 rep_item">
-						<div id="list_artist_cb" class="checkbox selected"></div>
-						<div class="sort_name">アーティスト名</div>
-					</div>
-					<div id="rep_list_edit" class="row-1 col-2">編集</div>
-					<div id="rep_list_close" class="row-2 col1">閉じる</div>
-					<div id="rep_share_rap" class="row-2 col-2">
-						<div id="rep_compose_tweet" class="twitter col-1">ツイート</div>
-						<div id="rep_copy" class="col-2"></div>
-					</div>
+				<div id="rep_share_link" class="rep_share_option">
+					<span class="rep_share_icon"></span>
+					<span class="rep_share_text">URLで共有</span>
+				</div>
+			</div>
+			<div id="rep_tweet" class="popup_frame hidden">
+				<div id="rep_tweet_title">アーティスト名を…</div>
+				<div id="rep_tweet_artist">
+					<div id="rep_tweet_ya" class="rep_tweet_a selected">含む</div>
+					<div id="rep_tweet_no" class="rep_tweet_a">含まない</div>
+				</div>
+				<div id="rep_tweet_k" class="rep_tweet_submit">
+					<span class="rep_tweet_birb"></span>
+					<span class="rep_tweet_tag">#うたってきららちゃま</span>
+				</div>
+				<div id="rep_tweet_m" class="rep_tweet_submit">
+					<span class="rep_tweet_birb"></span>
+					<span class="rep_tweet_tag">#ももっとリクエスト</span>
+				</div>
+				<div id="rep_tweet_y" class="rep_tweet_submit extra hidden">
+					<span class="rep_tweet_birb"></span>
+					<span class="rep_tweet_tag">#つきみゆこ</span>
+				</div>
+				<div id="rep_tweet_t" class="rep_tweet_submit">
+					<span class="rep_tweet_copy"></span>
+					<span class="rep_tweet_tag">テキストとしてコピー</span>
 				</div>
 			</div>
 			<div id="memcount" class="popup_frame memcount_subblock anti_extra hidden">

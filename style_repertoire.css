@@ -5,30 +5,29 @@
 #rep_input {
     width: 92vw;
     padding: 0 1.8vw;
-    margin: 1.5vw 2vw 0 2vw;
+    margin: 1.5vw 2vw;
     height: 10vw;
     font-size: 5vw;
 	border-radius : 2vw;
 }
 
 #filter_container {
-	height : auto;
-	width : 92vw;
-	margin : 2.4vw 2vw;
+	margin : 0.5vw 2vw 2.4vw;
 	padding : 1.6vw;
-	border-radius : 1.6vw;
+	width : 92vw;
 	background-color : var(--filter-back);
-	font-size : 3.2vw;
 	color : var(--filter-text);
+	font-size : 3.2vw;
 	font-weight : bold;
 	border: 0.36vw solid var(--filter-border);
+	border-radius : 3.2vw;
 }
 
-.filter_title {
+#filter_title {
 	display : flex;
 }
 
-.filter_title_name {
+#filter_title_name {
 	padding-left: 1.2vw;
 	flex-grow : 1;
 	font-size : 4.4vw;
@@ -36,24 +35,24 @@
 	align-items: center;
 }
 
-.filter_close {
+#filter_close {
 	content : url("icon/list.png");
 	width : 6vw;
 	height : 6vw;
 	align-items : center;
-	margin: 5px 5px 5px 0;
+	margin: 1vw 2vw;
 	filter: var(--black-icon);
 }
 
-.filter_close.closed {
+#filter_close.closed {
 	transform : rotate(180deg);
 }
 
 .filter_subblock_title {
 	border-bottom : 0.5vw solid var(--filter-text);
-	width : 84vw;
-	margin : 0.6vw 0 1vw 0;
-	padding-left : 3.2vw;
+	width : 100%;
+	margin : 0.6vw 0.6vw 1vw;
+	padding-left : 2.6vw;
 	font-size : 3.6vw;
 }
 
@@ -116,7 +115,7 @@
 .rep_item {
 	display : flex;
 	align-items: center;
-	padding-left: 1.2vw;
+	padding-left: 2.4vw;
 	height: 6vw;
 }
 
@@ -139,9 +138,9 @@
 .rep_song_container {
 	font-weight : bold;
 	font-size : 3.2vw;
-	margin : 1.5vw 3.2vw;
+	margin : 1.5vw 3.6vw;
 	padding : .8vw 1.2vw .2vw 1.2vw;
-	border-radius : 0.8vw;
+	border-radius : 1.2vw;
 	border : 0.6vw solid var(--trnsp);
 	outline : .2vw solid var(--song-border);
 	color: var(--song-text);
@@ -233,143 +232,136 @@
 	margin-left : 4vw;
 }
 
-#rep_list {
+#rep_share {
 	position : absolute;
 	left : 50%;
 	top : 50%;
 	transform: translate(-50%, -50%);
-	width : 92vw;
-	height : auto;
+	width : 70vw;
+	height : 39vh;
+	color: var(--dialog-text-alt);
 	background-color : var(--dialog-back);
-	font-size : 4vw;
 	border: 0.5vw solid var(--dialog-border);
 	border-radius: 2vw;
-	overflow-y : auto;
-	text-align : center;
-	color : var(--dialog-text);
+}
+.rep_share_title {
+	height: 6vh;
+	margin: 2vh;
+	font-size: 4.8vw;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-.rep_list_title_container {
-	display : grid;
-	grid-template-columns: 30% 40% 30%;
+.rep_share_option {
+	margin: 2.5vh;
+	height: 7vh;
+	background-color: var(--dialog-back-alt);
+	border-radius: 2vw;
+
+	display: flex;
+	align-items: center;
 }
 
-.rep_list_delete_container {
-	position : relative;
+.rep_share_icon {
+	margin: 0 2vw 0 12vw;
+	width: 6vw;
+	padding: 0 1vw;
 }
 
-.rep_list_delete {
+#rep_share_search .rep_share_icon {
+	content: url(icon/to_yt.png);
+	filter: var(--white-icon);
+}
+
+#rep_share_tweet .rep_share_icon {
+	content: url(icon/birb.png);
+	filter: var(--white-icon);
+}
+
+#rep_share_link .rep_share_icon {
+	content: url(icon/link.png);
+	filter: var(--share-icon);
+}
+
+#rep_tweet {
 	position : absolute;
-	content : url("icon/trash.png");
-	width : 4.8vw;
-	height : 4.8vw;
-	left : 0;
-	bottom : 0;
-	margin-left : 2.4vw;
+	left : 50%;
+	top : 50%;
+	transform: translate(-50%, -50%);
+	width : 70vw;
+	height : 39vh;
+	color: var(--dialog-text-alt);
+	background-color : var(--dialog-back);
+	border: 0.5vw solid var(--dialog-border);
+	border-radius: 2vw;
 }
 
-.rep_list_wc_container {
-	position : relative;
+#rep_tweet_title {
+	height: 4vh;
+	margin: 1.6vh 0 0;
+	font-size: 4vw;
+
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
 }
 
-.rep_list_wordcount {
-	position : absolute;
-	bottom : 0;
-	right : 4vw;
-	font-size : 4vw;
-	font-weight : bold;
+#rep_tweet_artist {
+	display: grid;
+	grid-template-columns: 50% 50%;
+	margin: 0.2vh 2vw 2.4vh;
 }
 
-#rep_list_container.editing {
-	display : grid;
-	grid-template-columns: 8vw auto;
+.rep_tweet_a {
+	margin: 0.5vh 2vw;
+	padding: 0.8vh;
+	height: 2.4vh;
+	background-color: var(--dialog-back-alt);
+	border: 0.4vh solid var(--trnsp);
+	border-radius: 2vw;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-#rep_list_leftbar {
-	padding : 2vw;
-	height : 50vh;
-	overflow : hidden;
+.rep_tweet_a.selected {
+	border: 0.4vh solid var(--dialog-border);
 }
 
-.rep_list_item {
-	padding : 1.2vw 0.4vw;
-	width : 4.8vw;
-	height : 4.8vw;
+.rep_tweet_a:not(.selected) {
+	filter: opacity(0.4);
 }
 
-.rep_list_item {
-	content : url("icon/target.png");
+.rep_tweet_submit {
+	margin: 0.6vh 4vw 1.4vh;
+	padding: 1.2vh;
+	height: 2.5vh;
+	background-color: var(--dialog-back-alt);
+	border-radius: 2vw;
+
+	display: flex;
+	align-items: center;
 }
 
-.rep_list_item.arrow_up {
-	content : url("icon/arrow.png");
+.rep_tweet_submit span:first-child {
+	margin: 0 1.8vw 0 6vw;
 }
 
-.rep_list_item.arrow_down {
-	content : url("icon/arrow.png");
-	transform : rotate(180deg);
+.rep_tweet_birb {
+	content: url(icon/birb.png);
+	height: 4vw;
+	width: 4vw;
+	filter: var(--white-icon);
 }
 
-#rep_list_content {
-	overflow-y : auto;
-	background-color : var(--dialog-back-alt);
-	border-radius : 2vw;
-	border : none;
-	margin : 0vw 2vw;
-	padding : 2vw;
-	height : 50vh;
-	white-space : nowrap;
-}
-
-#rep_list_content>div {
-	height : 1em;
-	line-height : 1em;
-	overflow : hidden;
-	text-align : left;
-	padding : 1.6vw 0.4vw;
-}
-
-[theme=light] #rep_list_content>div {
-	color: var(--dialog-back);
-}
-
-.rep_list_control {
-	margin : 0 5%;
-	grid-template-columns: 50% 50% !important;
-}
-
-.rep_list_control>div {
-	margin : 2vw 0vw;
-}
-
-#list_artist_cb {
-	margin : auto 1.2vw;
-}
-
-.rep_list_control .twitter {
-	display : flex;
-	justify-content : center;
-	align-items : center;
-	transform: translate(62.5%, 0);
-}
-
-.rep_list_control>.disabled {
-	opacity: 0.4;
-}
-
-#rep_share_rap {
-	display : grid;
-	grid-template-columns: 80% 20%;
-}
-
-#rep_copy {
-	right : 0;
-	margin : 0.6vw;
-	width : 6vw;
-	height : 6vw;
-	content : url("icon/copy.png");
-	background-color : var(--dialog-text);
-	border-radius : 0.8vw;
+.rep_tweet_copy {
+	content: url(icon/copy.png);
+	height: 4vw;
+	width: 4vw;
+	filter: var(--share-icon);
 }
 
 /* general stuff */
@@ -477,7 +469,7 @@
 }
 
 .radio {
-	margin : 0.6vw;
+	margin : 0.8vw 1vw 0.6vw;
 	width : 3vw;
 	height : 3vw;
 	border-radius : 3vw;

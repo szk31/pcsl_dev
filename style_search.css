@@ -38,23 +38,29 @@ input[type="text"]::placeholder {
 }
 
 #search_options_container {
-	margin : 0.5vw 2.4vw;
-	padding : 1.8vw;
+	width: 92vw;
+	margin : 0.5vw 2vw;
+	padding : 1.8vw 1.6vw 0.6vw;
 	background-color : var(--filter-back);
-	border-radius : 2vw;
+	border-radius : 3.2vw;
 	border: 0.36vw solid var(--filter-border);
 	color: var(--filter-text);
+}
+
+#search_options_container label {
+	padding-left: 2.4vw;
 }
 
 .search_options_title {
 	font-size : 5vw;
 	font-weight : bold;
+	padding-left: 2.4vw;
 }
 
 .search_options_underline {
 	border-bottom : 0.5vw solid var(--filter-text);
 	margin-bottom : 1.6vw;
-	width : 95%;
+	width : 97.5%;
 	margin-right : 5%;
 }
 
@@ -65,11 +71,11 @@ input[type="text"]::placeholder {
 }
 
 .search_grid_2 {
-	grid-template-columns: 45% 45%;
+	grid-template-columns: 50% 50%;
 }
 
 .search_grid_3 {
-	grid-template-columns: 20% 25% 55%;
+	grid-template-columns: 22.5% 27.5% 50%;
 }
 
 .search_options_subblock.search_grid_2>label:not(#search_options_count) {
@@ -88,6 +94,10 @@ input[type="text"]::placeholder {
 
 .search_options_subblock .attr_name {
 	font-weight : bold;
+	display : flex;
+	align-items: center;
+	padding-left: 0.4vw;
+	height: 6vw;
 }
 
 /* singer section */
@@ -299,6 +309,11 @@ input[type="text"]::placeholder {
 [theme=dark] .singer_8m {
 	background-color : var(--s-yuco-back);
 	color : var(--s-yuco-text);
+}
+
+.singer_12 {
+	background-color : var(--s-yckr-back);
+	color : var(--s-yckr-text);
 }
 /* shiro (10) cc : 4.63 */
 .singer_16m,

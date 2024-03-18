@@ -1,55 +1,42 @@
 // stores whats currently looking up
-var loading = "";
+let loading = "";
 
-var part_filter = [1, 1, 1, 1, 1, 1];
+let part_filter = [1, 1, 1, 1, 1, 1];
 const part_rom = [1, 2, 4, 8, 16, 32];
 
 // store song id (song[id]) of folded up songs
-var hide_song = new Array();
-
-// if searching through song names or artist names
-var searching_song_name = true;
-
-// sort by date / type
-var search_sort_by_date = true;
-
-// sort asd / des
-var search_sort_asd = true;
+let hide_song = new Array();
 
 // max display boxes of autocomplete
-var auto_display_max;
+let auto_display_max;
 
 // flag : is loading songs from rep selected
-var is_searching_from_rep = false;
+let is_searching_from_rep = false;
 
-var search_input_focused = false;
+let input_focused = false;
 
 $(function() {
 	// nav - random
 	$(document).on("click", "#nav_search_random", function() {
-		if($(this).hasClass("disabled") && !do_random_anyway || prevent_menu_popup) {
+		if($(this).hasClass("disabled") && !setting.random_ignore || prevent_menu_popup) {
 			return;
 		}
 		// check if the song has any visibile record
-		var random_song,
-			found = 0,
-			sel_member = 31;
-		for (var i in part_filter) {
-			if (!part_filter[i]) {
-				sel_member -= 1 << i;
+		let random_song,
+			found = sel_member = 0;
+		for (let i in part_filter) {
+			if (part_filter[i]) {
+				sel_member += part_rom[i];
 			}
 		}
-		if (sel_member === 0) {
+		if (!sel_member) {
 			// no body got selected so
 			return;
 		}
 		do {
 			random_song = 1 + Math.floor(Math.random() * song.length);
-			for (var i in entry_proc[random_song]) {
-				if (!(sel_member & entry[entry_proc[random_song][i]][entry_idx.type])) {
-					continue;
-				}
-				if ((!do_display_hidden) && is_private(entry_proc[random_song][i])) {
+			for (let i in entry_proc[random_song]) {
+				if (!(rep_list[random_song] & sel_member) || (!setting.show_hidden && is_private(entry_proc[random_song][i]))) {
 					continue;
 				}
 				found++;
@@ -67,9 +54,9 @@ $(function() {
 			return;
 		}
 		// generate url w/ first song
-		var out_url = "szk31.github.io/pcsl/?search=" + song_lookup.indexOf(hits[0]);
+		let out_url = "szk31.github.io/pcsl/?search=" + song_lookup.indexOf(hits[0]);
 		// then add 2nd to last song
-		for (var i = 1; i < hits.length; ++i) {
+		for (let i = 1; i < hits.length; ++i) {
 			out_url += ("," + song_lookup.indexOf(hits[i]));
 		}
 		navigator.clipboard.writeText(out_url);
@@ -84,16 +71,14 @@ $(function() {
 		
 		// search - input - autocomplete - selection
 		$(document).on("mousedown", ".auto_panel", function() {
-			var e = to_non_html($(this).attr("id"));
-			// set input
-			$("#input").val(e);
+			$("#input").val(to_non_html(this.id));
 			// input on blur fires after this so no need to run search here
 		});
 
 		// search - input - submit
 		$(document).on("blur", "#input", function() {
 			$("#search_auto").addClass("hidden");
-			search_input_focused = false;
+			input_focused = false;
 			is_searching_from_rep ? is_searching_from_rep = 0 : $("#nav_share").toggleClass("disabled", !is_searching_from_rep);
 			search();
 		});
@@ -106,23 +91,26 @@ $(function() {
 		});
 		
 		// search - input::focus -> reset, auto complete
-		$(document).on("click", "#input", function() {
-			if (search_input_focused) {
+		$(document).on("click", "#input, #rep_input", function() {
+			if (input_focused) {
 				return;
 			}
-			search_input_focused = true;
-			if (do_select_input) {
-				var pass = this;
+			input_focused = true;
+			if (setting.select_input && this.id === "input" ||
+			setting.rep_select_input && this.id === "rep_input") {
+				let pass = this;
 				setTimeout(function() {
 					pass.setSelectionRange(0, $(pass).val().length);
 				}, 0);
 			}
-			else if (loading === "!bulk_load_flag") {
+			else if (loading === "!bulk_load_flag" && this.id === "input") {
 				$(this).val("");
 				$("#nav_search_random").removeClass("disabled");
 				$("#nav_share").addClass("disabled");
 			}
-			auto_search();
+			if (this.id === "input") {
+				auto_search();
+			}
 		});
 		
 		// search - collapse option menu
@@ -133,7 +121,7 @@ $(function() {
 		
 		// search - options - singer
 		$(document).on("click", ".singer_icon", function() {
-			var e = parseInt($(this).attr('class').split(/\s+/).find(x => x.startsWith("sing_sel_")).replace("sing_sel_", ""));
+			let e = parseInt($(this).attr("class").split(/\s+/).find(x => x.startsWith("sing_sel_")).replace("sing_sel_", ""));
 			part_filter[part_rom.indexOf(e)] ^= 1;
 			// just add a new filter[6] to use at displaying
 			$(".sing_sel_" + e).toggleClass("selected");
@@ -143,72 +131,70 @@ $(function() {
 		
 		// search - options - method
 		$(document).on("click", ".search_option_group1", function() {
-			var clicked_id = $(this).attr("id").replace(/(search_options_)/, "");
-			var new_setting = clicked_id === "songname";
-			if (new_setting === searching_song_name) {
+			let new_setting = this.id === "search_options_songname";
+			if (new_setting === setting.search_by_song) {
 				// nothing changed
 				return;
 			}
-			searching_song_name = new_setting;
+			setting.search_by_song = new_setting;
 			$(".search_option_group1>.radio").toggleClass("selected");
 			$("#input").val("");
-			$("#nav_share").addClass("disabled");
-			$("#input").attr("placeholder", searching_song_name ? "曲名/読みで検索" : "アーティスト名で検索");
+			$("#input").attr("placeholder", setting.search_by_song ? "曲名/読みで検索" : "アーティスト名で検索");
 			$("#search_display").html("");
 			loading = "";
 			// disable / renable random
-			$("#nav_search_random").toggleClass("disabled", !searching_song_name);
+			$("#nav_search_random").toggleClass("disabled", !setting.search_by_song);
 		});
 		
 		// search - options - sort - method
 		$(document).on("click", ".search_option_group2", function() {
-			var clicked_id = $(this).attr("id").replace(/(search_options_)/, "");
-			var new_setting = clicked_id === "date";
-			if (search_sort_by_date === new_setting) {
+			let new_setting = thid.id === "search_options_date";
+			if (new_setting === setting.search_sort_by_date) {
 				// nothing changed
 				return;
 			}
-			search_sort_by_date = new_setting;
+			setting.search_sort_by_date = new_setting;
 			$(".search_option_group2>.radio").toggleClass("selected");
 			update_display();
-			$("#search_options_asd>.attr_name").html(search_sort_by_date ? 
-			(search_sort_asd ? "古い順&nbsp;(⇌新しい順)" : "新しい順&nbsp;(⇌古い順)") : 
-			(search_sort_asd ? "正順&nbsp;(⇌逆順)" : "逆順&nbsp;(⇌正順)"));
+			$("#search_options_asd>.attr_name").html(setting.search_sort_by_date ? 
+			(setting.search_sort_asd ? "古い順&nbsp;(⇌新しい順)" : "新しい順&nbsp;(⇌古い順)") : 
+			(setting.search_sort_asd ? "正順&nbsp;(⇌逆順)" : "逆順&nbsp;(⇌正順)"));
 		});
 		
 		// search - options - sort - asd/des
 		$(document).on("click", ".search_option_group3", function() {
-			search_sort_asd ^= 1;
-			$("#search_options_asd>.attr_name").html(search_sort_by_date ? 
-			(search_sort_asd ? "古い順&nbsp;(⇌新しい順)" : "新しい順&nbsp;(⇌古い順)") : 
-			(search_sort_asd ? "正順&nbsp;(⇌逆順)" : "逆順&nbsp;(⇌正順)"));
+			setting.search_sort_asd ^= 1;
+			$("#search_options_asd>.attr_name").html(setting.search_sort_by_date ? 
+				(setting.search_sort_asd ? "古い順&nbsp;(⇌新しい順)" : "新しい順&nbsp;(⇌古い順)") : 
+				(setting.search_sort_asd ? "正順&nbsp;(⇌逆順)" : "逆順&nbsp;(⇌正順)")
+			);
 			update_display();
 		});
 		
 		// search - song - hide_song
 		$(document).on("click", ".song_name_container", function(e) {
-			if (!$(e.target).hasClass("song_copy_icon")) {
-				var f = parseInt($(this).attr("id"));
-				if(!hide_song.includes(f)){
-					hide_song.push(f);
-				}else{
-					hide_song.splice(hide_song.indexOf(f), 1);
-				}
-				$(".song_" + f).toggleClass("hidden");
-				$("#fold_" + f).toggleClass("closed");
+			if ($(e.target).hasClass("song_copy_icon")) {
+				return;
 			}
+			let f = this.id;
+			if (hide_song.includes(f)) {
+				hide_song.splice(hide_song.indexOf(f), 1);
+			} else {
+				hide_song.push(f);
+			}
+			$(".song_" + f).toggleClass("hidden");
+			$("#fold_" + f).toggleClass("closed");
 		});
 
 		// search - song - copy_name
 		$(document).on("click", ".song_copy_icon", function() {
-			var e = parseInt($(this).attr("id").replace("copy_name_", ""));
-			navigator.clipboard.writeText(song[e][song_idx.name]);
+			navigator.clipboard.writeText(song[parseInt(this.id.replace("copy_name_", ""))][song_idx.name]);
 			copy_popup();
 		});
 		
 		// search - entry - share
 		$(document).on("click", ".entry_share", function() {
-			var entry_id = parseInt($(this).attr("id").replace("entry_", ""));
+			let entry_id = parseInt(this.id.replace("entry_", ""));
 			// get video title
 			const url = "https://www.youtube.com/watch?v=" + video[entry[entry_id][entry_idx.video]][video_idx.id];
 
@@ -220,7 +206,7 @@ $(function() {
 					alert("動画タイトル取得できませんでした。");
 					return;
 				}
-				var tweet;
+				let tweet;
 				if (entry[entry_id][entry_idx.time] === 0) {
 					tweet = data.title + "\n(youtu.be/" + video[entry[entry_id][entry_idx.video]][video_idx.id] + ")";
 				} else {
@@ -232,22 +218,22 @@ $(function() {
 	}
 });
 
-var hits = [];
+let hits = [];
 
 function auto_search() {
-	var e = $("#input").val().normalize("NFKC").toLowerCase().trim();
-	if (e === "" || !searching_song_name) {
+	let e = $("#input").val().normalize("NFKC").toLowerCase().trim();
+	if (e === "" || !setting.search_by_song) {
 		$("#search_auto").addClass("hidden");
 		return;
 	}
-	var auto_exact = [],
+	let auto_exact = [],
 		auto_other = [],
 		auto_exact_count = 0,
 		auto_other_count = 0;
 	// search for series name
-	for (var i in series_lookup) {
-		for (var j in series_lookup[i]) {
-			var f = series_lookup[i][j].indexOf(e);
+	for (let i in series_lookup) {
+		for (let j in series_lookup[i]) {
+			let f = series_lookup[i][j].indexOf(e);
 			if (f !== -1) {
 				// if string exist in series variations
 				auto_exact[auto_exact_count++] = i;
@@ -259,12 +245,12 @@ function auto_search() {
 	if (!/[^\u3040-\u309F\u30FC\u30F4]/.test(e)) {
 		// search for reading
 		// should search for index of 1st char -> 2nd then try to fill up auto_exact first but who cares about loading time anyway
-		for (var i = 1; i < song.length; ++i) {
+		for (let i = 1; i < song.length; ++i) {
 			// skip if same song name
 			if (i > 2 && song[i][song_idx.name].trim() === song[i - 1][song_idx.name].trim()) {
 				continue;
 			}
-			var f = song[i][song_idx.reading].indexOf(e);
+			let f = song[i][song_idx.reading].indexOf(e);
 			switch (f) {
 				case  0 : // found, from beginning
 					if (entry_proc[i].length > 0) {
@@ -285,16 +271,16 @@ function auto_search() {
 		}
 	} else {
 		// search for song name
-		for (var i = 1; i < song.length; ++i) {
+		for (let i = 1; i < song.length; ++i) {
 			// skip if same song name
 			if (i > 2 && song[i][song_idx.name].trim() === song[i - 1][song_idx.name].trim()) {
 				continue;
 			}
-			var f = song[i][song_idx.name].toLowerCase().indexOf(e);
+			let f = song[i][song_idx.name].toLowerCase().indexOf(e);
 			// special notation in reading
 			if (f === -1) {
 				// get reading first space position
-				var space_pos = song[i][song_idx.reading].indexOf(" ");
+				let space_pos = song[i][song_idx.reading].indexOf(" ");
 				if (space_pos > 0) {
 					//  position of searching string
 					if (song[i][song_idx.reading].indexOf(e) > space_pos) {
@@ -323,23 +309,19 @@ function auto_search() {
 		}
 	}
 	// display
-	var auto_display_count = 0;
-	var new_html = "";
-	for (var i in auto_exact) {
+	let auto_display_count = 0;
+	let new_html = "";
+	for (let i in auto_exact) {
 		// data being number (song id) or string (series name)
-		var auto_reading, auto_display, song_name;
+		let auto_reading, auto_display, song_name;
 		if (isNaN(parseInt(auto_exact[i]))) {
 			// series name
 			auto_reading = "";
 			auto_display = song_name = auto_exact[i];
 		} else {
 			// song reading
-			var song_reading = song[auto_exact[i]][song_idx.reading];
-			if (song_reading.indexOf(" ") === -1) {
-				auto_reading = bold(song_reading, e)
-			} else {
-				auto_reading = bold(song_reading.substring(0, song_reading.indexOf(" ")), e);
-			}
+			let song_reading = song[auto_exact[i]][song_idx.reading];
+			auto_reading = bold(song_reading.indexOf(" ") === -1 ? song_reading : song_reading.substring(0, song_reading.indexOf(" ")), e);
 			// song name
 			song_name = song[auto_exact[i]][song_idx.name];
 			auto_display = bold(song_name, e);
@@ -347,7 +329,7 @@ function auto_search() {
 		new_html += ("<div id=\"" + to_html(song_name) + "\" class=\"auto_panel" + (auto_display_count === 0 ? " auto_first" : "") + "\"><div class=\"auto_reading\">" + auto_reading + "</div><div class=\"auto_display\">" + auto_display + "</div></div>");
 		auto_display_count++;
 	}
-	for (var i in auto_other) {
+	for (let i in auto_other) {
 		new_html += ("<div id=\"" + to_html(song[auto_other[i]][song_idx.name]) + "\" class=\"auto_panel" + (auto_display_count === 0 ? " auto_first" : "") + "\"><div class=\"auto_reading\"></div><div class=\"auto_display\">" + bold(song[auto_other[i]][song_idx.name], e) + "</div></div>");
 		
 		if (++auto_display_count >= auto_display_max) {
@@ -355,11 +337,7 @@ function auto_search() {
 		}
 	}
 	$("#search_auto").html(new_html);
-	if (new_html !== "") {
-		$("#search_auto").removeClass("hidden");
-	} else {
-		$("#search_auto").addClass("hidden");
-	}
+	$("#search_auto").toggleClass("hidden", new_html === "");
 }
 
 function search() {
@@ -368,12 +346,12 @@ function search() {
 		update_display();
 		return;
 	}
-	var e = $("#input").val().trim();
-	if (e === loading) {
+	let search_value = $("#input").val().trim();
+	if (search_value === loading) {
 		return;
 	}
-	loading = e;
-	if (e === "") {
+	loading = search_value;
+	if (search_value === "") {
 		// clear current list
 		$("#search_display").html("");
 		// enable random
@@ -382,15 +360,15 @@ function search() {
 	}
 	// not empty input
 	// disable random
-	if (!do_random_anyway) {
+	if (!setting.random_ignore) {
 		$("#nav_search_random").addClass("disabled");
 	}
 	// replace wchar w/ char
-	e = e.normalize("NFKC").toLowerCase();
-	var series_name = "";
-	for (var i in series_lookup) {
-		for (var j in series_lookup[i]) {
-			if (series_lookup[i].includes(e)) {
+	search_value = search_value.normalize("NFKC").toLowerCase();
+	let series_name = "";
+	for (let i in series_lookup) {
+		for (let j in series_lookup[i]) {
+			if (series_lookup[i].includes(search_value)) {
 				series_name = i;
 				break;
 			}
@@ -400,10 +378,10 @@ function search() {
 		}
 	}
 	// search for series in attr
-	var attr_series = 0;
+	let attr_series = 0;
 	if (series_name != "") {
-		var using_attr = [2, 3, 4, 7];
-		for (var i in using_attr) {
+		let using_attr = [2, 3, 4, 7];
+		for (let i in using_attr) {
 			if (attr_idx[using_attr[i]] === series_name) {
 				attr_series = using_attr[i];
 				break;
@@ -412,11 +390,11 @@ function search() {
 	}
 
 	hits = [];
-	for (var i = 1; i < song.length; ++i) {
+	for (let i = 1; i < song.length; ++i) {
 		if (hits.length === 200) {
 			break;
 		}
-		if (searching_song_name) {
+		if (setting.search_by_song) {
 			if (series_name !== "") {
 				if (song[i][song_idx.reading].includes(series_name)) {
 					hits.push(i);
@@ -429,31 +407,27 @@ function search() {
 					}
 				}
 			} else {
-				if (processed_song_name[i].includes(e) ||
-					song[i][song_idx.reading].toLowerCase().includes(e)
+				if (processed_song_name[i].includes(search_value) ||
+					song[i][song_idx.reading].toLowerCase().includes(search_value)
 				) {
 					hits.push(i);
 				}
 			}
 		} else {
-			if (song[i][song_idx.artist].toLowerCase().includes(e)) {
+			if (song[i][song_idx.artist].toLowerCase().includes(search_value)) {
 				hits.push(i);
 			}
 		}
 	}
-	$("#nav_share").toggleClass("disabled", searching_song_name || hits === 0);
+	$("#nav_share").toggleClass("disabled", setting.search_by_song || hits === 0);
 	// sort exact song name to top
 	hits.sort(function (a, b) {
-		if (song[a][song_idx.name].trim().toLowerCase() === e) {
+		let song_b_name = song[b][song_idx.name].trim().toLowerCase();
+		if (song[a][song_idx.name].trim().toLowerCase() === search_value) {
 			// exist a record same to input
-			if (song[b][song_idx.name].trim().toLowerCase() === e) {
-				// if the other record is also same to input
-				return 0;
-			} else {
-				return -1;
-			}
+			return song_b_name === search_value ? 0 : -1;
 		} else {
-			if (song[b][song_idx.name].trim().toLowerCase() === e) {
+			if (song_b_name === search_value) {
 				return 1;
 			}
 		}
@@ -469,42 +443,39 @@ function update_display(force = false) {
 	if (loading === "" && !force) {
 		return;
 	}
-	var current_song = -1;
+	let current_song = -1;
 	// record loaded song (for un-hiding song thats no longer loaded)
-	var loaded_song = [];
-	var loaded_count = 0;
-	
-	var new_html = "";
-	var displayed = 0;
-	var found_entries = 0;
-	for (var i = 0; i < hits.length; ++i) {
+	let loaded_song = [];
+	let loaded_count = displayed = found_entries = 0;
+	let new_html = "";
+	for (let i = 0; i < hits.length; ++i) {
 		// sort according to settings
-		var sorted_enrties = [];
-		if (search_sort_by_date) {
+		let sorted_enrties = [];
+		if (setting.search_sort_by_date) {
 			sorted_enrties = entry_proc[hits[i]].sort((a, b) => {
-				return (search_sort_asd ? a - b : b - a);
+				return (setting.search_sort_asd ? a - b : b - a);
 			});
 		} else {
 			sorted_enrties = entry_proc[hits[i]].sort((a, b) => {
 				if (entry[a][entry_idx.type] === entry[b][entry_idx.type]) {
 					return a - b;
 				}
-				return (search_sort_asd ? 1 : -1) * (display_order[entry[a][entry_idx.type]] - display_order[entry[b][entry_idx.type]])
+				return (setting.search_sort_asd ? 1 : -1) * (display_order[entry[a][entry_idx.type]] - display_order[entry[b][entry_idx.type]])
 			});
 		}
 		found_entries += sorted_enrties.length;
-		for (var j = 0; j < sorted_enrties.length; ++j) {
-			var cur_entry = sorted_enrties[j];
+		for (let j = 0; j < sorted_enrties.length; ++j) {
+			let cur_entry = sorted_enrties[j];
 			// get part filter
-			var no_selected_found = true;
-			for (var k in part_filter) {
+			let no_selected_found = true;
+			for (let k in part_filter) {
 				if (part_filter[k] && (part_rom[k] & entry[cur_entry][entry_idx.type])){
 					no_selected_found = false;
 					break;
 				}
 			}
 			// if hit on previous module or private
-			if (no_selected_found || ((!do_display_hidden) && is_private(cur_entry))) {
+			if (no_selected_found || ((!setting.show_hidden) && is_private(cur_entry))) {
 				continue;
 			}
 			// if new song
@@ -513,11 +484,11 @@ function update_display(force = false) {
 				current_song = entry[cur_entry][entry_idx.song_id];
 				loaded_song[loaded_count++] = current_song;
 				// if hide the song
-				var show = !hide_song.includes(current_song);
+				let show = !hide_song.includes(current_song);
 				// check song name
-				var song_name = song[current_song][song_idx.name].normalize("NFKC");
-				var song_name_length = 0;
-				for (var k = 0; k < song_name.length; ++k) {
+				let song_name = song[current_song][song_idx.name].normalize("NFKC");
+				let song_name_length = 0;
+				for (let k = 0; k < song_name.length; ++k) {
 					song_name_length += /[ -~]/.test(song_name.charAt(k)) ? 1 : 2;
 				}
 				// you know what fuck this shit i will just add exception
@@ -543,9 +514,9 @@ function update_display(force = false) {
 					"</div>" +
 				"</div>");
 			}
-			var is_mem = entry[cur_entry][entry_idx.note].includes("【メン限");
-			var no_note = entry[cur_entry][entry_idx.note] === "" || entry[cur_entry][entry_idx.note] === "【メン限】" || entry[cur_entry][entry_idx.note] === "【メン限アーカイブ】";
-			var note = entry[cur_entry][entry_idx.note];
+			let is_mem = entry[cur_entry][entry_idx.note].includes("【メン限");
+			let no_note = entry[cur_entry][entry_idx.note] === "" || entry[cur_entry][entry_idx.note] === "【メン限】" || entry[cur_entry][entry_idx.note] === "【メン限アーカイブ】";
+			let note = entry[cur_entry][entry_idx.note];
 			if (is_mem) {
 				note = note.replace(/【メン限アーカイブ】|【メン限】/g, "");
 			}
@@ -594,7 +565,7 @@ function update_display(force = false) {
 	
 	$("#search_display").html(new_html + "</div><div class=\"general_vertical_space\"></div>");
 	// check all hiden songs
-	for (var i = 0; i < hide_song.length; ++i) {
+	for (let i = 0; i < hide_song.length; ++i) {
 		// if song havnt been loaded, remove from hide list
 		if (!loaded_song.includes(hide_song[i])) {
 			hide_song.splice(i--, 1);

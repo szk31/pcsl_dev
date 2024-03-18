@@ -1,7 +1,7 @@
 //"use strict";
 // display string, refered in entry[].type
-var singer_lookup = [
-	"reserved",			// 0b 0000 0x 0
+const singer_lookup = [
+	"",					// 0b 0000 0x 0
 	"看谷にぃあ",		//    0001    1
 	"胡桃澤もも",		//    0010    2
 	"ももにぃあ",		//    0011    3
@@ -9,16 +9,18 @@ var singer_lookup = [
 	"きらにぃあ",		//    0101    5
 	"ももきら",			//    0110    6
 	"ぷちここ",			//    0111    7
-	"つきみゆこ",		//    1001    8
-	9,10,11,12,13,14,15,
-	"愛白ふりる",		//    1010    A
-	17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
-	"小悪熊ちゅい",		//    1100    C
+	"つきみゆこ",		//    1000    8
+	,,,
+	"ゆこきら",
+	,,,
+	"愛白ふりる",		//   10000   10
+	,,,,,,,,,,,,,,,
+	"小悪熊ちゅい",		//  100000   20
 ];
 
 // display order of search
-var display_order = [
-	-1,		// 0000
+const display_order = [
+	,		// 0000
 	7, 		// 0001
 	6,		// 0010
 	4,		// 0011
@@ -26,18 +28,17 @@ var display_order = [
 	3,		// 0101
 	2,		// 0110
 	1,		// 0111
-	-1,		// 1000
-	14,		// 1001
-	13,		// 1010
-	11,		// 1011
-	12,		// 1100
-	10,		// 1101
-	9,		// 1110
-	8,		// 1111
+	11,		// 1000
+	,,,
+	8,
+	,,,
+	10,		//10000
+	,,,,,,,,,,,,,,,
+	9
 ];
 
 // display order of rep display
-var member_display_order = [
+let member_display_order = [
 	7,
 	6,
 	5,
@@ -48,7 +49,7 @@ var member_display_order = [
 ];
 
 // series search
-var series_lookup = {
+const series_lookup = {
 	"マクロス" : ["マクロス", "まくろす"],
 	"ラブライブ" : ["ラブライブ", "らぶらいぶ", "LL", "ll"],
 	"アイマス" : ["アイマス", "あいます", "デレマス", "でれます"],
@@ -59,30 +60,28 @@ var series_lookup = {
 };
 
 // indices lookup
-var entry_idx = {
+const entry_idx = {
 	song_id : 0,
 	video : 1,
 	note : 2,
 	time : 3,
 	type : 4
-};
-var song_idx = {
+}, song_idx = {
 	name : 0,
 	artist : 1,
 	reading : 2,
 	attr : 3,
 	release : 4,
 	reference : 5
-};
-var video_idx = {
+}, video_idx = {
 	id : 0,
 	date : 1
 };
 
-var video, entry;
+let video, entry;
 
-var version = "1.6.5";
-var key_hash = [
+const version = "1.7.0";
+const key_hash = [
 	"473c05c1ae8349a187d233a02c514ac73fe08ff4418429806a49f7b2fe4ba0b7a36ba95df1d58b8e84a602258af69194", //thereIsNoPassword
 	"3f01e53f1bcee58f6fb472b5d2cf8e00ce673b13599791d8d2d4ddcde3defbbb4e0ab7bc704538080d704d87d79d0410"
 ];
@@ -90,61 +89,54 @@ var key_hash = [
 /* control / memories */
 
 // prevent menu from opening when info or setting is up
-var prevent_menu_popup = false;
+let prevent_menu_popup = false;
 
 // current page name
-var current_page = "home";
+let current_page = "home";
 
 // key inputed check
-var key_valid = 0;
+let key_valid = 0;
 
 /* setting section */
-// if on, display private entries despite not accessable
-var do_display_hidden = true;
+let setting = {
+	// search
+	show_hidden : true,				// if display private video
+	select_input : true,			// select input on click
+	show_random : false,			// display random button
+	random_ignore : true,			// bypass random rule:(input being empty)
+	search_by_song : true,			// config: searching by song name
+	search_sort_by_date : true,		// config: display sort by date
+	search_sort_asd : true,			// config: sort ascendingly 
 
-// if the previous input should be selected when user tap input box
-var do_select_input = true;
-
-// if random requirement is ignored (input being blank)
-var do_random_anyway = false;
-
-// show search random icon
-var do_show_random = false;
-
-// show rep-song release date
-var do_show_release = false;
-
-// copy song name when long press on rep song name
-var do_longPress_copy = true;
+	// rep
+	show_release : false,			// if display release date
+	longPress_copy : true,			// if long press on song name copies
+	rep_select_input : true,		// select input on click
+	rep_sort : "50",				// config: display sort by method
+	rep_sort_asd : true,			// config: sort ascendingly
+	rep_selected_first : false,		// config: display selecetd songs on top
+	rep_show_artist : true			// hidden: rep-share include artist name
+};
 
 // ram for searching (entry_processed)
-var entry_proc = [];
+let entry_proc = [];
 
 // memcount - rep generate interval flag
-var memcount_rep_int;
+let memcount_rep_int;
 
 // pre-process song names
-var processed_song_name = [""];
+let processed_song_name = [""];
 
 {	// theme
-	var theme = localStorage.getItem("theme");
+	let theme = ls("theme");
 	if (theme === null) {
 		theme = "mixed";
-		localStorage.setItem("theme", theme);
+		ls("theme", theme);
 	}
 	document.documentElement.setAttribute("theme", theme);
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
-	// change settings selected theme
-	$(`#three_way_${localStorage.getItem("theme")}`).addClass("selected");
-
-	var key;
-	function decrypt(input) {
-		return content_level ? CryptoJS.AES.decrypt(input, key).toString(CryptoJS.enc.Utf8) : input;
-	}
-	// check if loading inner sector
-	
 	if (window.innerHeight / window.innerWidth < 1.5) {
 		// bad screen ratio, open new window
 		$("#v_screen").addClass("post_switch");
@@ -157,45 +149,46 @@ document.addEventListener('DOMContentLoaded', async function() {
 		return;
 	}
 
-	// check url para first
-	var url_para = new URLSearchParams(window.location.search);
-	key = url_para.get("key");
-	var load_from_storage = true;
-	var content_level = 0;
-	// swicth to local storage if needed
-	if (getCookie("pcsl_content_key") !== "") {
-		localStorage.setItem("pcsl_key", getCookie("pcsl_content_key"));
-		removeCookie("pcsl_content_key");
+	let key;
+	function decrypt(input) {
+		return content_level ? CryptoJS.AES.decrypt(input, key).toString(CryptoJS.enc.Utf8) : input;
 	}
+	// change settings selected theme
+	$(`#three_way_${ls("theme")}`).addClass("selected");
+	// check url para first
+	let url_para = new URLSearchParams(window.location.search);
+	key = url_para.get("key");
+	let load_from_storage = true;
+	let content_level = 0;
 	// level 2 storage
-	if (await getSHA384Hash(localStorage.getItem("pcsl_key")) === key_hash[1]) {
+	if (await getSHA384Hash(ls("pcsl_key")) === key_hash[1]) {
 		content_level = 2;
-		key = localStorage.getItem("pcsl_key");
+		key = ls("pcsl_key");
 	}
 	// level 2 url para
 	else if (key !== "" && await getSHA384Hash(key) === key_hash[1]) {
 		content_level = 2;
 		load_from_storage = false;
-		localStorage.setItem("pcsl_key", key);
+		ls("pcsl_key", key);
 	}
 	// level 1 storage
-	else if (await getSHA384Hash(localStorage.getItem("pcsl_key")) === key_hash[0]) {
+	else if (await getSHA384Hash(ls("pcsl_key")) === key_hash[0]) {
 		content_level = 1;
-		key = localStorage.getItem("pcsl_key");
+		key = ls("pcsl_key");
 	}
 	// level 1 url para
 	else if (key !== "" && await getSHA384Hash(key) === key_hash[0]) {
 		content_level = 1;
 		load_from_storage = false;
-		localStorage.setItem("pcsl_key", key);
+		ls("pcsl_key", key);
 	}
 	key_valid = content_level ? 1 : 0;
 	// load data
-	var local_version_hash = localStorage.getItem("pcsl_version_hash");
+	let local_version_hash = ls("pcsl_version_hash");
 	//  data version is up to date             key did not update
 	if (local_version_hash === version_hash && load_from_storage) {
 		// good to use old data
-		var ls_data = localStorage.getItem("pcsl_data").split("\n");
+		let ls_data = ls("pcsl_data").split("\n");
 		video = JSON.parse(decrypt(ls_data[0]));
 		entry = JSON.parse(decrypt(ls_data[1]));
 		process_data();
@@ -216,15 +209,15 @@ document.addEventListener('DOMContentLoaded', async function() {
 			entry = JSON.parse(decrypt(objs[1]));
 
 			// save to local storage
-			localStorage.setItem("pcsl_data", data);
-			localStorage.setItem("pcsl_version_hash", version_hash);
+			ls("pcsl_data", data);
+			ls("pcsl_version_hash", version_hash);
 			process_data();
 		});
 	}
 	
 	// changing thing if key valid
 	if (key_valid) {
-		member_display_order = [7, 6, 5, 3, 4, 2, 1, 12, 10, 9];
+		member_display_order = [7, 6, 5, 3, 4, 2, 1, 32, 16, 8];
 		$(".extra").removeClass("hidden");
 		$(".memcount_subblock").removeClass("anti_extra");
 		$(".anti_extra").html("");
@@ -233,91 +226,79 @@ document.addEventListener('DOMContentLoaded', async function() {
 		$("#filter_entry_icon_container").addClass("hidden");
 		$("#filter_entry_icon_extra").removeClass("hidden");
 	} else {
-		// remove things thats not needed
-		$(".extra").html("");
-		$(".extra").attr("class", "");
 		part_filter = [1, 1, 1, 0, 0, 0];
 	}
 });
 
 function process_data() {
 	$("#loading_text").html("Processing data...");
-	var url_para = new URLSearchParams(window.location.search);
+	let url_para = new URLSearchParams(window.location.search);
 	// remove key
 	url_para.delete("key");
 	window.history.pushState(null, null, `${document.location.href.split('?')[0]}${url_para.size ? `?${url_para}` : ""}`)
 	
-	// switch from cookie to local storage
-	if (getCookie("pcsl_settings_display") !== "") {
-		// old user, not switched
-		do_display_hidden = (getCookie("pcsl_settings_hidden")) === "1";
-		do_select_input   = (getCookie("pcsl_settings_clear")) === "1";
-		do_random_anyway  = (getCookie("pcsl_settings_random")) === "1";
-		
-		localStorage.setItem("pcsl_s_showHidden", getCookie("pcsl_settings_hidden"));
-		localStorage.setItem("pcsl_s_selecInput", getCookie("pcsl_settings_clear"));
-		localStorage.setItem("pcsl_s_showRandom", "0");
-		localStorage.setItem("pcsl_s_ignoreRule", getCookie("pcsl_settings_random"));
-		localStorage.setItem("pcsl_s_showReleas", "0");
-		localStorage.setItem("pcsl_s_LPressCopy", "1")
+	// ad local storage if not exist
+	const lookup = [
+		["pcsl_s_showHidden", 1],
+		["pcsl_s_selecInput", 1],
+		["pcsl_s_showRandom", 0],
+		["pcsl_s_ignoreRule", 0],
+		["pcsl_s_showReleas", 0],
+		["pcsl_s_LPressCopy", 1],
+		["pcsl_s_rep_select", 1]
+	];
+	for (let i in lookup) {
+		if (ls(lookup[i][0]) === null) {
+			ls(lookup[i][0], lookup[i][1]);
+		}
+	}
 
-		// remove cookies
-		removeCookie("pcsl_settings_hidden");
-		removeCookie("pcsl_settings_clear");
-		removeCookie("pcsl_settings_random");
-		
-		removeCookie("is_mobile");
-		removeCookie("pcsl_settings_display");
-		removeCookie("pcsl_settings_select");
-		removeCookie("pcsl_settings_share");
-	}
-	else if (localStorage.getItem("pcsl_s_showHidden") === null) {
-		// new user
-		localStorage.setItem("pcsl_s_showHidden", "1");
-		localStorage.setItem("pcsl_s_selecInput", "1");
-		localStorage.setItem("pcsl_s_showRandom", "0");
-		localStorage.setItem("pcsl_s_ignoreRule", "0");
-		localStorage.setItem("pcsl_s_showReleas", "0");
-		localStorage.setItem("pcsl_s_LPressCopy", "1")
-	} else {
-		// read from local storage
-		do_display_hidden = localStorage.getItem("pcsl_s_showHidden") === "1";
-		do_select_input   = localStorage.getItem("pcsl_s_selecInput") === "1";
-		do_show_random    = localStorage.getItem("pcsl_s_showRandom") === "1";
-		do_random_anyway  = localStorage.getItem("pcsl_s_ignoreRule") === "1";
-		do_show_release   = localStorage.getItem("pcsl_s_showReleas") === "1";
-		do_longPress_copy = localStorage.getItem("pcsl_s_LPressCopy") === "1";
-	}
-	
+	// read from local storage
+	setting.show_hidden     = ls("pcsl_s_showHidden") == 1;
+	setting.select_input    = ls("pcsl_s_selecInput") == 1;
+	setting.show_random     = ls("pcsl_s_showRandom") == 1;
+	setting.random_ignore   = ls("pcsl_s_ignoreRule") == 1;
+	setting.show_release    = ls("pcsl_s_showReleas") == 1;
+	setting.longPress_copy  = ls("pcsl_s_LPressCopy") == 1;
+	setting.rep_select_input= ls("pcsl_s_rep_select") == 1;
+	setting.rep_show_artist = ls("pcsl_s_rep_artist") == 1;
+
 	// switch display in settings according to saved settings
-	if (!do_display_hidden) {
+	if (!setting.show_hidden) {
 		$("#setting_hidden>div").toggleClass("selected");
 	}
-	if (!do_select_input) {
+	if (!setting.select_input) {
 		$("#setting_select>div").toggleClass("selected");
 	}
-	if (do_show_random) {
+	if (setting.show_random) {
 		$("#setting_random>div").toggleClass("selected");
 	}
-	if (do_random_anyway) {
+	if (setting.random_ignore) {
 		$("#setting_ignore>div").toggleClass("selected");
 	}
-	if (do_show_release) {
+	if (setting.show_release) {
 		$("#setting_release>div").toggleClass("selected");
 	}
-	if (!do_longPress_copy) {
+	if (!setting.longPress_copy) {
 		$("#setting_copy>div").toggleClass("selected");
 	}
-	$("#nav_search_random").addClass("blank", !do_show_random);
-	$(".setting_req_random").toggleClass("disabled", !do_show_random);
+	if (!setting.rep_select_input) {
+		$("#setting_rep_select>div").toggleClass("selected");
+	}
+	if (!setting.rep_show_artist) {
+		$(".rep_tweet_a").toggleClass("selected");
+	}
+
+	$("#nav_search_random").toggleClass("blank", !setting.show_random);
+	$(".setting_req_random").toggleClass("disabled", !setting.show_random);
 
 	// processing url para
 	init();
 	if (url_para.get("sfilter") !== null) {
 		// extract member data
-		var ext = parseInt(url_para.get("sfilter"));
+		let ext = parseInt(url_para.get("sfilter"));
 		// bit and = true => default 
-		var member_name = [
+		const member_name = [
 			ext & 1 ? "" : "nia",
 			ext & 2 ? "" : "momo",
 			ext & 4 ? "" : "kirara",
@@ -327,7 +308,7 @@ function process_data() {
 		];
 		// rep
 		if (url_para.get("page") === ("rep" || "repertoire") || url_para.get("rfilter") !== null) {
-			for (var i in member_name) {
+			for (let i in member_name) {
 				if (member_name[i] === "") {
 					continue;
 				}
@@ -336,14 +317,14 @@ function process_data() {
 		}
 		//search
 		if (url_para.get("page") === "search" || url_para.get("search") !== null) {
-			for (var i in member_name) {
+			for (let i in member_name) {
 				if (member_name[i].length) {
 					$(".singer_icon.icon_" + member_name[i]).click();
 				}
 			}
 		}
 	}
-	var target_page = url_para.get("page");
+	let target_page = url_para.get("page");
 	if (target_page !== "home") {
 		if (jump2page(target_page) === -1) {
 			jump2page("home");
@@ -354,12 +335,12 @@ function process_data() {
 			jump2page("search");
 		}
 		// prevent out of range
-		var song_id = url_para.get("search").split(",");
+		let song_id = url_para.get("search").split(",");
 		if (song_id.length > 1) {
-			var added_song = 0;
-			for (var i in song_id) {
+			let added_song = 0;
+			for (let i in song_id) {
 				// check if valid
-				var temp = parseInt(song_id[i]);
+				let temp = parseInt(song_id[i]);
 				if (temp >= 1 && temp < song.length) {
 					hits[added_song++] = song_lookup[temp];
 				}
@@ -381,9 +362,9 @@ function process_data() {
 			jump2page("rep");
 		}
 		// extract bits
-		var selected_bits = [];
-		var temp = parseInt(url_para.get("rfilter"));
-		var counter = 0;
+		let selected_bits = [];
+		let temp = parseInt(url_para.get("rfilter"));
+		let counter = 0;
 		while (temp) {
 			// test if last bit is 1
 			if (temp % 2) {
@@ -394,12 +375,12 @@ function process_data() {
 			counter++;
 		}
 		// click all checkbox thats NOT selected
-		for (var i in rep_anisong) {
+		for (let i in rep_anisong) {
 			if (!selected_bits.includes(rep_anisong[i][1])) {
 				$("#anisong_" + i).click();
 			}
 		}
-		for (var i in rep_genre) {
+		for (let i in rep_genre) {
 			if (!selected_bits.includes(rep_genre[i][1])) {
 				$("#general_" + i).click();
 			}
@@ -431,15 +412,15 @@ $(function() {
 			if (prevent_menu_popup) {
 				return;
 			}
-			var scrollTop = $("html,body").scrollTop();
-			var delta = scrollTop / 33;
+			let scrollTop = $("html,body").scrollTop();
+			let delta = scrollTop / 33;
 			function frame() {
 				scrollTop -= delta;
 				$("html,body").scrollTop(scrollTop);
 				if (scrollTop <= 0)
 					clearInterval(id)
 			}
-			var id = setInterval(frame, 1);
+			let id = setInterval(frame, 1);
 			if (current_page === "repertoire" && rep_display_selected_first) {
 				rep_display();
 			}
@@ -458,7 +439,7 @@ $(function() {
 		
 		// menu -> page
 		$(document).on("click", ".menu2page", function(e) {
-			var target = ($(e.target).attr("id")).replace("menu2page_", "");
+			let target = ($(e.target).attr("id")).replace("menu2page_", "");
 			if (target === current_page) {
 				return;
 			}
@@ -494,12 +475,12 @@ $(function() {
 				return;
 			}
 			// is empty, generate
-			var entry_count = [];
+			let entry_count = [];
 			// entry_count[singer_id][0:public, 1:member, 2:private]
-			for (var i = 0; i < 16; ++i) {
+			for (let i = 0; i < 33; ++i) {
 				entry_count[i] = [0, 0, 0];
 			}
-			for (var i = 0; i < entry.length; ++i) {
+			for (let i = 0; i < entry.length; ++i) {
 				if (is_private(i)) {
 					entry_count[entry[i][entry_idx.type]][2]++;
 					continue;
@@ -512,12 +493,12 @@ $(function() {
 			}
 			
 			// output as html
-			var new_html = "<table id=\"memcount_table\"><tr><th></th><th>通常</th><th>メン限</th><th>非公開</th></tr>";
-			for (var i in member_display_order) {
-				var mem_id = member_display_order[i];
+			let new_html = "<table id=\"memcount_table\"><tr><th></th><th>通常</th><th>メン限</th><th>非公開</th></tr>";
+			for (let i in member_display_order) {
+				let mem_id = member_display_order[i];
 				// new row, name
 				new_html += ("<tr class=\"memcount_row singer_" + mem_id + "\"><td><div class=\"memcount_name\">" + singer_lookup[mem_id] + "</div></td>");
-				for (var j = 0; j < 3; ++j) {
+				for (let j = 0; j < 3; ++j) {
 					new_html += ("<td" + (entry_count[mem_id][j] === 0 ? " class=\"memcount_empty\"" : "") + ">" + entry_count[mem_id][j] + "</td>");
 				}
 				// close row
@@ -526,25 +507,24 @@ $(function() {
 			
 			// total for each member
 			// get numbers
-			var entry_count_total = [[0, 0, 0], [0, 0, 0]];
-			for (var i in entry) {
-				for (var j = 0; j < 3; ++j) {
-					if ((1 << j) & entry[i][entry_idx.type]) {
-						entry_count_total[entry[i][entry_idx.type] > 8 ? 1 : 0][j]++;
-					}
+			let entry_count_total = [0, 0, 0, 0, 0, 0];
+			for (let i in entry) {
+				let solo_output = split_to_solo(entry[i][entry_idx.type])
+				for (let j in solo_output) {
+					entry_count_total[part_rom.indexOf(solo_output[j])]++;
 				}
 			}
 			if (key_valid) {
 				new_html += "</table><div id=\"memcount_sum_warpper\" class=\"memcount_sum\"><div class=\"memcount_sum_icon col-1 colspan-2\"></div>";
-				for (var row = 0; row < 2; ++row) {
-					for (var col = 2; col >= 0; --col) {
-						new_html += ("<div class=\"row-" + (row + 1) + " col-" + (4 - col) + " singer_" + ((row ? 8 : 0) + (1 << col)) + "\">" + entry_count_total[row][col] + "</div>");
+				for (let row = 0; row < 2; ++row) {
+					for (let col = 2; col >= 0; --col) {
+						new_html += ("<div class=\"row-" + (row + 1) + " col-" + (4 - col) + " singer_" + (1 << (row * 3 + col)) + "\">" + entry_count_total[row * 3 + col] + "</div>");
 					}
 				}
 			} else {
 				new_html += "</table><div class=\"memcount_sum\"><div class=\"memcount_sum_icon\"></div>";
-				for (var i = 2; i >= 0; --i) {
-					new_html += ("<div class=\"singer_" + (1 << i) + "\">" + entry_count_total[0][i] + "</div>");
+				for (let i = 2; i >= 0; --i) {
+					new_html += ("<div class=\"singer_" + (1 << i) + "\">" + entry_count_total[i] + "</div>");
 				}
 			}
 			$("#memcount_content").html(new_html + "</div>");
@@ -566,9 +546,9 @@ $(function() {
 	{ // settings
 		// general - display_theme
 		$(document).on("click", ".three_way>div", function() {
-			var selected = $(this).attr("id").replace("three_way_", "");
+			let selected = this.id.replace("three_way_", "");
 			document.documentElement.setAttribute("theme", selected);
-			localStorage.setItem("theme", selected);
+			ls("theme", selected);
 			$(".three_way>div").removeClass("selected");
 			$(this).addClass("selected");
 			// set post-switch bg colour
@@ -580,34 +560,39 @@ $(function() {
 			$(this).children().toggleClass("selected");
 			switch (this.id) {
 				case "setting_hidden":
-					do_display_hidden ^= 1;
-					localStorage.setItem("pcsl_s_showHidden", do_display_hidden ? "1" : "0");
+					setting.show_hidden ^= 1;
+					ls("pcsl_s_showHidden", setting.show_hidden ? "1" : "0");
 					break;
 				case "setting_select":
-					do_select_input ^= 1;
-					localStorage.setItem("pcsl_s_selecInput", do_select_input ? "1" : "0");
+					setting.select_input ^= 1;
+					ls("pcsl_s_selecInput", setting.select_input ? "1" : "0");
 					break;
 				case "setting_random":
-					do_show_random ^= 1;
-					$("#nav_search_random").toggleClass("blank", do_show_random);
-					localStorage.setItem("pcsl_s_showRandom", do_show_random ? "1" : "0");
-					$(".setting_req_random").toggleClass("disabled", !do_show_random);
+					setting.show_random ^= 1;
+					$("#nav_search_random").toggleClass("blank", setting.show_random);
+					ls("pcsl_s_showRandom", setting.show_random ? "1" : "0");
+					$(".setting_req_random").toggleClass("disabled", !setting.show_random);
 					break;
 				case "setting_ignore":
-					do_random_anyway ^= 1;
-					$("#nav_search_random").toggleClass("disabled", searching_song_name ? (do_random_anyway ? false : loading !== "") : true);
-					localStorage.setItem("pcsl_s_ignoreRule", do_random_anyway ? "1" : "0");
+					setting.random_ignore ^= 1;
+					$("#nav_search_random").toggleClass("disabled", setting.search_by_song ? (setting.random_ignore ? false : loading !== "") : true);
+					ls("pcsl_s_ignoreRule", setting.random_ignore ? "1" : "0");
 					break;
 				case "setting_release":
-					do_show_release ^= 1;
-					localStorage.setItem("pcsl_s_showReleas", do_show_release ? "1" : "0");
+					setting.show_release ^= 1;
+					ls("pcsl_s_showReleas", setting.show_release ? "1" : "0");
 					if (current_page === "repertoire") {
 						rep_display();
 					}
 					break;
 				case "setting_copy":
-					do_longPress_copy ^= 1;
-					localStorage.setItem("pcsl_s_LPressCopy", do_longPress_copy ? "1" : "0");
+					setting.longPress_copy ^= 1;
+					ls("pcsl_s_LPressCopy", setting.longPress_copy ? "1" : "0");
+					break;
+				case "setting_rep_select":
+					setting.rep_select_input ^= 1;
+					ls("pcsl_s_rep_select", setting.longPress_copy ? "1" : "0");
+
 			}
 		})
 	}
@@ -622,8 +607,7 @@ $(function() {
 	// popup - return
 	$(document).on("click", "#popup_container", function(e) {
 		// all popup except rep share
-		if (!($(e.target).closest('.popup_frame').length ||
-			  $(e.target).find("#rep_list:not(.hidden)").length)) {
+		if (!$(e.target).closest('.popup_frame').length) {
 			$(".popup_frame").addClass("hidden");
 			$("#popup_container").addClass("hidden");
 			$(document.body).removeClass("no_scroll");
@@ -643,8 +627,8 @@ $(function() {
 	
 	// key reset - yes
 	$(document).on("click", "#remove_key_yes", function() {
-		localStorage.setItem("pcsl_version_hash", "");
-		localStorage.setItem("pcsl_key", "");
+		ls("pcsl_version_hash", "");
+		ls("pcsl_key", "");
 		window.location = window.location.href.split("?")[0];
 	});
 	
@@ -665,26 +649,26 @@ function init() {
 		const date_start = new Date("2021-01-01");
 
 		function getDateText(passed) {
-			var result = new Date(date_start);
+			let result = new Date(date_start);
 			result.setDate(date_start.getDate() + passed);
 			return result.toISOString().slice(0, 10);
 		}
 		
-		for (var i in video) {
+		for (let i in video) {
 			video[i][video_idx.date] = getDateText(video[i][video_idx.date]);
 		}
 		
 		// reverse note
-		for (var i in entry) {
+		for (let i in entry) {
 			entry[i][entry_idx.note] = note_index[entry[i][entry_idx.note]];
 		}
 		// remove note index
 		note_index = null;
 	}
-	for (var i in song) {
+	for (let i in song) {
 		entry_proc[i] = [];
 	}
-	for (var i = 0; i < entry.length; ++i) {
+	for (let i = 0; i < entry.length; ++i) {
 		if (entry[i][entry_idx.type]) {
 			entry_proc[entry[i][0]].push(i);
 		}
@@ -695,24 +679,24 @@ function init() {
 	auto_display_max = Math.floor(5 * Math.pow(window.innerHeight / window.innerWidth, 1.41421356237));
 	
 	// rep
-	var rep_solo_temp = [];
+	let rep_solo_temp = [];
 	
 	// process song names
-	for (var i = 1; i < song.length; ++i) {
+	for (let i = 1; i < song.length; ++i) {
 		processed_song_name.push(song[i][song_idx.name].toLowerCase().normalize("NFKC"));
 	}
 	
 	// get each member's repertoire
-	for (var i = 0; i < song.length; ++i) {
+	for (let i = 0; i < song.length; ++i) {
 		rep_list[i] = 0;
-		for (var j in entry_proc[i]) {
+		for (let j in entry_proc[i]) {
 			// or is faster than checking then add (i think)
 			rep_list[i] |= entry[entry_proc[i][j]][entry_idx.type];
 		}
 		
 		rep_solo_temp[i] = [...new Set(entry_proc[i])];
 		rep_hits_solo[i] = [];
-		for (var j in rep_solo_temp[i]) {
+		for (let j in rep_solo_temp[i]) {
 			rep_hits_solo[i] = rep_hits_solo[i].concat(split_to_solo(entry[rep_solo_temp[i][j]][entry_idx.type]));
 		}
 		rep_hits_solo[i] = [...new Set(rep_hits_solo[i])].filter(Number);
@@ -725,21 +709,21 @@ function memcount_load_rep() {
 	clearInterval(memcount_rep_int);
 	
 	// get number for each member
-	var singer_counter = [];
-	for (var i = 0; i < 33; ++i) {
+	let singer_counter = [];
+	for (let i = 0; i < 33; ++i) {
 		singer_counter[i] = [];
 	}
-	for (var i in rep_hits_solo) {
-		for (var j in rep_hits_solo[i]) {
-			var bits = split_to_solo(rep_hits_solo[i][j]);
-			for (var k in bits) {
+	for (let i in rep_hits_solo) {
+		for (let j in rep_hits_solo[i]) {
+			let bits = split_to_solo(rep_hits_solo[i][j]);
+			for (let k in bits) {
 				singer_counter[bits[k]].push(i);
 			}
 		}
 	}
 	// remove duplicates
 	singer_counter.map(x => [...new Set(x)]);
-	var display_number = [
+	let display_number = [
 		singer_counter[4].length,
 		singer_counter[2].length,
 		singer_counter[1].length,
@@ -753,16 +737,16 @@ function memcount_load_rep() {
 		new Set([...singer_counter[1], ...singer_counter[8]]).size
 	];
 	
-	var display_lookup = [4, 2, 1, 32, 16, 8, 4, 2, 1];
+	let display_lookup = [4, 2, 1, 32, 16, 8, 4, 2, 1];
 	
 	// display
-	var new_html = "";
-	for (var i = 0; i < (key_valid ? 6 : 3); ++i) {
+	let new_html = "";
+	for (let i = 0; i < (key_valid ? 6 : 3); ++i) {
 		new_html += ("<div class=\"memcount_rep_block\"><div class=\"singer_" + display_lookup[i] + "m memcount_rep_name\">" + singer_lookup[display_lookup[i]] + "</div><div class=\"singer_" + display_lookup[i] + "\">" + display_number[i] + "</div></div>");
 	}
 	if (key_valid) {
 		new_html += ("<div></div><div class=\"memcount_rep_sum\"></div><div></div>");
-		for (var i = 6; i < 9; ++i) {
+		for (let i = 6; i < 9; ++i) {
 			new_html += ("<div class=\"memcount_rep_block_sum memcount_rep_singer_" + display_lookup[i] + "\"><div>" + display_number[i] + "</div></div>");
 		}
 	}
@@ -774,7 +758,7 @@ function memcount_load_rep() {
 
 // display date in yyyy-MM-dd format
 function display_date(input) {
-	var e = typeof(input) === "string" ? new Date(input) : input;
+	let e = typeof(input) === "string" ? new Date(input) : input;
 	return (e.getFullYear() + "-" + fill_digit(e.getMonth() + 1, 2) + "-" + fill_digit(e.getDate(), 2));
 }
 
@@ -795,7 +779,7 @@ function is_private(index) {
 
 // rap the `selc` section in bold tag if exist in `org`
 function bold(org, selc) {
-	var e = org.toLowerCase().indexOf(selc.toLowerCase());
+	let e = org.toLowerCase().indexOf(selc.toLowerCase());
 	if (e === -1 || selc === "") {
 		return org;
 	} else {
@@ -812,7 +796,7 @@ function copy_of(input) {
 }
 
 function get_last_sang(id, mask = [4, 2, 1, 32, 16, 8]) {
-	for (var i = entry_proc[id].length - 1; i >= 0; --i) {
+	for (let i = entry_proc[id].length - 1; i >= 0; --i) {
 		if (mask.some((x) => (x & entry[entry_proc[id][i]][entry_idx.type]) === x)) {
 			return new Date(video[entry[entry_proc[id][i]][entry_idx.video]][video_idx.date]);
 		}
@@ -835,7 +819,7 @@ function to8601(date_string) {
 	}
 }
 
-var today = new Date().setHours(0, 0, 0, 0);
+const today = new Date().setHours(0, 0, 0, 0);
 
 // get day different between {date1 and date2} or {date1 and today}
 function get_date_different(date1, date2 = today) {
@@ -847,9 +831,9 @@ function get_date_different(date1, date2 = today) {
 // get entry count of all entry and member-only entry that fufills mask
 function get_sang_count(id, mask = [4, 2, 1, 32, 16, 8]) {
 	
-	var count = 0,
+	let count = 0,
 		mem_count = 0;
-	for (var i in entry_proc[id]) {
+	for (let i in entry_proc[id]) {
 		if (mask.some((x) => (x & entry[entry_proc[id][i]][entry_idx.type]) === x)) {
 			count++;
 			if (entry[entry_proc[id][i]][entry_idx.note].includes("【メン限")) {
@@ -884,8 +868,6 @@ function jump2page(target) {
 		case "search" :
 			// show section
 			$("#nav_search_random").removeClass("hidden");
-			$("#nav_share").removeClass("hidden");
-			$("#nav_share").toggleClass("disabled", !is_searching_from_rep);
 			$("#nav_title").html("曲検索");
 			// reset input -> reload
 			$("#input").val("");
@@ -895,7 +877,6 @@ function jump2page(target) {
 		case "repertoire" : 
 			// show section
 			$("#repertoire_section").removeClass("hidden");
-			$("#nav_bulk_search").removeClass("hidden");
 			$("#nav_share").removeClass("hidden");
 			$("#nav_share").toggleClass("disabled", !rep_selected.length);
 			$("#nav_title").html("レパートリー");
@@ -928,7 +909,7 @@ function split_to_solo(input) {
 	}
 }
 
-var copy_popup_is_displaying = false;
+let copy_popup_is_displaying = false;
 
 function copy_popup() {
 	if (copy_popup_is_displaying) {
@@ -961,26 +942,10 @@ const getSHA384Hash = async (input) => {
 	return hash;
 };
 
-// from w3school
-function getCookie(cname) {
-	let name = cname + "=";
-	let ca = document.cookie.split(';');
-	for(let i = 0; i < ca.length; i++) {
-		let c = ca[i];
-		while (c.charAt(0) == ' ') {
-			c = c.substring(1);
-		}
-		if (c.indexOf(name) == 0) {
-			return c.substring(name.length, c.length);
-		}
-	}
-	return "";
-}
-
-function removeCookie(cname) {
-	document.cookie = cname + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
-}
-
 function refresh_bgColour() {
-	document.documentElement.setAttribute("theme", localStorage.getItem("theme"));
+	document.documentElement.setAttribute("theme", ls("theme"));
+}
+
+function ls(a, b) {
+	return b === undefined ? localStorage.getItem(a) : localStorage.setItem(a, b);
 }
