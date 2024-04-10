@@ -12,9 +12,6 @@ const attr_idx = [
 	"特撮",
 	"ロック",
 	"歌謡曲",
-	"ポップス",
-	"R&B",
-	"キャラソン",
 	"disney"
 ];
 // type of all songs
@@ -37,10 +34,7 @@ let rep_genre = {
 	tok : [1, 8],
 	rock : [1, 9],
 	kay : [1, 10],
-	pops : [1, 11],
-	rnb : [1, 12],
-	cha : [1, 13],
-	dis : [1, 14],
+	dis : [1, 11],
 	other : [1, 0]
 };
 // songs no longer have karaoke available
@@ -231,8 +225,8 @@ $(function() {
 				post_longpress_timer = setTimeout(function() {
 					is_long_pressing = false;
 					clearTimeout(post_longpress_timer);
-				}, 500);
-			}, 600);
+				}, setting.longPress_time - 100);
+			}, setting.longPress_time);
 		});
 		
 		// display - long press copy (disabling)
@@ -297,14 +291,15 @@ $(function() {
 		$(document).on("click", ".rep_tweet_submit", function() {
 			let tweet = "";
 			for (let i in rep_selected) {
-				tweet += (song[rep_selected[i]][song_idx.name] + (setting.rep_show_artist ? (" / " + song[rep_selected[i]][song_idx.artist]) : "") + "\n");
+				tweet += `${song[rep_selected[i]][song_idx.name]}${setting.rep_show_artist ? (" / " + song[rep_selected[i]][song_idx.artist]) : ""}\n`;
 			}
 			const lookup = {
 				k : "#うたってきららちゃま",
 				m : "#ももっとリクエスト",
 				y : "#つきみゆこ"
 			}
-			switch (e, e = this.id.replace("rep_tweet_", "")) {
+			let e = this.id.replace("rep_tweet_", "");
+			switch (e) {
 				case "t":
 					navigator.clipboard.writeText(tweet);
 					copy_popup();
@@ -314,33 +309,6 @@ $(function() {
 			}
 			// close pop up
 			$("#popup_container").click();
-		})
-
-		// share - tweet
-		$(document).on("click", "#rep_compose_tweet", function() {
-			if ($("#rep_compose_tweet").hasClass("disabled") || rep_selected.length === 0) {
-				return;
-			}
-			prevent_menu_popup = false;
-			$("#rep_share").addClass("hidden");
-			$("#popup_container").addClass("hidden");
-			$(document.body).toggleClass("no_scroll");
-			// ignore character limit and tweet anyway
-			let tweet = "";
-			for (let i in rep_selected) {
-				tweet += (song[rep_selected[i]][song_idx.name] + ($("#list_artist_cb").hasClass("selected") ? (" / " + song[rep_selected[i]][song_idx.artist]) : "") + "\n");
-			}
-			window.open("https://twitter.com/intent/tweet?text=" + encodeURIComponent(tweet), "_blank");
-		});
-		
-		// display - copy
-		$(document).on("click", "#rep_copy", function() {
-			let content = "";
-			for (let i in rep_selected) {
-				content += (song[rep_selected[i]][song_idx.name] + ($("#list_artist_cb").hasClass("selected") ? (" / " + song[rep_selected[i]][song_idx.artist]) : "") + "\n");
-			}
-			navigator.clipboard.writeText(content);
-			copy_popup();
 		});
 	}
 });
@@ -521,29 +489,12 @@ function rep_display_loop() {
 	for (let i = rep_loading_progress; i < load_end; ++i) {
 		// sang count
 		let sang_count = get_sang_count(rep_hits[i], selected_member);
-		// container div
-		let new_html = "<div class=\"rep_song_container" + (rep_selected.includes(rep_hits[i]) ? " selected" : "") + ((sang_count[0] > 0) && (sang_count[0] === sang_count[1]) ? " rep_mem_only" : "") + "\" id=\"rep_song_" + rep_hits[i] + "\"><div class=\"rep_song_row1\">";
-		// title
-		new_html += ("<div class=\"rep_song_title\">" + song[rep_hits[i]][song_idx.name] + " / " + song[rep_hits[i]][song_idx.artist] + "</div>");
-		// bad karaoke
-		new_html += ("<div class=\"rep_song_nooke\">" + (oke_gone.includes(song[rep_hits[i]][song_idx.name]) ? "オケ消滅" : "") + "</div>");
-		// info line1
-		new_html += "</div><div class=\"rep_song_info grid_block-4\">";
 		// last sang
 		let last_sang = get_last_sang(rep_hits[i], selected_member);
 		let delta_last = last_sang === 0 ? -1 : get_date_different(last_sang);
-		new_html += ("<div>" + (delta_last === 0 ? "今日" : delta_last === -1 ? "---" : (delta_last + "日前")) + "</div>");
-		// count
-		new_html += ("<div>" + sang_count[0] + "回" + (sang_count[1] > 0 ? (sang_count[0] === sang_count[1] ? " (メン限のみ)" : " (" + sang_count[1] + "回メン限)") : "") + "</div>");
-		// type
-		new_html += ("<div class=\"rep_song_singer" + (key_valid ? " rep_singer_2rows" : "") + "\"><div class=\"" + (rep_hits_solo[rep_hits[i]].includes(4) ? "rep_song_kirara" : "rep_song_empty") + "\"></div><div class=\"" + (rep_hits_solo[rep_hits[i]].includes(2) ? "rep_song_momo" : "rep_song_empty") + "\"></div><div class=\"" + (rep_hits_solo[rep_hits[i]].includes(1) ? "rep_song_nia" : "rep_song_empty") + "\"></div>" + (key_valid ? ("<div class=\"" + (rep_hits_solo[rep_hits[i]].includes(32) ? "rep_song_chui" : "rep_song_empty") + "\"></div><div class=\"" + (rep_hits_solo[rep_hits[i]].includes(16) ? "rep_song_shiro" : "rep_song_empty") + "\"></div><div class=\"" + (rep_hits_solo[rep_hits[i]].includes(8) ? "rep_song_yuco" : "rep_song_empty") + "\"></div>") : "") + "</div>");
-		// extra info
-		if (setting.show_release) {
-			new_html += ("<div class=\"rep_extra_info\"> (" + display_date(to8601(song[rep_hits[i]][song_idx.release])) + ")</div>");
-		} else {
-			new_html += "<div></div>";
-		}
-		$("#rep_display").append(new_html + "</div></div>");
+		
+		let new_html = `<div class="rep_song_container${rep_selected.includes(rep_hits[i]) ? " selected" : ""}${sang_count[0] && (sang_count[0] === sang_count[1]) ? " rep_mem_only" : ""}" id="rep_song_${rep_hits[i]}"><div class="rep_song_row1"><div class="rep_song_title">${song[rep_hits[i]][song_idx.name]} / ${song[rep_hits[i]][song_idx.artist]}</div><div class="rep_song_nooke">${oke_gone.includes(song[rep_hits[i]][song_idx.name]) ? "オケ消滅" : ""}</div></div><div class="rep_song_info grid_block-4"><div>${delta_last === 0 ? "今日" : delta_last === -1 ? "---" : `${delta_last}日前`}</div><div>${sang_count[0]}回${sang_count[1] > 0 ? (sang_count[0] === sang_count[1] ? " (メン限のみ)" : ` (${sang_count[1]}回メン限)`) : ""}</div><div class="rep_song_singer${key_valid ? " rep_singer_2rows" : ""}"><div${rep_hits_solo[rep_hits[i]].includes(4) ? ` class="singer_4"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(2) ? ` class="singer_2"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(1) ? ` class="singer_1"` : ""}></div>${key_valid ? `<div${rep_hits_solo[rep_hits[i]].includes(32) ? ` class="singer_32"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(16) ? ` class="singer_16"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(8) ? ` class="singer_8"` : ""}></div>` : ""}</div>${setting.show_release ? `<div class="rep_extra_info"> (${display_date(to8601(song[rep_hits[i]][song_idx.release]))})</div>` : "<div></div>"}</div></div>`;
+		$("#rep_display").append(new_html);
 	}
 	// call itself again if not finished
 	rep_loading_progress += 20;

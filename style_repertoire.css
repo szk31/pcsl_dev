@@ -3,24 +3,24 @@
 }
 
 #rep_input {
-    width: 92vw;
-    padding: 0 1.8vw;
-    margin: 1.5vw 2vw;
+	width: 96vw;
+    padding: 5vw 2vw;
+    margin: 2vw 2vw 0;
     height: 10vw;
     font-size: 5vw;
 	border-radius : 2vw;
 }
 
 #filter_container {
-	margin : 0.5vw 2vw 2.4vw;
-	padding : 1.6vw;
-	width : 92vw;
-	background-color : var(--filter-back);
-	color : var(--filter-text);
-	font-size : 3.2vw;
-	font-weight : bold;
-	border: 0.36vw solid var(--filter-border);
-	border-radius : 3.2vw;
+	margin: 2vw;
+	padding: 1.6vw;
+	width: 96vw;
+	background-color: var(--filter-back);
+	color: var(--filter-text);
+	font-size: 3.2vw;
+	font-weight: bold;
+	border: 0.5vw solid var(--filter-border);
+	border-radius: 4vw;
 }
 
 #filter_title {
@@ -36,7 +36,7 @@
 }
 
 #filter_close {
-	content : url("icon/list.png");
+	content : var(--ico-arrow-alt);
 	width : 6vw;
 	height : 6vw;
 	align-items : center;
@@ -50,7 +50,7 @@
 
 .filter_subblock_title {
 	border-bottom : 0.5vw solid var(--filter-text);
-	width : 100%;
+	width: 88vw;
 	margin : 0.6vw 0.6vw 1vw;
 	padding-left : 2.6vw;
 	font-size : 3.6vw;
@@ -70,7 +70,7 @@
 }
 
 .filter_icon_bg {
-	margin : 0 1.2vw;
+	margin : 0 0.6vw;
 	border-width :  0.5vw;
 	border-radius : 4vw;
 	width : 17vw;
@@ -78,24 +78,24 @@
 }
 
 .filter_icon {
-	padding : 0.5vw;
-	border-radius : 4vw;
+	margin: 0.5vw;
+	border-radius : 3.5vw;
 	width : 16vw;
 	height : 16vw;
 }
 
 .filter_icon_bg_extra {
-	margin : 0.5vw;
-	border-radius : 3.6vw;
-	width : 13.8vw;
-	height : 13.8vw;
+	margin : 0 0.29vw;
+	border-radius : 4vw;
+	width : 14.2vw;
+	height : 14.2vw;
 }
 
 .filter_icon_extra {
-	padding : 0.4vw;
+	margin: 0.4vw;
 	border-radius : 3.6vw;
-	width : 13vw;
-	height : 13vw;
+	width : 13.4vw;
+	height : 13.4vw;
 }
 
 .filter_icon:not(.selected),
@@ -115,7 +115,7 @@
 .rep_item {
 	display : flex;
 	align-items: center;
-	padding-left: 2.4vw;
+	padding-left: 1.6vw;
 	height: 6vw;
 }
 
@@ -138,16 +138,15 @@
 .rep_song_container {
 	font-weight : bold;
 	font-size : 3.2vw;
-	margin : 1.5vw 3.6vw;
-	padding : .8vw 1.2vw .2vw 1.2vw;
-	border-radius : 1.2vw;
-	border : 0.6vw solid var(--trnsp);
-	outline : .2vw solid var(--song-border);
+	margin : 1.6vw 3.2vw;
+	padding : 1.2vw 1.6vw 0.6vw;
+	border-radius : 2vw;
 	color: var(--song-text);
+	outline : 0.25vw solid var(--dialog-border);
 }
 
 .rep_song_container.selected {
-	border : 0.6vw solid var(--song-selected);
+	outline : 0.5vw solid var(--song-selected);
 }
 
 .rep_song_container.rep_mem_only {
@@ -177,7 +176,7 @@
 }
 
 .rep_song_info {
-	margin-top : 0.8vw;
+	margin: 0.8vw 0 0 0.4vw;
 }
 
 .rep_song_singer {
@@ -189,43 +188,14 @@
 	margin-top : -1.1vw;
 }
 
-.rep_song_singer div {
+.rep_song_singer div[class] {
 	margin : 0.2vw;
 	border-radius : 1.6vw;
+	border: 0.4vw solid currentColor;
 }
 
 .rep_singer_2rows div {
 	aspect-ratio: 1 / 1;
-}
-
-.rep_song_kirara {
-	background-color : var(--s-krr-back);
-	border : max(2px, 0.4vw) solid var(--s-krr-text);
-}
-
-.rep_song_momo {
-	background-color : var(--s-momo-back);
-	border : max(2px, 0.4vw) solid var(--s-momo-text);
-}
-
-.rep_song_nia {
-	background-color : var(--s-nia-back);
-	border : max(2px, 0.4vw) solid var(--s-nia-text);
-}
-
-.rep_song_chui {
-	background-color : var(--s-chui-back);
-	border : max(2px, 0.4vw) solid var(--s-chui-text);
-}
-
-.rep_song_shiro {
-	background-color : var(--s-siro-back);
-	border : max(2px, 0.4vw) solid var(--s-siro-text);
-}
-
-.rep_song_yuco {
-	background-color : var(--s-yuco-back);
-	border : max(2px, 0.4vw) solid var(--s-yuco-text);
 }
 
 .rep_extra_info {
@@ -271,17 +241,17 @@
 }
 
 #rep_share_search .rep_share_icon {
-	content: url(icon/to_yt.png);
+	content: var(--ico-toyt);
 	filter: var(--white-icon);
 }
 
 #rep_share_tweet .rep_share_icon {
-	content: url(icon/birb.png);
+	content: var(--ico-birb);
 	filter: var(--white-icon);
 }
 
 #rep_share_link .rep_share_icon {
-	content: url(icon/link.png);
+	content: var(--ico-link);
 	filter: var(--share-icon);
 }
 
@@ -351,14 +321,14 @@
 }
 
 .rep_tweet_birb {
-	content: url(icon/birb.png);
+	content: var(--ico-birb);
 	height: 4vw;
 	width: 4vw;
 	filter: var(--white-icon);
 }
 
 .rep_tweet_copy {
-	content: url(icon/copy.png);
+	content: var(--ico-copy);
 	height: 4vw;
 	width: 4vw;
 	filter: var(--share-icon);
@@ -451,27 +421,27 @@
 }
 
 .checkbox.selected {
-	content : url("icon/cbx_check.png");
+	content : var(--cbx-check);
 }
 
 .checkbox:not(.selected) {
-	content : url("icon/cbx_minus.png");
+	content : var(--cbx-minus);
 }
 
 .search_grid_2 .checkbox:not(.selected),
 .sort3_checkbox:not(.selected),
 #list_artist_cb:not(.selected) {
-	content : url("icon/cbx_cross.png");
+	content : var(--cbx-cross);
 }
 
 .switch {
-	content : url("icon/cbx_switch.png");
+	content : var(--cbx-switch);
 }
 
 .radio {
 	margin : 0.8vw 1vw 0.6vw;
-	width : 3vw;
-	height : 3vw;
+	width : 4.4vw;
+	height : 4.4vw;
 	border-radius : 3vw;
 	border : 0.8vw solid var(--radio-border);
 	outline : 0.3vw solid var(--radio-outline);

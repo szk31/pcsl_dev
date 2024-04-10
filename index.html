@@ -2,12 +2,19 @@
 <html lang="ja-JP">
 	<head>
 		<meta charset="UTF-8">
-		<meta name="theme-color" content="#6E24B7" />
 		<meta name="HandheldFriendly" content="true" />
 		<meta name="MobileOptimized" content="320" />
 		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no" />
+		<meta name="description" content="PCSL is a webapp that provides users a search engine for songs in hundreds of videos and repertoire of included members." />
 		<title>ぷちここ歌まとめ</title>
 		<link rel="icon" type="image/png" href="icon/icon.png">
+		<!-- css -->
+		<link rel="stylesheet" href="style_min.css">
+		<!--link rel="stylesheet" href="style_general.css">
+		<link rel="stylesheet" href="style_home.css">
+		<link rel="stylesheet" href="style_search.css">
+		<link rel="stylesheet" href="style_repertoire.css"-->
+		<link rel="stylesheet" href="icon.css" defer>
 		<!-- using libraries -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 		<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
@@ -19,32 +26,52 @@
 		<!--script type="text/javascript" src="main.js"></script>
 		<script type="text/javascript" src="search.js"></script>
 		<script type="text/javascript" src="rep.js"></script-->
-		<!-- css -->
-		<link rel="stylesheet" href="style_min.css">
-		<!--link rel="stylesheet" href="style_general.css">
-		<link rel="stylesheet" href="style_home.css">
-		<link rel="stylesheet" href="style_search.css">
-		<link rel="stylesheet" href="style_repertoire.css"-->
 		<style>
 			#loading_overlay {
-				position : fixed;
-				top : 0;
-				width : 100%;
-				height : 100%;
-				background-color : rgba(0, 0, 0, 0.666);
-				z-index : 99;
+				position: fixed;
+				font-size: 20px;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0, 0, 0, 0.666);
+				z-index: 99;
+				color: white;
 			}
 
 			#loading_text {
-				position : fixed;
-				color : White;
-				font-size : 20px;
-				font-weight : bold;
-				left : 50%;
-				top : 50%;
+				position: fixed;
+				font-weight: bold;
+				left: 50%;
+				top: 50%;
 				transform: translate(-50%, -50%);
 			}
+
+			#clear_storage {
+				position: fixed;
+				background-color: black;
+				font-weight: bold;
+				left: 50%;
+				top: 70%;
+				transform: translate(-50%, -50%);
+				text-align: center;
+				border-radius: 10px;
+				border: 5px solid White;
+				padding: 5px;
+				width: 250px;
+			}
+
+			.hidden {
+				display : none !important;
+			}
 		</style>
+		<script>
+			function reset() {
+				localStorage.removeItem("pcsl_data");
+				localStorage.removeItem("pcsl_key");
+				localStorage.removeItem("pcsl_version_hash");
+				window.location.reload();
+			}
+		</script>
 		<!-- font -->
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,7 +82,6 @@
 		<div id="navbar">
 			<div id="nav_menu_group">
 				<div id="nav_menu"></div>
-				<div class="hidden"></div>
 			</div>
 			<div id="nav_title">ホーム</div>
 			<div id="nav_control_group">
@@ -72,7 +98,7 @@
 					<div class="icon_kirara"></div>
 				</div>
 				<div class="home_member_right_section">
-					<div class="home_member_name">逢魔きらら<a href="https://lit.link/Omakirara" class="ext_link" target="_blank"></a><a href="https://youtu.be/xCXiwwAvDGo" class="schedule" target="_blank"></a></div>
+					<div class="home_member_name">逢魔きらら<a href="https://lit.link/Omakirara" class="ext_link" target="_blank" aria-label="各種リンク(lit link)"></a><a href="https://youtu.be/xCXiwwAvDGo" class="schedule" target="_blank" aria-label="配信スケジュール"></a></div>
 					<div class="home_member_social">
 						<a href="https://www.youtube.com/@omakirara" class="youtube" target="_blank">YouTube</a>
 						<a href="https://twitter.com/omakirara" class="twitter" target="_blank">twitter</a>
@@ -84,7 +110,7 @@
 					<div class="icon_momo"></div>
 				</div>
 				<div class="home_member_right_section">
-					<div class="home_member_name">胡桃澤もも<a href="https://lit.link/kurumizawamomo" class="ext_link" target="_blank"></a></div>
+					<div class="home_member_name">胡桃澤もも<a href="https://lit.link/kurumizawamomo" class="ext_link" target="_blank" aria-label="各種リンク(lit link)"></a></div>
 					<div class="home_member_social">
 						<a href="https://www.youtube.com/@kurumizawamomo" class="youtube" target="_blank">YouTube</a>
 						<a href="https://twitter.com/kurumizawamomo" class="twitter" target="_blank">twitter</a>
@@ -133,7 +159,7 @@
 						<div class="icon_yuco"></div>
 					</div>
 					<div class="home_member_right_section">
-						<div class="home_member_name">つきみゆこ<a href="https://lit.link/YUCO" class="ext_link" target="_blank"></a><a href="https://youtu.be/WW2B-Y9ERc4" class="schedule" target="_blank"></a></div>
+						<div class="home_member_name">つきみゆこ<a href="https://lit.link/YUCO" class="ext_link" target="_blank" aria-label="各種リンク(lit link)"></a><a href="https://youtu.be/WW2B-Y9ERc4" class="schedule" target="_blank" aria-label="配信スケジュール"></a></div>
 						<div class="home_member_social">
 							<a href="https://www.youtube.com/@yuco5427" class="youtube" target="_blank">YouTube</a>
 							<a href="https://twitter.com/_yuco__" class="twitter" target="_blank">twitter</a>
@@ -385,10 +411,17 @@
 					<div class="settings_inner_title">全般</div>
 					<div class="settings_option">
 						<div>表示色</div>
-						<div class="three_way">
+						<div id="three_way_theme">
 							<div id="three_way_light">L</div>
 							<div id="three_way_mixed">M</div>
 							<div id="three_way_dark">D</div>
+						</div>
+					</div>
+					<div id="setting_extra_container" class="settings_option hidden">
+						<div>ダークモード</div>
+						<div id="setting_extra" class="two_way">
+							<div id="dark_normal" class="selected">通常</div>
+							<div id="dark_extra">EX</div>
 						</div>
 					</div>
 					<div class="settings_inner_title">曲検索</div>
@@ -422,6 +455,13 @@
 					</div>
 					<div class="settings_inner_title">レパートリー</div>
 					<div class="settings_option">
+						<div>入力自動選択</div>
+						<div id="setting_rep_select" class="two_way">
+							<div class="selected">する</div>
+							<div>しない</div>
+						</div>
+					</div>
+					<div class="settings_option">
 						<div>リリース日付表示</div>
 						<div id="setting_release" class="two_way">
 							<div>表示</div>
@@ -436,10 +476,11 @@
 						</div>
 					</div>
 					<div class="settings_option">
-						<div>入力自動選択</div>
-						<div id="setting_rep_select" class="two_way">
-							<div class="selected">する</div>
-							<div>しない</div>
+						<div class="setting_copy_time">長押し時間(秒)</div>
+						<div id="three_way_time" class="setting_copy_time">
+							<div id="three_way_400">0.4</div>
+							<div id="three_way_600" class="selected">0.6</div>
+							<div id="three_way_800">0.8</div>
 						</div>
 					</div>
 				</div>
@@ -502,6 +543,7 @@
 		<div id="search_auto" class="hidden"></div>
 		<div id="loading_overlay">
 			<div id="loading_text">Loading page...</div>
+			<div id="clear_storage" onclick="reset();">Click here to<br />clear storage and reload<br />if load failed</div>
 		</div>
     </body>
 </html>

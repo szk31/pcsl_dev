@@ -12,7 +12,7 @@
 .home_member_block, .home_general_block {
 	margin : 2vw 4vw;
 	padding : 2vw;
-	border-radius : 2vw;
+	border-radius : 3.2vw;
 	border : .4vw solid color-mix(in srgb, currentColor 72%, var(--base-back));
 	
 	display : grid;
@@ -37,6 +37,7 @@
 	margin : 2vw auto 4vw 8vw;
 	font-size : 6vw;
 	font-weight : bold;
+	display: flex;
 }
 
 .home_general_title {
@@ -60,14 +61,16 @@
 }
 
 .home_general_content {
-	text-align : center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 #home_key_reset {
 	background-color : Crimson;
 	color : White;
 	border-radius : 2vw;
-	width : 16vw;
+	width : 20vw;
 	margin : 6vh auto 10vh auto;
 	padding : 2vw;
 	font-size : 3.6vw;
@@ -82,12 +85,12 @@
 	transform: translate(-50%, -50%);
 	width : 80vw;
 	height : 30vh;
-	background-color : DarkSlateBlue;
+	background-color : var(--dialog-back-alt);
 	font-weight : bold;
 	text-align : center;
-	color : AliceBlue;
+	color : var(--dialog-text-alt);
 	border-radius : 2vw;
-	border: 0.5vw solid SlateBlue;
+	border: 0.5vw solid var(--dialog-border);
 }
 
 #remove_key_text {
@@ -109,17 +112,21 @@
 	display : flex;
 	justify-content : center;
 	align-items : center;
-	border-top : 0.8vw solid SlateBlue;
+	border-top : 0.8vw solid var(--dialog-border);
 	font-size : 4.8vw;
 }
 
 #remove_key_nah {
-	border-right : 0.4vw solid SlateBlue;
+	border-right : 0.4vw solid var(--dialog-border);
 	border-bottom-left-radius : 2vw;
 }
 
 #remove_key_yes {
-	border-left : 0.4vw solid SlateBlue;
+	border-left : 0.4vw solid var(--dialog-border);
 	background-color : DarkRed;
 	border-bottom-right-radius : 2vw;
+}
+
+[theme=light] #remove_key_yes {
+	background-color : rgb(242, 98, 98);
 }

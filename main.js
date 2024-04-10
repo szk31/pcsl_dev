@@ -1,7 +1,7 @@
 //"use strict";
 // display string, refered in entry[].type
 const singer_lookup = [
-	"",					// 0b 0000 0x 0
+	,					// 0b 0000 0x 0
 	"看谷にぃあ",		//    0001    1
 	"胡桃澤もも",		//    0010    2
 	"ももにぃあ",		//    0011    3
@@ -10,12 +10,14 @@ const singer_lookup = [
 	"ももきら",			//    0110    6
 	"ぷちここ",			//    0111    7
 	"つきみゆこ",		//    1000    8
-	,,,
+	,
+	"ゆこもも",
+	,
 	"ゆこきら",
 	,,,
 	"愛白ふりる",		//   10000   10
 	,,,,,,,,,,,,,,,
-	"小悪熊ちゅい",		//  100000   20
+	"小悪熊ちゅい"		//  100000   20
 ];
 
 // display order of search
@@ -28,13 +30,15 @@ const display_order = [
 	3,		// 0101
 	2,		// 0110
 	1,		// 0111
-	11,		// 1000
-	,,,
+	12,		// 1000
+	,
+	9,
+	,
 	8,
 	,,,
-	10,		//10000
+	11,		//10000
 	,,,,,,,,,,,,,,,
-	9
+	10
 ];
 
 // display order of rep display
@@ -50,13 +54,13 @@ let member_display_order = [
 
 // series search
 const series_lookup = {
-	"マクロス" : ["マクロス", "まくろす"],
-	"ラブライブ" : ["ラブライブ", "らぶらいぶ", "LL", "ll"],
-	"アイマス" : ["アイマス", "あいます", "デレマス", "でれます"],
-	"ジブリ" : ["ジブリ", "じぶり"],
-	"物語シリーズ" : ["物語シリーズ", "ものがたりしりーず", "ものがたりシリーズ"],
-	"まどマギ" : ["まどマギ", "まどまぎ", "まどか"],
-	"disney" : ["disney", "ディズニー", "でぃずにー", "Disney"]
+	"マクロス" : "マクロスまくろす",
+	"ラブライブ" : "ラブライブらぶらいぶll",
+	"アイマス" : "アイマスあいますデレマスでれます",
+	"ジブリ" : "ジブリじぶり",
+	"物語シリーズ" : "物語シリーズものがたりしりーず",
+	"まどマギ" : "まどマギまどまぎ",
+	"disney" : "disneyディズニーでぃずにー"
 };
 
 // indices lookup
@@ -80,7 +84,7 @@ const entry_idx = {
 
 let video, entry;
 
-const version = "1.7.0";
+const version = "1.7.4";
 const key_hash = [
 	"473c05c1ae8349a187d233a02c514ac73fe08ff4418429806a49f7b2fe4ba0b7a36ba95df1d58b8e84a602258af69194", //thereIsNoPassword
 	"3f01e53f1bcee58f6fb472b5d2cf8e00ce673b13599791d8d2d4ddcde3defbbb4e0ab7bc704538080d704d87d79d0410"
@@ -115,7 +119,8 @@ let setting = {
 	rep_sort : "50",				// config: display sort by method
 	rep_sort_asd : true,			// config: sort ascendingly
 	rep_selected_first : false,		// config: display selecetd songs on top
-	rep_show_artist : true			// hidden: rep-share include artist name
+	rep_show_artist : true,			// hidden: rep-share include artist name
+	longPress_time : 600			// conifg: long press copy time (ms)
 };
 
 // ram for searching (entry_processed)
@@ -127,9 +132,12 @@ let memcount_rep_int;
 // pre-process song names
 let processed_song_name = [""];
 
+// pre-process song to be skipped
+let auto_skips = [];
+
 {	// theme
 	let theme = ls("theme");
-	if (theme === null) {
+	if (!theme) {
 		theme = "mixed";
 		ls("theme", theme);
 	}
@@ -146,6 +154,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 		// hide original page
 		$("body > div").addClass("post_switch");
 		$("body").addClass("post_switch");
+		// remove key
+		let url_para = new URLSearchParams(window.location.search);
+		url_para.delete("key");
+		window.history.pushState(null, null, `${document.location.href.split('?')[0]}${url_para.size ? `?${url_para}` : ""}`);
+		// delete data
+		song = song_lookup = note_index = null;
 		return;
 	}
 
@@ -154,7 +168,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		return content_level ? CryptoJS.AES.decrypt(input, key).toString(CryptoJS.enc.Utf8) : input;
 	}
 	// change settings selected theme
-	$(`#three_way_${ls("theme")}`).addClass("selected");
+	$(`#three_way_${ls("theme") === "extra" ? "dark" : ls("theme")}`).addClass("selected");
 	// check url para first
 	let url_para = new URLSearchParams(window.location.search);
 	key = url_para.get("key");
@@ -235,7 +249,7 @@ function process_data() {
 	let url_para = new URLSearchParams(window.location.search);
 	// remove key
 	url_para.delete("key");
-	window.history.pushState(null, null, `${document.location.href.split('?')[0]}${url_para.size ? `?${url_para}` : ""}`)
+	window.history.pushState(null, null, `${document.location.href.split('?')[0]}${url_para.size ? `?${url_para}` : ""}`);
 	
 	// ad local storage if not exist
 	const lookup = [
@@ -243,9 +257,10 @@ function process_data() {
 		["pcsl_s_selecInput", 1],
 		["pcsl_s_showRandom", 0],
 		["pcsl_s_ignoreRule", 0],
+		["pcsl_s_rep_select", 1],
 		["pcsl_s_showReleas", 0],
 		["pcsl_s_LPressCopy", 1],
-		["pcsl_s_rep_select", 1]
+		["pcsl_s_longP_time", 600]
 	];
 	for (let i in lookup) {
 		if (ls(lookup[i][0]) === null) {
@@ -258,10 +273,11 @@ function process_data() {
 	setting.select_input    = ls("pcsl_s_selecInput") == 1;
 	setting.show_random     = ls("pcsl_s_showRandom") == 1;
 	setting.random_ignore   = ls("pcsl_s_ignoreRule") == 1;
+	setting.rep_select_input= ls("pcsl_s_rep_select") == 1;
 	setting.show_release    = ls("pcsl_s_showReleas") == 1;
 	setting.longPress_copy  = ls("pcsl_s_LPressCopy") == 1;
-	setting.rep_select_input= ls("pcsl_s_rep_select") == 1;
 	setting.rep_show_artist = ls("pcsl_s_rep_artist") == 1;
+	setting.longPress_time  = parseInt(ls("pcsl_s_longP_time"));
 
 	// switch display in settings according to saved settings
 	if (!setting.show_hidden) {
@@ -276,21 +292,36 @@ function process_data() {
 	if (setting.random_ignore) {
 		$("#setting_ignore>div").toggleClass("selected");
 	}
+	if (!setting.rep_select_input) {
+		$("#setting_rep_select>div").toggleClass("selected");
+	}
 	if (setting.show_release) {
 		$("#setting_release>div").toggleClass("selected");
 	}
 	if (!setting.longPress_copy) {
 		$("#setting_copy>div").toggleClass("selected");
 	}
-	if (!setting.rep_select_input) {
-		$("#setting_rep_select>div").toggleClass("selected");
-	}
 	if (!setting.rep_show_artist) {
 		$(".rep_tweet_a").toggleClass("selected");
 	}
+	$("#three_way_time>div").removeClass("selected");
+	$(`#three_way_${setting.longPress_time}`).addClass("selected");
 
 	$("#nav_search_random").toggleClass("blank", !setting.show_random);
 	$(".setting_req_random").toggleClass("disabled", !setting.show_random);
+	$(".setting_copy_time").toggleClass("disabled", !setting.longPress_copy);
+
+	if (ls("pcsl_s_show_extra")) {
+		$("#setting_extra_container").removeClass("hidden");
+	}
+	switch (ls("theme")) {
+		case "light":
+		case "mixed":
+			$("#setting_extra_container>div").addClass("disabled");
+			break;
+		case "extra":
+			$("#setting_extra").click();
+	}
 
 	// processing url para
 	init();
@@ -421,7 +452,7 @@ $(function() {
 					clearInterval(id)
 			}
 			let id = setInterval(frame, 1);
-			if (current_page === "repertoire" && rep_display_selected_first) {
+			if (current_page === "repertoire" && setting.rep_selected_first) {
 				rep_display();
 			}
 		});
@@ -497,9 +528,9 @@ $(function() {
 			for (let i in member_display_order) {
 				let mem_id = member_display_order[i];
 				// new row, name
-				new_html += ("<tr class=\"memcount_row singer_" + mem_id + "\"><td><div class=\"memcount_name\">" + singer_lookup[mem_id] + "</div></td>");
+				new_html += `<tr class=\"memcount_row singer_${mem_id}\"><td class=\"memcount_name\"><div>${singer_lookup[mem_id]}</div></td>`;
 				for (let j = 0; j < 3; ++j) {
-					new_html += ("<td" + (entry_count[mem_id][j] === 0 ? " class=\"memcount_empty\"" : "") + ">" + entry_count[mem_id][j] + "</td>");
+					new_html += `<td${entry_count[mem_id][j] === 0 ? ` class="memcount_empty"` : ""}>${entry_count[mem_id][j]}</td>`;
 				}
 				// close row
 				new_html += "</tr>";
@@ -515,16 +546,16 @@ $(function() {
 				}
 			}
 			if (key_valid) {
-				new_html += "</table><div id=\"memcount_sum_warpper\" class=\"memcount_sum\"><div class=\"memcount_sum_icon col-1 colspan-2\"></div>";
+				new_html += `</table><div id="memcount_sum_warpper" class="memcount_sum"><div class="memcount_sum_icon col-1 colspan-2"></div>`;
 				for (let row = 0; row < 2; ++row) {
 					for (let col = 2; col >= 0; --col) {
-						new_html += ("<div class=\"row-" + (row + 1) + " col-" + (4 - col) + " singer_" + (1 << (row * 3 + col)) + "\">" + entry_count_total[row * 3 + col] + "</div>");
+						new_html += `<div class="row-${row + 1} col-${4 - col} singer_${1 << (row * 3 + col)}">${entry_count_total[row * 3 + col]}</div>`;
 					}
 				}
 			} else {
-				new_html += "</table><div class=\"memcount_sum\"><div class=\"memcount_sum_icon\"></div>";
+				new_html += `</table><div class="memcount_sum"><div class="memcount_sum_icon"></div>`;
 				for (let i = 2; i >= 0; --i) {
-					new_html += ("<div class=\"singer_" + (1 << i) + "\">" + entry_count_total[i] + "</div>");
+					new_html += `<div class=\"singer_${(1 << i)}">${entry_count_total[i]}</div>`;
 				}
 			}
 			$("#memcount_content").html(new_html + "</div>");
@@ -544,24 +575,51 @@ $(function() {
 	}
 	
 	{ // settings
+
+		let dark_clicked = 0;
 		// general - display_theme
-		$(document).on("click", ".three_way>div", function() {
+		$(document).on("click", "#three_way_theme>div", function() {
 			let selected = this.id.replace("three_way_", "");
+			$("#setting_extra_container>div").toggleClass("disabled", selected !== "dark");
+			if (selected === "dark") {
+				selected = $("#dark_extra").hasClass("selected") ? "extra" : "dark";
+			}
 			document.documentElement.setAttribute("theme", selected);
 			ls("theme", selected);
-			$(".three_way>div").removeClass("selected");
+			$("#three_way_theme>div").removeClass("selected");
 			$(this).addClass("selected");
 			// set post-switch bg colour
 			// does not account for cross origin, not needed anyways
 			parent.refresh_bgColour();
+			dark_clicked = selected === "dark" ? ++dark_clicked : 0;
+			if (dark_clicked === 5) {
+				$("#setting_extra_container").removeClass("hidden");
+				ls("pcsl_s_show_extra", 1);
+			}
+			
+		});
+
+		// rep - long press length
+		$(document).on("click", "#three_way_time>div", function() {
+			let time = parseInt(this.id.replace("three_way_", ""));
+			ls("pcsl_s_longP_time", time);
+			setting.longPress_time = time;
+			$("#three_way_time>div").removeClass("selected");
+			$(this).addClass("selected");
 		});
 
 		$(document).on("click", ".two_way:not(.disabled)", function() {
 			$(this).children().toggleClass("selected");
 			switch (this.id) {
+				case "setting_extra":
+					let cur_state = $("#dark_extra").hasClass("selected");
+					ls("theme", cur_state ? "extra" : "dark");
+					document.documentElement.setAttribute("theme", ls("theme"));
+					break;
 				case "setting_hidden":
 					setting.show_hidden ^= 1;
 					ls("pcsl_s_showHidden", setting.show_hidden ? "1" : "0");
+					update_display(1);
 					break;
 				case "setting_select":
 					setting.select_input ^= 1;
@@ -585,14 +643,14 @@ $(function() {
 						rep_display();
 					}
 					break;
+				case "setting_rep_select":
+					setting.rep_select_input ^= 1;
+					ls("pcsl_s_rep_select", setting.rep_select_input ? "1" : "0");
+					break;
 				case "setting_copy":
 					setting.longPress_copy ^= 1;
 					ls("pcsl_s_LPressCopy", setting.longPress_copy ? "1" : "0");
-					break;
-				case "setting_rep_select":
-					setting.rep_select_input ^= 1;
-					ls("pcsl_s_rep_select", setting.longPress_copy ? "1" : "0");
-
+					$(".setting_copy_time").toggleClass("disabled", !setting.longPress_copy);
 			}
 		})
 	}
@@ -676,7 +734,7 @@ function init() {
 	$("#info_version").html(version);
 	$("#info_last-update").html(video[video.length - 1][video_idx.date]);
 	// get screen size
-	auto_display_max = Math.floor(5 * Math.pow(window.innerHeight / window.innerWidth, 1.41421356237));
+	auto_display_max = Math.floor(7 * window.innerHeight / window.innerWidth);
 	
 	// rep
 	let rep_solo_temp = [];
@@ -684,6 +742,9 @@ function init() {
 	// process song names
 	for (let i = 1; i < song.length; ++i) {
 		processed_song_name.push(song[i][song_idx.name].toLowerCase().normalize("NFKC"));
+		if (i > 2 && song[i][song_idx.name].trim() === song[i - 1][song_idx.name].trim()) {
+			auto_skips.push(i);
+		}
 	}
 	
 	// get each member's repertoire
@@ -742,12 +803,12 @@ function memcount_load_rep() {
 	// display
 	let new_html = "";
 	for (let i = 0; i < (key_valid ? 6 : 3); ++i) {
-		new_html += ("<div class=\"memcount_rep_block\"><div class=\"singer_" + display_lookup[i] + "m memcount_rep_name\">" + singer_lookup[display_lookup[i]] + "</div><div class=\"singer_" + display_lookup[i] + "\">" + display_number[i] + "</div></div>");
+		new_html += `<div class="memcount_rep_block"><div class="singer_${display_lookup[i]}m memcount_rep_name">${singer_lookup[display_lookup[i]]}</div><div class="singer_${display_lookup[i]}">${display_number[i]}</div></div>`;
 	}
 	if (key_valid) {
-		new_html += ("<div></div><div class=\"memcount_rep_sum\"></div><div></div>");
+		new_html += `<div></div><div class="memcount_rep_sum"></div><div></div>`;
 		for (let i = 6; i < 9; ++i) {
-			new_html += ("<div class=\"memcount_rep_block_sum memcount_rep_singer_" + display_lookup[i] + "\"><div>" + display_number[i] + "</div></div>");
+			new_html += `<div class="memcount_rep_block_sum memcount_rep_singer_${display_lookup[i]}"><div>${display_number[i]}</div></div>`;
 		}
 	}
 	$("#memcount_rep_content").toggleClass("extra_content", key_valid === 1);
@@ -764,7 +825,7 @@ function display_date(input) {
 
 // add 0 in front of a number
 function fill_digit(input, length) {
-	e = "" + input;
+	let e = "" + input;
 	while (e.length < length) {
 		e = "0" + e;
 	}
@@ -830,9 +891,7 @@ function get_date_different(date1, date2 = today) {
 
 // get entry count of all entry and member-only entry that fufills mask
 function get_sang_count(id, mask = [4, 2, 1, 32, 16, 8]) {
-	
-	let count = 0,
-		mem_count = 0;
+	let count = mem_count = 0;
 	for (let i in entry_proc[id]) {
 		if (mask.some((x) => (x & entry[entry_proc[id][i]][entry_idx.type]) === x)) {
 			count++;
@@ -873,7 +932,6 @@ function jump2page(target) {
 			$("#input").val("");
 			search();
 			break;
-		case "rep" :
 		case "repertoire" : 
 			// show section
 			$("#repertoire_section").removeClass("hidden");
@@ -885,7 +943,7 @@ function jump2page(target) {
 			rep_search();
 			break;
 		default :
-			// error
+			// error **this is used code**
 			return -1;
 	}
 	$(window).scrollTop(0);
@@ -902,23 +960,24 @@ function split_to_solo(input) {
 			return [2, 4];
 		case 7 : 
 			return [1, 2, 4];
+		case 10:
+			return [2, 8];
 		case 12:
 			return [4, 8];
-		default:
-			return [input];
 	}
+	return [input];
 }
 
-let copy_popup_is_displaying = false;
+let copy_popup_flag = false;
 
 function copy_popup() {
-	if (copy_popup_is_displaying) {
+	if (copy_popup_flag) {
 		return;
 	}
-	copy_popup_is_displaying = true;
+	copy_popup_flag = true;
 	$("#copy_popup").attr("class", "fade_out");
 	setTimeout(() => {
-		copy_popup_is_displaying = false;
+		copy_popup_flag = false;
 		$("#copy_popup").attr("class", "hidden");
 	}, 1500);
 }
@@ -946,6 +1005,6 @@ function refresh_bgColour() {
 	document.documentElement.setAttribute("theme", ls("theme"));
 }
 
-function ls(a, b) {
-	return b === undefined ? localStorage.getItem(a) : localStorage.setItem(a, b);
+function ls(key, value) {
+	return value === undefined ? localStorage.getItem(key) : localStorage.setItem(key, value);
 }
