@@ -281,13 +281,13 @@
 #rep_tweet_artist {
 	display: grid;
 	grid-template-columns: 50% 50%;
-	margin: 0.2vh 2vw 2.4vh;
+	margin: 0.2vh 2vw 2vh;
 }
 
 .rep_tweet_a {
 	margin: 0.5vh 2vw;
 	padding: 0.8vh;
-	height: 2.4vh;
+	height: 4vh;
 	background-color: var(--dialog-back-alt);
 	border: 0.4vh solid var(--trnsp);
 	border-radius: 2vw;
@@ -308,7 +308,7 @@
 .rep_tweet_submit {
 	margin: 0.6vh 4vw 1.4vh;
 	padding: 1.2vh;
-	height: 2.5vh;
+	height: 5vh;
 	background-color: var(--dialog-back-alt);
 	border-radius: 2vw;
 

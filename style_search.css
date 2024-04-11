@@ -252,7 +252,7 @@ input[type=text]::placeholder {
 
 .entry_note {
 	font-size : 2.7vw;
-	margin : 0vw 2.5vw;
+	padding : 0vw 2.5vw;
 }
 
 
@@ -374,6 +374,11 @@ input[type=text]::placeholder {
 
 .auto_panel:not(.auto_first) {
 	border-top : 0.5vw solid GhostWhite;
+}
+
+.auto_panel.selected {
+	background-color : var(--song-display-alt);
+	color : var(--song-selected);
 }
 
 /* like i know theres aint no hover on a damn mobile site */

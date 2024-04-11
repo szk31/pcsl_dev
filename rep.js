@@ -46,7 +46,7 @@ let selected_member = [4, 2, 1, 32, 16, 8];
 const selected_member_ram = [4, 2, 1, 32, 16, 8];
 const name_lookup = ["kirara", "momo", "nia", "chui", "shiro", "yuco"];
 
-const exist = (x) => selected_member.includes(x);
+const exist = x => selected_member.includes(x);
 
 let longpress_timer;
 let post_longpress_timer;
@@ -79,34 +79,6 @@ $(function() {
 			rep_singer[name_lookup.indexOf(e)] ^= 1;
 			$(this).toggleClass("selected");
 			rep_search(true);
-		});
-		
-		// filter - entry - attr
-		$(document).on("click", ".filter_entry_attr_item", function() {
-			let e = this.id.replace(/(attr_container_)/, "");
-			if (e === "all") {
-				// if selecting all
-				// check if it is previously selected
-				$(".attr_checkbox").toggleClass("selected", !$("#attr_" + e).hasClass("selected"));
-				for (let i in rep_attr) {
-					rep_attr[i] = $("#attr_" + e).hasClass("selected") ? 1 : 0;
-				}
-			} else {
-				$("#attr_" + e).toggleClass("selected");
-				rep_attr[e] ^= 1;
-				if (!$("#attr_" + e).hasClass("selected")) {
-					$("#attr_all").removeClass("selected");
-				} else {
-					for (let i in rep_attr) {
-						if (!rep_attr[i]) {
-							rep_search();
-							return;
-						}
-					}
-					$("#attr_all").addClass("selected");
-				}
-			}
-			rep_search();
 		});
 		
 		// filter - genre - anisong
@@ -197,15 +169,15 @@ $(function() {
 			if (is_long_pressing) {
 				return;
 			}
-			let e = parseInt(this.id.replace(/(rep_song_)/, ""));
+			let song_id = parseInt(this.id.replace(/(rep_song_)/, ""));
 			if ($(this).hasClass("selected")) {
-				rep_selected.splice(rep_selected.indexOf(e), 1);
-				if (rep_selected.length === 0) {
+				rep_selected.splice(rep_selected.indexOf(song_id), 1);
+				if (!rep_selected.length) {
 					$("#nav_share").addClass("disabled");
 					$("#nav_bulk_search").addClass("disabled");
 				}
 			} else {
-				rep_selected.push(e);
+				rep_selected.push(song_id);
 				$("#nav_share").removeClass("disabled");
 				$("#nav_bulk_search").removeClass("disabled");
 			}
@@ -217,9 +189,9 @@ $(function() {
 			if (!setting.longPress_copy) {
 				return;
 			}
-			let e = parseInt(this.id.replace(/(rep_song_)/, ""));
+			let song_id = parseInt(this.id.replace(/(rep_song_)/, ""));
 			longpress_timer = setTimeout(function() {
-				navigator.clipboard.writeText(song[e][song_idx.name]);
+				navigator.clipboard.writeText(song[song_id][song_idx.name]);
 				copy_popup();
 				is_long_pressing = true;
 				post_longpress_timer = setTimeout(function() {
@@ -298,14 +270,14 @@ $(function() {
 				m : "#ももっとリクエスト",
 				y : "#つきみゆこ"
 			}
-			let e = this.id.replace("rep_tweet_", "");
-			switch (e) {
+			let selected = this.id.replace("rep_tweet_", "");
+			switch (selected) {
 				case "t":
 					navigator.clipboard.writeText(tweet);
 					copy_popup();
 					break;
 				default :
-					window.open("https://twitter.com/intent/tweet?text=" + encodeURIComponent(tweet + lookup[e]), "_blank");
+					window.open("https://twitter.com/intent/tweet?text=" + encodeURIComponent(tweet + lookup[selected]), "_blank");
 			}
 			// close pop up
 			$("#popup_container").click();
@@ -315,83 +287,58 @@ $(function() {
 
 let rep_hits = [];
 let rep_hits_solo = [];
-let rep_hits_count = 0;
 
 let rep_selected = [];
 let rep_input_memory = "";
 
 function rep_search(force = false) {
 	// check if input is empty
-	let input_value = $("#rep_input").val().normalize("NFKC").trim();
+	let input_value = $("#rep_input").val().normalize("NFKC").trim().toLowerCase();
 	// check if input has been updated
 	if (input_value !== rep_input_memory) {
 		rep_input_memory = input_value;
-	} else if (!force && input_value !== "") {
+	} else if (!force && input_value) {
 		// if input didnt changed and is not blank
 		return;
 	}
-	// update selected member before branching out
+	// update selected member
 	selected_member = [];
-	for (let i in selected_member_ram) {
-		if (rep_singer[i]) {
-			selected_member.push(selected_member_ram[i]);
-		}
-	}
-	if (rep_input_memory !== "") {
+	rep_singer.forEach((val, i) => val ? selected_member.push(selected_member_ram[i]) : null);
+	if (input_value) {
 		rep_hits = [];
-		rep_hits_count = 0;
 		// returning search result by input
 		for (let i = 1; i < song.length; ++i) {
-			if (entry_proc[i].length === 0) {
+			if (!entry_proc[i].length) {
 				continue;
 			}
-			if (processed_song_name[i].search(input_value.toLowerCase()) !== -1 ||
-				song[i][song_idx.reading].search(input_value) !== -1
-				) {
-				rep_hits[rep_hits_count++] = i;
+			if (processed_song_name[i].includes(input_value) || song[i][song_idx.reading].includes(input_value)) {
+				rep_hits.push(i);
 			}
 		}
 		rep_display();
 		return;
 	}
 	// return nothing if no one is selected and nothing is being searched
-	if (selected_member.length === 0) {
+	if (!selected_member.length) {
 		// no one selected
 		clearInterval(rep_display_inter);
 		$("#rep_display").html("");
 		return;
 	}
 	// get mask
-	let mask = 0;
-	rep_hits = [];
-	rep_hits_count = 0;
-	for (let i in rep_anisong) {
-		mask += rep_anisong[i][0] << rep_anisong[i][1];
-	}
-	for (let i in rep_genre) {
-		mask += rep_genre[i][0] << rep_genre[i][1];
-	}
-	// remove flag
-	let inv_mask = 0;
-	for (let i in rep_anisong) {
-		if (i === "other") {
-			continue;
-		}
-		inv_mask += (1 - rep_anisong[i][0]) << rep_anisong[i][1];
-	}
+	let mask = inv_mask = 0;
+	// combine both mask_object and create binary mask
+	Object.values(rep_anisong).concat(Object.values(rep_genre)).forEach(x => mask += x[0] << x[1]);
+	Object.values(rep_anisong).forEach(x => inv_mask += x[0] << x[1]);
+	inv_mask = ~inv_mask & 28;	// 28: 0b11100, the only 3 bits used in anisong filter 
 	// search
-	for (let i = 0; i < song.length; ++i) {
-		if (song[i][song_idx.attr] & mask) {
-			if (inv_mask) {
-				// remove song thats deselected
-				if (song[i][song_idx.attr] & inv_mask) {
-					continue;
-				}
-			}
-			if (!rep_hits_solo[i].some(exist)) {
-				continue;
-			}
-			rep_hits[rep_hits_count++] = i;
+	rep_hits = [];
+	for (i in song) {
+		if (rep_hits_solo[i].some(exist) &&		// has entry of selected member
+		    song[i][song_idx.attr] & mask &&	// satisflies filter mask
+		  !(song[i][song_idx.attr] & inv_mask)	// does not satisfly inverse filter mask
+		) {
+			rep_hits.push(i);
 		}
 	}
 	rep_display();
@@ -402,74 +349,33 @@ let rep_display_inter;
 function rep_display() {
 	if (setting.rep_selected_first) {
 		// remove selected item in main array
-		for (let i in rep_selected) {
-			if (rep_hits.indexOf(rep_selected[i]) === -1) {
-				continue;
-			}
-			rep_hits.splice(rep_hits.indexOf(rep_selected[i]), 1);
-		}
+		rep_hits = rep_hits.filter(val => !rep_selected.includes(val));
 	}
-
-	// get member
 	$("#rep_display").html("");
 	// sort record
 	switch (setting.rep_sort) {
-		case "50" :
-			// default, do nothing
-			rep_hits.sort((a, b) => {
-				return a - b;
-			});
-			if (!setting.rep_sort_asd) {
-				rep_hits.reverse();
-			}
+		case "50" : // default, do nothing
+			rep_hits.sort((a, b) => (setting.rep_sort_asd ? 1 : -1) * (a - b));
 			break;
-		case "count" :
-			// sang entry count
+		case "count" : // sang entry count
 			// create a lookup array for all songs for the current member selection
 			let entry_count = [];
-			for (let i in song) {
-				if (selected_member.length === 6) {
-					entry_count[i] = entry_proc[i].length;
-					continue;
-				}
-				entry_count[i] = 0;
-				for (let j in entry_proc[i]) {
-					if (selected_member.includes(entry[entry_proc[i][j]][entry_idx.type])) {
-						entry_count[i]++;
-					} 
-				}
-			}
-			rep_hits.sort((a, b) => {
-				return (setting.rep_sort_asd ? 1 : -1) * (entry_count[b] - entry_count[a]);
-			});
+			rep_hits.forEach(x => entry_count[x] = selected_member.length === 6 ? entry_proc[x].length : entry_proc[x].filter(y => split_to_solo(entry[y][entry_idx.type]).some(z => selected_member.includes(z))).length);
+			rep_hits.sort((a, b) => (setting.rep_sort_asd ? 1 : -1) * (entry_count[b] - entry_count[a]));
 			break;
-		case "date" : {
-			// sort with last sang date
+		case "date" : // sort with last sang date
 			let date_lookup = [];
-			for (let i in song) {
-				let dummy = get_last_sang(i, selected_member);
-				date_lookup[i] = dummy ? dummy.getTime() : 0;
-			}
-			rep_hits.sort((a, b) => {
-				return (setting.rep_sort_asd ? 1 : -1) * (date_lookup[b] - date_lookup[a]);
+			rep_hits.forEach(x => {
+				let date = get_last_sang(x, selected_member);
+				date_lookup[x] = date ? date.getTime() : 0;
 			});
+			rep_hits.sort((a, b) => (setting.rep_sort_asd ? 1 : -1) * (date_lookup[b] - date_lookup[a]));
 			break;
-		}
-		case "release" : {
-			// release date of song
-			let date_lookup = [];
-			for (let i = 1; i < song.length; ++i) {
-				date_lookup[i] = to8601(song[i][song_idx.release]).getTime();
-			}
-			rep_hits.sort((a, b) => {
-				return (setting.rep_sort_asd ? 1 : -1) * (date_lookup[b] - date_lookup[a]);
-			});
+		case "release" : // release date of song
+			let rls_lookup = [];
+			rep_hits.forEach(val => rls_lookup[val] = to8601(song[val][song_idx.release]).getTime());
+			rep_hits.sort((a, b) => (setting.rep_sort_asd ? 1 : -1) * (rls_lookup[b] - rls_lookup[a]));
 			break;
-		}
-		default : 
-			// anything else is error
-			console.log("rep_sort of type \"" + setting.rep_sort + "\" not found");
-			return;
 	}
 	if (setting.rep_selected_first) {
 		// add selected back into main array
@@ -487,9 +393,7 @@ let rep_loading_progress = 0;
 function rep_display_loop() {
 	let load_end = Math.min(rep_loading_progress + 20, rep_hits.length);
 	for (let i = rep_loading_progress; i < load_end; ++i) {
-		// sang count
 		let sang_count = get_sang_count(rep_hits[i], selected_member);
-		// last sang
 		let last_sang = get_last_sang(rep_hits[i], selected_member);
 		let delta_last = last_sang === 0 ? -1 : get_date_different(last_sang);
 		

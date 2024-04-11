@@ -106,6 +106,7 @@ let setting = {
 	// search
 	show_hidden : true,				// if display private video
 	select_input : true,			// select input on click
+	changeless_auto : false,		// config: show auto even input is the same
 	show_random : false,			// display random button
 	random_ignore : true,			// bypass random rule:(input being empty)
 	search_by_song : true,			// config: searching by song name
@@ -120,7 +121,7 @@ let setting = {
 	rep_sort_asd : true,			// config: sort ascendingly
 	rep_selected_first : false,		// config: display selecetd songs on top
 	rep_show_artist : true,			// hidden: rep-share include artist name
-	longPress_time : 600			// conifg: long press copy time (ms)
+	longPress_time : 600			// config: long press copy time (ms)
 };
 
 // ram for searching (entry_processed)
@@ -255,6 +256,7 @@ function process_data() {
 	const lookup = [
 		["pcsl_s_showHidden", 1],
 		["pcsl_s_selecInput", 1],
+		["pcsl_s_autoAnyway", 0],
 		["pcsl_s_showRandom", 0],
 		["pcsl_s_ignoreRule", 0],
 		["pcsl_s_rep_select", 1],
@@ -271,6 +273,7 @@ function process_data() {
 	// read from local storage
 	setting.show_hidden     = ls("pcsl_s_showHidden") == 1;
 	setting.select_input    = ls("pcsl_s_selecInput") == 1;
+	setting.changeless_auto = ls("pcsl_s_autoAnyway") == 1;
 	setting.show_random     = ls("pcsl_s_showRandom") == 1;
 	setting.random_ignore   = ls("pcsl_s_ignoreRule") == 1;
 	setting.rep_select_input= ls("pcsl_s_rep_select") == 1;
@@ -285,6 +288,9 @@ function process_data() {
 	}
 	if (!setting.select_input) {
 		$("#setting_select>div").toggleClass("selected");
+	}
+	if (setting.changeless_auto) {
+		$("#setting_auto>div").toggleClass("selected");
 	}
 	if (setting.show_random) {
 		$("#setting_random>div").toggleClass("selected");
@@ -608,6 +614,7 @@ $(function() {
 			$(this).addClass("selected");
 		});
 
+		// settings - other options
 		$(document).on("click", ".two_way:not(.disabled)", function() {
 			$(this).children().toggleClass("selected");
 			switch (this.id) {
@@ -624,6 +631,10 @@ $(function() {
 				case "setting_select":
 					setting.select_input ^= 1;
 					ls("pcsl_s_selecInput", setting.select_input ? "1" : "0");
+					break;
+				case "setting_auto":
+					setting.changeless_auto ^= 1;
+					ls("pcsl_s_autoAnyway", setting.changeless_auto ? "1" : "0");
 					break;
 				case "setting_random":
 					setting.show_random ^= 1;
