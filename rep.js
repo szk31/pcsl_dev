@@ -68,32 +68,32 @@ $(function() {
 		});
 		
 		// filter - hide_block
-		$(document).on("click", "#filter_title", function() {
+		$(document).on("click", "#filter_display", function() {
 			$("#filter_close").toggleClass("closed");
 			$("#filter_content").toggleClass("hidden");
 		});
 		
 		// filter - entry - singer
-		$(document).on("click", ".filter_icon, .filter_icon_extra", function() {
+		$(document).on("click", ".filter_icon", function() {
 			let e = $(this).attr('class').split(/\s+/).find(x => x.startsWith("icon_")).replace("icon_", "");
 			rep_singer[name_lookup.indexOf(e)] ^= 1;
 			$(this).toggleClass("selected");
 			rep_search(true);
 		});
 		
-		// filter - genre - anisong
-		$(document).on("click", ".filter_genre_anisong_item", function() {
-			let e = this.id.replace(/(genre_container_anisong_)/, "");
+		// filter - anisong
+		$(document).on("click", ".filter_anisong", function() {
+			let e = this.id.replace("anisong_", "");
 			if (e === "all") {
-				$(".genre_anisong_checkbox").toggleClass("selected", !$("#anisong_all").hasClass("selected"));
+				$(".filter_anisong .checkbox").toggleClass("selected", !$("#anisong_all .checkbox").hasClass("selected"));
 				for (let i in rep_anisong) {
-					rep_anisong[i][0] = $("#anisong_all").hasClass("selected") ? 1 : 0;
+					rep_anisong[i][0] = $("#anisong_all .checkbox").hasClass("selected") ? 1 : 0;
 				}
 			} else {
-				$("#anisong_" + e).toggleClass("selected");
+				$(`#${this.id} .checkbox`).toggleClass("selected");
 				rep_anisong[e][0] ^= 1;
-				if (!$("#anisong_" + e).hasClass("selected")) {
-					$("#anisong_all").removeClass("selected");
+				if (!$(`#${this.id} .checkbox`).hasClass("selected")) {
+					$("#anisong_all .checkbox").removeClass("selected");
 				} else {
 					for (let i in rep_anisong) {
 						if (!rep_anisong[i][0]) {
@@ -101,25 +101,26 @@ $(function() {
 							return;
 						}
 					}
-					$("#anisong_all").addClass("selected");
+					$("#anisong_all .checkbox").addClass("selected");
 				}
 			}
 			rep_search();
 		});
 		
-		// filter - genre - general
-		$(document).on("click", ".filter_genre_general_item", function() {
-			let e = this.id.replace(/(genre_container_general_)/, "");
+		// filter - genre
+		$(document).on("click", ".filter_genre", function() {
+			let e = this.id.replace("genre_", "");
+			const all = "#genre_all .checkbox";
 			if (e === "all") {
-				$(".genre_general_checkbox").toggleClass("selected", !$("#general_all").hasClass("selected"));
+				$(".filter_genre .checkbox").toggleClass("selected", !$(all).hasClass("selected"));
 				for (let i in rep_genre) {
-					rep_genre[i][0] = $("#general_all").hasClass("selected") ? 1 : 0;
+					rep_genre[i][0] = $(all).hasClass("selected") ? 1 : 0;
 				}
 			} else {
-				$("#general_" + e).toggleClass("selected");
+				$(`#${this.id} .checkbox`).toggleClass("selected");
 				rep_genre[e][0] ^= 1;
-				if (!$("#general_" + e).hasClass("selected")) {
-					$("#general_all").removeClass("selected");
+				if (!$(`#${this.id} .checkbox`).hasClass("selected")) {
+					$(all).removeClass("selected");
 				} else {
 					for (let i in rep_genre) {
 						if (!rep_genre[i][0]) {
@@ -127,28 +128,28 @@ $(function() {
 							return;
 						}
 					}
-					$("#general_all").addClass("selected");
+					$(all).addClass("selected");
 				}
 			}
 			rep_search();
 		});
 		
 		// filter - sort - sort options
-		$(document).on("click", ".filter_sort_item", function() {
-			let e = this.id.replace(/(sort_container_)/, "");
+		$(document).on("click", ".filter_sort", function() {
+			let e = this.id.replace("sort_", "");
 			// check if clicking on the same item
 			if (setting.rep_sort === e) {
 				return;
 			}
-			$(".sort_checkbox").removeClass("selected");
-			$("#sort_" + e).addClass("selected");
+			$(".filter_sort .radio").removeClass("selected");
+			$(`#${this.id} .radio`).addClass("selected");
 			setting.rep_sort = e;
 			update_rep_sort_display();
 			rep_display();
 		});
 		
 		// filter - sort - asd/des
-		$(document).on("click", ".filter_sort2_item", function() {
+		$(document).on("click", "#filter_asd", function() {
 			// swap sort way
 			setting.rep_sort_asd ^= 1;
 			// update text
@@ -157,9 +158,9 @@ $(function() {
 		});
 		
 		// filter - if display selecetd first
-		$(document).on("click", ".filter_sort3_item", function() {
+		$(document).on("click", "#sort_selected", function() {
 			setting.rep_selected_first ^= 1;
-			$(".sort3_checkbox").toggleClass("selected", setting.rep_selected_first);
+			$("#sort_selected .checkbox").toggleClass("selected");
 			// update
 			rep_display();
 		});
@@ -169,17 +170,15 @@ $(function() {
 			if (is_long_pressing) {
 				return;
 			}
-			let song_id = parseInt(this.id.replace(/(rep_song_)/, ""));
+			let song_id = parseInt(this.id.replace("rep_song_", ""));
 			if ($(this).hasClass("selected")) {
 				rep_selected.splice(rep_selected.indexOf(song_id), 1);
 				if (!rep_selected.length) {
 					$("#nav_share").addClass("disabled");
-					$("#nav_bulk_search").addClass("disabled");
 				}
 			} else {
 				rep_selected.push(song_id);
 				$("#nav_share").removeClass("disabled");
-				$("#nav_bulk_search").removeClass("disabled");
 			}
 			$(this).toggleClass("selected");
 		});
@@ -189,7 +188,7 @@ $(function() {
 			if (!setting.longPress_copy) {
 				return;
 			}
-			let song_id = parseInt(this.id.replace(/(rep_song_)/, ""));
+			let song_id = parseInt(this.id.replace("rep_song_", ""));
 			longpress_timer = setTimeout(function() {
 				navigator.clipboard.writeText(song[song_id][song_idx.name]);
 				copy_popup();
@@ -226,7 +225,7 @@ $(function() {
 			jump2page("search");
 			hits = copy_of(rep_selected);
 			// set loading and input display to special value
-			loading = "!bulk_load_flag";
+			search_memory = "!bulk_load_flag";
 			$("#input").val("");
 			update_display(1);
 		})
@@ -323,6 +322,7 @@ function rep_search(force = false) {
 		// no one selected
 		clearInterval(rep_display_inter);
 		$("#rep_display").html("");
+		$("#rep_count").html(`hits: 0`);
 		return;
 	}
 	// get mask
@@ -347,6 +347,7 @@ function rep_search(force = false) {
 let rep_display_inter;
 
 function rep_display() {
+	$("#rep_count").html(`hit${rep_hits.length > 1 ? "s" : ""}: ${rep_hits.length}`);
 	if (setting.rep_selected_first) {
 		// remove selected item in main array
 		rep_hits = rep_hits.filter(val => !rep_selected.includes(val));
@@ -425,5 +426,5 @@ function update_rep_sort_display() {
 			// error
 			return 1;
 	}
-	$("#sort_name_sort").html(temp);
+	$("#filter_asd div:nth-child(2)").html(temp);
 }

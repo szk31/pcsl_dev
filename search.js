@@ -1,5 +1,5 @@
 // stores whats currently looking up
-let loading = "";
+let search_memory = "";
 
 let part_filter = [1, 1, 1, 1, 1, 1];
 const part_rom = [1, 2, 4, 8, 16, 32];
@@ -19,46 +19,43 @@ let input_focused = false;
 
 $(function() {
 	// nav - random
+	let random_last;
 	$(document).on("click", "#nav_search_random", function() {
 		if($(this).hasClass("disabled") && !setting.random_ignore || prevent_menu_popup) {
 			return;
 		}
 		// check if the song has any visibile record
-		let random_song,
-			found = sel_member = 0;
-		for (let i in part_filter) {
-			if (part_filter[i]) {
-				sel_member += part_rom[i];
-			}
-		}
+		let sel_member = 0;
+		part_filter.forEach((val, i) => val ? sel_member += part_rom[i] : null);
 		if (!sel_member) {
 			// no body got selected so
 			return;
 		}
-		do {
+		let random_song;
+		while (1) {
 			random_song = 1 + Math.floor(Math.random() * song.length);
-			for (let i in entry_proc[random_song]) {
-				if (!(rep_list[random_song] & sel_member) || (!setting.show_hidden && is_private(entry_proc[random_song][i]))) {
-					continue;
-				}
-				found++;
+			if (random_song === random_last) {
+				continue;
+			}
+			if (rep_list[random_song] & sel_member && (setting.show_hidden || entry_proc[random_song].some(x => entry[x][entry_idx.type] & sel_member && !is_private(x)))) {
 				break;
 			}
-		} while (found === 0);
-		$("#input").val(song[random_song][song_idx.name]);
+		}
+		random_last = random_song;
+		$("#search_input").val(song[random_song][song_idx.name]);
 		is_searching_from_rep = 0;
 		search();
 	});
 	
 	{ // search
 		// search - input - autocomplete
-		$(document).on("input", "#input", function() {
+		$(document).on("input", "#search_input", function() {
 			auto_search();
 		});
 		
 		// search - input - autocomplete - selection
 		$(document).on("mousedown", ".auto_panel", function() {
-			$("#input").val(to_non_html(this.id));
+			$("#search_input").val(to_non_html(this.id));
 			// input on blur fires after this so no need to run search here
 		});
 
@@ -67,8 +64,11 @@ $(function() {
 		$(document).on("keydown", function(e) {
 			// 38: up-arrow, 40: down-arrow
 			let dir = Object({38 : -1, 40 : 1})[e.keyCode];
-			// pressing up first, wrong key, still in ime, not in search
-			if ((!auto_pointer && dir === -1) || dir === undefined || auto_input_memory !== get_search_input() || $("#search_auto").hasClass("hidden")) {
+			if ($("#search_auto").hasClass("hidden") ||		// not in search
+				dir === undefined ||						// wrong key
+				auto_input_memory !== get_search_input() ||	// still in ime
+				(!auto_pointer && dir === -1)				// pressing up first
+			) {
 				return;
 			}
 			// such that 1 <= pointer_position <= max display
@@ -78,7 +78,7 @@ $(function() {
 		});
 
 		// search - input - submit
-		$(document).on("blur", "#input", function() {
+		$(document).on("blur", "#search_input", function() {
 			$("#search_auto").addClass("hidden");
 			input_focused = false;
 			is_searching_from_rep ? is_searching_from_rep = 0 : $("#nav_share").toggleClass("disabled", !is_searching_from_rep);
@@ -87,18 +87,17 @@ $(function() {
 		
 		// search - input::enter -> blur
 		$(document).on("keydown", function(e) {
-
 			if (e.keyCode === 13 && current_page === "search") {
 				if (auto_pointer) {
 					auto_pointer = 0;
-					$("#input").val($(".auto_panel.selected")[0].id);
+					$("#search_input").val($(".auto_panel.selected")[0].id);
 				}
-				$("#input").blur();
+				$("#search_input").blur();
 			}
 		});
 		
 		// search - input::focus -> reset, auto complete
-		$(document).on("click", "#input, #rep_input", function() {
+		$(document).on("click", "#search_input, #rep_input", function() {
 			if (input_focused) {
 				return;
 			}
@@ -110,7 +109,7 @@ $(function() {
 					pass.setSelectionRange(0, $(pass).val().length);
 				}, 0);
 			}
-			else if (loading === "!bulk_load_flag" && this.id === "input") {
+			else if (search_memory === "!bulk_load_flag" && this.id === "input") {
 				$(this).val("");
 				$("#nav_search_random").removeClass("disabled");
 				$("#nav_share").addClass("disabled");
@@ -121,60 +120,61 @@ $(function() {
 		});
 		
 		// search - collapse option menu
-		$(document).on("click", "#search_options_button", function() {
-			$("#search_options_button").toggleClass("opened");
-			$("#search_options_container").toggleClass("hidden");
+		$(document).on("click", "#ser_opt_button", function() {
+			$(this).toggleClass("opened");
+			$("#ser_opt_container").toggleClass("hidden");
 		});
 		
 		// search - options - singer
 		$(document).on("click", ".singer_icon", function() {
-			let e = parseInt($(this).attr("class").split(/\s+/).find(x => x.startsWith("sing_sel_")).replace("sing_sel_", ""));
-			part_filter[part_rom.indexOf(e)] ^= 1;
+			part_filter[part_rom.indexOf(parseInt($(this).attr("name")))] ^= 1;
 			// just add a new filter[6] to use at displaying
-			$(".sing_sel_" + e).toggleClass("selected");
-			loading = "";
+			$(this).toggleClass("selected");
+			search_memory = "";
 			search();
 		});
 		
 		// search - options - method
-		$(document).on("click", ".search_option_group1", function() {
-			let new_setting = this.id === "search_options_songname";
+		$(document).on("click", ".ser_opt_gp1", function() {
+			let new_setting = this.id === "ser_opt_songname";
 			if (new_setting === setting.search_by_song) {
 				// nothing changed
 				return;
 			}
 			setting.search_by_song = new_setting;
-			$(".search_option_group1>.radio").toggleClass("selected");
-			$("#input").val("");
-			$("#input").attr("placeholder", setting.search_by_song ? "曲名/読みで検索" : "アーティスト名で検索");
+			$(".ser_opt_gp1>.radio").toggleClass("selected");
+			$("#search_input").val("");
+			$("#search_input").attr("placeholder", setting.search_by_song ? "曲名/読みで検索" : "アーティスト名で検索");
 			$("#search_display").html("");
-			loading = "";
+			search_memory = "";
 			// disable / renable random
 			$("#nav_search_random").toggleClass("disabled", !setting.search_by_song);
 		});
 		
+		function update_ser_asd() {
+			$("#ser_opt_asd>.attr_name").html(new Array(
+				"古い順&nbsp;(⇌新しい順)", "新しい順&nbsp;(⇌古い順)",
+				"正順&nbsp;(⇌逆順)", "逆順&nbsp;(⇌正順)"
+			)[(setting.search_sort_by_date ? 0 : 2) + (setting.search_sort_asd ? 0 : 1)]);
+		}
+
 		// search - options - sort - method
-		$(document).on("click", ".search_option_group2", function() {
-			let new_setting = thid.id === "search_options_date";
+		$(document).on("click", ".ser_opt_gp2", function() {
+			let new_setting = this.id === "ser_opt_date";
 			if (new_setting === setting.search_sort_by_date) {
 				// nothing changed
 				return;
 			}
 			setting.search_sort_by_date = new_setting;
-			$(".search_option_group2>.radio").toggleClass("selected");
+			$(".ser_opt_gp2>.radio").toggleClass("selected");
+			update_ser_asd();
 			update_display();
-			$("#search_options_asd>.attr_name").html(setting.search_sort_by_date ? 
-			(setting.search_sort_asd ? "古い順&nbsp;(⇌新しい順)" : "新しい順&nbsp;(⇌古い順)") : 
-			(setting.search_sort_asd ? "正順&nbsp;(⇌逆順)" : "逆順&nbsp;(⇌正順)"));
 		});
 		
 		// search - options - sort - asd/des
-		$(document).on("click", ".search_option_group3", function() {
+		$(document).on("click", "#ser_opt_asd", function() {
 			setting.search_sort_asd ^= 1;
-			$("#search_options_asd>.attr_name").html(setting.search_sort_by_date ? 
-				(setting.search_sort_asd ? "古い順&nbsp;(⇌新しい順)" : "新しい順&nbsp;(⇌古い順)") : 
-				(setting.search_sort_asd ? "正順&nbsp;(⇌逆順)" : "逆順&nbsp;(⇌正順)")
-			);
+			update_ser_asd();
 			update_display();
 		});
 		
@@ -301,6 +301,7 @@ function auto_search() {
 	$("#search_auto").html(new_html);
 	$("#search_auto").toggleClass("hidden", !new_html);
 	auto_pointer = 0;
+	$("#search_auto>div").removeClass("selected");
 }
 
 function search() {
@@ -310,10 +311,10 @@ function search() {
 		return;
 	}
 	let search_value = get_search_input();
-	if (search_value === loading) {
+	if (search_value === search_memory) {
 		return;
 	}
-	loading = search_value;
+	search_memory = search_value;
 	if (!search_value) {
 		// clear current list
 		$("#search_display").html("");
@@ -352,7 +353,7 @@ function update_display(force = false) {
 	force |= is_searching_from_rep;
 	
 	$("#search_auto").addClass("hidden");
-	if (!loading && !force) {
+	if (!search_memory && !force) {
 		return;
 	}
 	let current_song = -1;
@@ -457,5 +458,5 @@ function timestamp(id) {
 }
 
 function get_search_input() {
-	return $("#input").val().normalize("NFKC").toLowerCase().trim();
+	return $("#search_input").val().normalize("NFKC").toLowerCase().trim();
 }

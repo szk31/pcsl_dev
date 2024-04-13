@@ -84,11 +84,13 @@ const entry_idx = {
 
 let video, entry;
 
-const version = "1.7.4";
+const version = "1.7.5";
 const key_hash = [
 	"473c05c1ae8349a187d233a02c514ac73fe08ff4418429806a49f7b2fe4ba0b7a36ba95df1d58b8e84a602258af69194", //thereIsNoPassword
 	"3f01e53f1bcee58f6fb472b5d2cf8e00ce673b13599791d8d2d4ddcde3defbbb4e0ab7bc704538080d704d87d79d0410"
 ];
+
+let __TEST__ = [];
 
 /* control / memories */
 
@@ -383,7 +385,7 @@ function process_data() {
 				}
 			}
 			is_searching_from_rep = 1;
-			loading = "!bulk_load_flag";
+			search_memory = "!bulk_load_flag";
 			update_display(1);
 		} else if (song_id >= 1 && song_id < song.length) {
 			$("#input").val(song[song_lookup[song_id]][song_idx.name]);
@@ -530,13 +532,13 @@ $(function() {
 			}
 			
 			// output as html
-			let new_html = "<table id=\"memcount_table\"><tr><th></th><th>通常</th><th>メン限</th><th>非公開</th></tr>";
+			let new_html = `<table id="memcount_table"><tr><th></th><th>通常</th><th>メン限</th><th>非公開</th></tr>`;
 			for (let i in member_display_order) {
 				let mem_id = member_display_order[i];
 				// new row, name
-				new_html += `<tr class=\"memcount_row singer_${mem_id}\"><td class=\"memcount_name\"><div>${singer_lookup[mem_id]}</div></td>`;
+				new_html += `<tr class="memcount_row"><td class="memcount_name singer_${mem_id}"><div>${singer_lookup[mem_id]}</div></td>`;
 				for (let j = 0; j < 3; ++j) {
-					new_html += `<td${entry_count[mem_id][j] === 0 ? ` class="memcount_empty"` : ""}>${entry_count[mem_id][j]}</td>`;
+					new_html += `<td class="${entry_count[mem_id][j] === 0 ? "memcount_empty" : `singer_${mem_id}`}">${entry_count[mem_id][j]}</td>`;
 				}
 				// close row
 				new_html += "</tr>";
@@ -555,8 +557,9 @@ $(function() {
 				new_html += `</table><div id="memcount_sum_warpper" class="memcount_sum"><div class="memcount_sum_icon col-1 colspan-2"></div>`;
 				for (let row = 0; row < 2; ++row) {
 					for (let col = 2; col >= 0; --col) {
-						new_html += `<div class="row-${row + 1} col-${4 - col} singer_${1 << (row * 3 + col)}">${entry_count_total[row * 3 + col]}</div>`;
+						new_html += `<div class="singer_${1 << (row * 3 + col)}">${entry_count_total[row * 3 + col]}</div>`;
 					}
+					new_html += "<div></div>";
 				}
 			} else {
 				new_html += `</table><div class="memcount_sum"><div class="memcount_sum_icon"></div>`;
@@ -644,7 +647,7 @@ $(function() {
 					break;
 				case "setting_ignore":
 					setting.random_ignore ^= 1;
-					$("#nav_search_random").toggleClass("disabled", setting.search_by_song ? (setting.random_ignore ? false : loading !== "") : true);
+					$("#nav_search_random").toggleClass("disabled", setting.search_by_song ? (setting.random_ignore ? false : search_memory !== "") : true);
 					ls("pcsl_s_ignoreRule", setting.random_ignore ? "1" : "0");
 					break;
 				case "setting_release":
@@ -795,6 +798,7 @@ function memcount_load_rep() {
 	}
 	// remove duplicates
 	singer_counter.map(x => [...new Set(x)]);
+	__TEST__ = singer_counter;
 	let display_number = [
 		singer_counter[4].length,
 		singer_counter[2].length,
