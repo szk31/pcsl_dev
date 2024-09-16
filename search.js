@@ -21,7 +21,7 @@ $(function() {
 	// nav - random
 	let random_last;
 	$(document).on("click", "#nav_search_random", function() {
-		if($(this).hasClass("disabled") && !setting.random_ignore || prevent_menu_popup) {
+		if($(this).hasClass("disabled") && !settings.ser_rand_req_empty.value || prevent_menu_popup) {
 			return;
 		}
 		// check if the song has any visibile record
@@ -37,7 +37,7 @@ $(function() {
 			if (random_song === random_last) {
 				continue;
 			}
-			if (rep_list[random_song] & sel_member && (setting.show_hidden || entry_proc[random_song].some(x => entry[x][entry_idx.type] & sel_member && !is_private(x)))) {
+			if (rep_list[random_song] & sel_member && (settings.ser_show_private.value || entry_proc[random_song].some(x => entry[x][entry_idx.type] & sel_member && !is_private(x)))) {
 				break;
 			}
 		}
@@ -90,7 +90,12 @@ $(function() {
 			if (e.keyCode === 13 && current_page === "search") {
 				if (auto_pointer) {
 					auto_pointer = 0;
-					$("#search_input").val($(".auto_panel.selected")[0].id);
+					const selected = $(".auto_panel.selected")[0].id;
+					$("#search_input").val(selected);
+					if (settings.pdt_copy_on_select.value) {
+						navigator.clipboard.writeText(selected);
+						copy_popup();
+					}
 				}
 				$("#search_input").blur();
 			}
@@ -102,19 +107,19 @@ $(function() {
 				return;
 			}
 			input_focused = true;
-			if (setting.select_input && this.id === "input" ||
-			setting.rep_select_input && this.id === "rep_input") {
+			if (settings.ser_select_input.value && this.id === "search_input" ||
+				settings.rep_select_input.value && this.id === "rep_input") {
 				let pass = this;
 				setTimeout(function() {
 					pass.setSelectionRange(0, $(pass).val().length);
 				}, 0);
 			}
-			else if (search_memory === "!bulk_load_flag" && this.id === "input") {
+			else if (search_memory === "!bulk_load_flag" && this.id === "search_input") {
 				$(this).val("");
 				$("#nav_search_random").removeClass("disabled");
 				$("#nav_share").addClass("disabled");
 			}
-			if (this.id === "input") {
+			if (this.id === "search_input") {
 				auto_search();
 			}
 		});
@@ -128,8 +133,13 @@ $(function() {
 		// search - options - singer
 		$(document).on("click", ".singer_icon", function() {
 			part_filter[part_rom.indexOf(parseInt($(this).attr("name")))] ^= 1;
-			// just add a new filter[6] to use at displaying
-			$(this).toggleClass("selected");
+			// test if all un-selected
+			if (part_filter.every(x => !x)) {
+				part_filter = part_filter.map(() => 1);
+				$(".singer_icon").addClass("selected");
+			} else {
+				$(this).toggleClass("selected");
+			}
 			search_memory = "";
 			search();
 		});
@@ -137,35 +147,35 @@ $(function() {
 		// search - options - method
 		$(document).on("click", ".ser_opt_gp1", function() {
 			let new_setting = this.id === "ser_opt_songname";
-			if (new_setting === setting.search_by_song) {
+			if (new_setting === settings.ser_via_song_name.value) {
 				// nothing changed
 				return;
 			}
-			setting.search_by_song = new_setting;
+			settings.ser_via_song_name.value = new_setting;
 			$(".ser_opt_gp1>.radio").toggleClass("selected");
 			$("#search_input").val("");
-			$("#search_input").attr("placeholder", setting.search_by_song ? "曲名/読みで検索" : "アーティスト名で検索");
+			$("#search_input").attr("placeholder", settings.ser_via_song_name.value ? "曲名/読みで検索" : "アーティスト名で検索");
 			$("#search_display").html("");
 			search_memory = "";
 			// disable / renable random
-			$("#nav_search_random").toggleClass("disabled", !setting.search_by_song);
+			$("#nav_search_random").toggleClass("disabled", !settings.ser_via_song_name.value);
 		});
 		
 		function update_ser_asd() {
 			$("#ser_opt_asd>.attr_name").html(new Array(
 				"古い順&nbsp;(⇌新しい順)", "新しい順&nbsp;(⇌古い順)",
 				"正順&nbsp;(⇌逆順)", "逆順&nbsp;(⇌正順)"
-			)[(setting.search_sort_by_date ? 0 : 2) + (setting.search_sort_asd ? 0 : 1)]);
+			)[(settings.ser_sort_by_date.value ? 0 : 2) + (settings.ser_sort_asd.value ? 0 : 1)]);
 		}
 
 		// search - options - sort - method
 		$(document).on("click", ".ser_opt_gp2", function() {
 			let new_setting = this.id === "ser_opt_date";
-			if (new_setting === setting.search_sort_by_date) {
+			if (new_setting === settings.ser_sort_by_date.value) {
 				// nothing changed
 				return;
 			}
-			setting.search_sort_by_date = new_setting;
+			settings.ser_sort_by_date.value = new_setting;
 			$(".ser_opt_gp2>.radio").toggleClass("selected");
 			update_ser_asd();
 			update_display();
@@ -173,7 +183,7 @@ $(function() {
 		
 		// search - options - sort - asd/des
 		$(document).on("click", "#ser_opt_asd", function() {
-			setting.search_sort_asd ^= 1;
+			settings.ser_sort_asd.value ^= 1;
 			update_ser_asd();
 			update_display();
 		});
@@ -231,11 +241,11 @@ let auto_input_memory = "";
 
 function auto_search() {
 	let input = get_search_input();
-	if (auto_input_memory === input && !setting.changeless_auto) {
+	if (auto_input_memory === input && !settings.pdt_on_change_only.value) {
 		return;
 	}
 	auto_input_memory = input;
-	if (!input || !setting.search_by_song) {
+	if (!input || !settings.ser_via_song_name.value) {
 		$("#search_auto").addClass("hidden");
 		return;
 	}
@@ -260,28 +270,32 @@ function auto_search() {
 	}
 	// if input not consist of only hiragana, "ー" or "ヴ"
 	const auto_thru_name = /[^\u3040-\u309F\u30FC\u30F4]/.test(input);
+	const roman_kana = r2k(input);
 	for (let i = 1; i < song.length && auto_exact.length < auto_display_max; ++i) {
 		// skip if same song name
 		if (auto_skips.includes(i)) {
 			continue;
 		}
-		if (auto_thru_name) {
-			let name_pos = processed_song_name[i].indexOf(input);
-			// check for special notation in reading
-			if (name_pos === -1 && song[i][song_idx.reading].includes(" ") && song[i][song_idx.reading].includes(input)) {
-				name_pos = 1;
-			}
-			add_song(i, name_pos);
-		} else {
+		if (!auto_thru_name) {
 			add_song(i, song[i][song_idx.reading].indexOf(input));
+			continue;
 		}
+		let name_pos = processed_song_name[i].indexOf(input);
+		// check for special notation in reading
+		if (name_pos === -1 && song[i][song_idx.reading].includes(" ") && song[i][song_idx.reading].includes(input)) {
+			name_pos = 1;
+		}
+		if (name_pos === -1 && roman_kana) {
+			name_pos = song[i][song_idx.reading].indexOf(roman_kana);
+		}
+		add_song(i, name_pos);
 	}
 	// display
 	auto_display_count = 0;
 	let new_html = "";
 	for (let i in auto_exact) {
 		// data being number (song id) or string (series name)
-		let auto_reading =  auto_display =  song_name = "";
+		let auto_reading = auto_display = song_name = "";
 		if (typeof auto_exact[i] === "string") {
 			// series name
 			auto_display = song_name = auto_exact[i];
@@ -290,13 +304,13 @@ function auto_search() {
 			song_name = song[auto_exact[i]][song_idx.name];
 			auto_display = bold(song_name, input);
 		}
-		new_html += `<div id="${to_html(song_name)}" class="auto_panel${auto_display_count++ === 0 ? " auto_first" : ""}"><div class="auto_reading">${auto_reading}</div><div class="auto_display">${auto_display}</div></div>`;
+		new_html += `<div id="${to_html(song_name)}" class="auto_panel${auto_display_count++ === 0 ? " auto_first" : ""}"><div class="auto_reading${!auto_reading || !settings.pdt_reading.value ? " auto_no_reading" : ""}">${auto_reading}</div><div class="auto_display">${auto_display}</div></div>`;
 	}
 	for (let i in auto_other) {
 		if (auto_display_count++ >= auto_display_max) {
 			break;
 		}
-		new_html += `<div id="${to_html(song[auto_other[i]][song_idx.name])}" class="auto_panel${(auto_display_count === 0 ? " auto_first" : "")}"><div class="auto_reading"></div><div class="auto_display">${bold(song[auto_other[i]][song_idx.name], input)}</div></div>`;
+		new_html += `<div id="${to_html(song[auto_other[i]][song_idx.name])}" class="auto_panel${(auto_display_count === 0 ? " auto_first" : "")}"><div class="auto_reading${settings.pdt_reading.value ? "" : " auto_no_reading"}">${song[auto_other[i]][song_idx.reading].split(" ")[0]}</div><div class="auto_display">${bold(song[auto_other[i]][song_idx.name], input)}</div></div>`;
 	}
 	$("#search_auto").html(new_html);
 	$("#search_auto").toggleClass("hidden", !new_html);
@@ -323,7 +337,7 @@ function search() {
 		return;
 	}
 	// not empty input
-	$("#nav_search_random").toggleClass("disabled", !setting.random_ignore);
+	$("#nav_search_random").toggleClass("disabled", !settings.ser_rand_req_empty.value);
 	
 	// series
 	const series_name = search_value in series_lookup ? search_value : "",
@@ -334,10 +348,12 @@ function search() {
 		song.forEach((val, i) => (i ? ((attr_series ? val[song_idx.attr] & (1 << attr_series) : val[song_idx.reading].includes(search_value)) ? hits.push(i) : null) : null));
 	} else {			// get song by search
 		const max_hit = 200;
+		const roman_kana = r2k(search_value);
 		for (var i = 1; i < song.length && hits.length < max_hit; ++i) {
-			if (setting.search_by_song ? 
+			if (settings.ser_via_song_name.value ? 
 				processed_song_name[i].includes(search_value) ||
-				song[i][song_idx.reading].toLowerCase().includes(search_value) :
+				song[i][song_idx.reading].toLowerCase().includes(search_value) ||
+				song[i][song_idx.reading].includes(roman_kana) :
 				song[i][song_idx.artist].toLowerCase().includes(search_value)
 			) {
 				// put in front if song name is exactly the same as searched value
@@ -364,16 +380,16 @@ function update_display(force = false) {
 	for (let i = 0; i < hits.length && i <= 200; ++i) {
 		// sort according to settings
 		let sorted_enrties = [];
-		if (setting.search_sort_by_date) {
+		if (settings.ser_sort_by_date.value) {
 			sorted_enrties = entry_proc[hits[i]].sort((a, b) => {
-				return (setting.search_sort_asd ? a - b : b - a);
+				return (settings.ser_sort_asd.value ? a - b : b - a);
 			});
 		} else {
 			sorted_enrties = entry_proc[hits[i]].sort((a, b) => {
 				if (entry[a][entry_idx.type] === entry[b][entry_idx.type]) {
 					return a - b;
 				}
-				return (setting.search_sort_asd ? 1 : -1) * (display_order[entry[a][entry_idx.type]] - display_order[entry[b][entry_idx.type]])
+				return (settings.ser_sort_asd.value ? 1 : -1) * (display_order[entry[a][entry_idx.type]] - display_order[entry[b][entry_idx.type]])
 			});
 		}
 		found_entries += sorted_enrties.length;
@@ -382,7 +398,7 @@ function update_display(force = false) {
 			// get part filter
 			let no_selected_found = !part_filter.some((val, i) => (val && (part_rom[i] & entry[cur_entry][entry_idx.type])));
 			// if hit on previous module or private
-			if (no_selected_found || ((!setting.show_hidden) && is_private(cur_entry))) {
+			if (no_selected_found || ((!settings.ser_show_private.value) && is_private(cur_entry))) {
 				continue;
 			}
 			// if new song

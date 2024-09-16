@@ -66,6 +66,22 @@
 	padding : 1.5vw;
 }
 
+#filter_set {
+	position: absolute;
+	right: 6vw;
+	background-color: var(--filter-back);
+	padding: 0 1.2vw;
+	border-radius: 1.2vw;
+}
+
+#filter_set>span {
+	padding: 0 1vw;
+}
+
+#filter_set>span:not(.selected) {
+	opacity: 0.25;
+}
+
 #filter_icon_container {
 	display : flex;
 	flex-wrap: wrap;
@@ -218,6 +234,10 @@ label div:nth-child(2) {
 	filter: var(--share-icon);
 }
 
+.rep_share_text {
+	font-size: 3.6vw;
+}
+
 #rep_tweet {
 	position : absolute;
 	left : 50%;
@@ -297,6 +317,10 @@ label div:nth-child(2) {
 	filter: var(--share-icon);
 }
 
+.rep_tweet_tag {
+	font-size: 3.2vw;
+}
+
 /* general stuff */
 .grid_block-2 {
 	display : grid;
@@ -310,7 +334,7 @@ label div:nth-child(2) {
 
 .grid_block-4 {
 	display : grid;
-	grid-template-columns: 20% 35% 10% 35%;
+	grid-template-columns: 20% 35% 9.875% 35%;
 }
 
 .rowspan-2 {

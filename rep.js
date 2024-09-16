@@ -77,7 +77,13 @@ $(function() {
 		$(document).on("click", ".filter_icon", function() {
 			let e = $(this).attr('class').split(/\s+/).find(x => x.startsWith("icon_")).replace("icon_", "");
 			rep_singer[name_lookup.indexOf(e)] ^= 1;
-			$(this).toggleClass("selected");
+			// test if all un-selected
+			if (rep_singer.every(x => !x)) {
+				rep_singer = rep_singer.map(() => 1);
+				$(".filter_icon").addClass("selected");
+			} else {
+				$(this).toggleClass("selected");
+			}
 			rep_search(true);
 		});
 		
@@ -138,12 +144,12 @@ $(function() {
 		$(document).on("click", ".filter_sort", function() {
 			let e = this.id.replace("sort_", "");
 			// check if clicking on the same item
-			if (setting.rep_sort === e) {
+			if (settings.rep_sort_method.value === e) {
 				return;
 			}
 			$(".filter_sort .radio").removeClass("selected");
 			$(`#${this.id} .radio`).addClass("selected");
-			setting.rep_sort = e;
+			settings.rep_sort_method.value = e;
 			update_rep_sort_display();
 			rep_display();
 		});
@@ -151,7 +157,7 @@ $(function() {
 		// filter - sort - asd/des
 		$(document).on("click", "#filter_asd", function() {
 			// swap sort way
-			setting.rep_sort_asd ^= 1;
+			settings.rep_sort_asd.value ^= 1;
 			// update text
 			update_rep_sort_display();
 			rep_display();
@@ -159,7 +165,7 @@ $(function() {
 		
 		// filter - if display selecetd first
 		$(document).on("click", "#sort_selected", function() {
-			setting.rep_selected_first ^= 1;
+			settings.rep_selected_first.value ^= 1;
 			$("#sort_selected .checkbox").toggleClass("selected");
 			// update
 			rep_display();
@@ -185,7 +191,7 @@ $(function() {
 		
 		// display - long press copy
 		$(document).on("mousedown touchstart", ".rep_song_container", function() {
-			if (!setting.longPress_copy) {
+			if (!settings.rep_long_press_copy.value) {
 				return;
 			}
 			let song_id = parseInt(this.id.replace("rep_song_", ""));
@@ -196,8 +202,8 @@ $(function() {
 				post_longpress_timer = setTimeout(function() {
 					is_long_pressing = false;
 					clearTimeout(post_longpress_timer);
-				}, setting.longPress_time - 100);
-			}, setting.longPress_time);
+				}, settings.rep_long_press_time.value - 100);
+			}, settings.rep_long_press_time.value);
 		});
 		
 		// display - long press copy (disabling)
@@ -251,18 +257,18 @@ $(function() {
 		});
 
 		$(document).on("click", ".rep_tweet_a", function() {
-			if (setting.rep_show_artist == (this.id === "rep_tweet_ya")) {
+			if (settings.rep_show_artist.value == (this.id === "rep_tweet_ya")) {
 				return;
 			}
-			setting.rep_show_artist ^= 1;
+			settings.rep_show_artist.value ^= 1;
 			$(".rep_tweet_a").toggleClass("selected");
-			ls("pcsl_s_rep_artist", setting.rep_show_artist ? 1 : 0);
+			update_setting("rep_show_artist");
 		});
 
 		$(document).on("click", ".rep_tweet_submit", function() {
 			let tweet = "";
 			for (let i in rep_selected) {
-				tweet += `${song[rep_selected[i]][song_idx.name]}${setting.rep_show_artist ? (" / " + song[rep_selected[i]][song_idx.artist]) : ""}\n`;
+				tweet += `${song[rep_selected[i]][song_idx.name]}${settings.rep_show_artist.value ? (" / " + song[rep_selected[i]][song_idx.artist]) : ""}\n`;
 			}
 			const lookup = {
 				k : "#うたってきららちゃま",
@@ -305,6 +311,12 @@ function rep_search(force = false) {
 	rep_singer.forEach((val, i) => val ? selected_member.push(selected_member_ram[i]) : null);
 	if (input_value) {
 		rep_hits = [];
+		if (input_value === "未披露") {
+			entry_proc.forEach((val, i) => val.length ? null : rep_hits.push(i));
+			rep_hits.shift();
+			rep_display();
+			return;
+		}
 		// returning search result by input
 		for (let i = 1; i < song.length; ++i) {
 			if (!entry_proc[i].length) {
@@ -348,21 +360,21 @@ let rep_display_inter;
 
 function rep_display() {
 	$("#rep_count").html(`hit${rep_hits.length > 1 ? "s" : ""}: ${rep_hits.length}`);
-	if (setting.rep_selected_first) {
+	if (settings.rep_selected_first.value) {
 		// remove selected item in main array
 		rep_hits = rep_hits.filter(val => !rep_selected.includes(val));
 	}
 	$("#rep_display").html("");
 	// sort record
-	switch (setting.rep_sort) {
+	switch (settings.rep_sort_method.value) {
 		case "50" : // default, do nothing
-			rep_hits.sort((a, b) => (setting.rep_sort_asd ? 1 : -1) * (a - b));
+			rep_hits.sort((a, b) => (settings.rep_sort_asd.value ? 1 : -1) * (a - b));
 			break;
 		case "count" : // sang entry count
 			// create a lookup array for all songs for the current member selection
 			let entry_count = [];
 			rep_hits.forEach(x => entry_count[x] = selected_member.length === 6 ? entry_proc[x].length : entry_proc[x].filter(y => split_to_solo(entry[y][entry_idx.type]).some(z => selected_member.includes(z))).length);
-			rep_hits.sort((a, b) => (setting.rep_sort_asd ? 1 : -1) * (entry_count[b] - entry_count[a]));
+			rep_hits.sort((a, b) => (settings.rep_sort_asd.value ? 1 : -1) * (entry_count[b] - entry_count[a]));
 			break;
 		case "date" : // sort with last sang date
 			let date_lookup = [];
@@ -370,15 +382,15 @@ function rep_display() {
 				let date = get_last_sang(x, selected_member);
 				date_lookup[x] = date ? date.getTime() : 0;
 			});
-			rep_hits.sort((a, b) => (setting.rep_sort_asd ? 1 : -1) * (date_lookup[b] - date_lookup[a]));
+			rep_hits.sort((a, b) => (settings.rep_sort_asd.value ? 1 : -1) * (date_lookup[b] - date_lookup[a]));
 			break;
 		case "release" : // release date of song
 			let rls_lookup = [];
 			rep_hits.forEach(val => rls_lookup[val] = to8601(song[val][song_idx.release]).getTime());
-			rep_hits.sort((a, b) => (setting.rep_sort_asd ? 1 : -1) * (rls_lookup[b] - rls_lookup[a]));
+			rep_hits.sort((a, b) => (settings.rep_sort_asd.value ? 1 : -1) * (rls_lookup[b] - rls_lookup[a]));
 			break;
 	}
-	if (setting.rep_selected_first) {
+	if (settings.rep_selected_first.value) {
 		// add selected back into main array
 		rep_hits = rep_selected.concat(rep_hits);
 	}
@@ -398,7 +410,7 @@ function rep_display_loop() {
 		let last_sang = get_last_sang(rep_hits[i], selected_member);
 		let delta_last = last_sang === 0 ? -1 : get_date_different(last_sang);
 		
-		let new_html = `<div class="rep_song_container${rep_selected.includes(rep_hits[i]) ? " selected" : ""}${sang_count[0] && (sang_count[0] === sang_count[1]) ? " rep_mem_only" : ""}" id="rep_song_${rep_hits[i]}"><div class="rep_song_row1"><div class="rep_song_title">${song[rep_hits[i]][song_idx.name]} / ${song[rep_hits[i]][song_idx.artist]}</div><div class="rep_song_nooke">${oke_gone.includes(song[rep_hits[i]][song_idx.name]) ? "オケ消滅" : ""}</div></div><div class="rep_song_info grid_block-4"><div>${delta_last === 0 ? "今日" : delta_last === -1 ? "---" : `${delta_last}日前`}</div><div>${sang_count[0]}回${sang_count[1] > 0 ? (sang_count[0] === sang_count[1] ? " (メン限のみ)" : ` (${sang_count[1]}回メン限)`) : ""}</div><div class="rep_song_singer${key_valid ? " rep_singer_2rows" : ""}"><div${rep_hits_solo[rep_hits[i]].includes(4) ? ` class="singer_4"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(2) ? ` class="singer_2"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(1) ? ` class="singer_1"` : ""}></div>${key_valid ? `<div${rep_hits_solo[rep_hits[i]].includes(32) ? ` class="singer_32"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(16) ? ` class="singer_16"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(8) ? ` class="singer_8"` : ""}></div>` : ""}</div>${setting.show_release ? `<div class="rep_extra_info"> (${display_date(to8601(song[rep_hits[i]][song_idx.release]))})</div>` : "<div></div>"}</div></div>`;
+		let new_html = `<div class="rep_song_container${rep_selected.includes(rep_hits[i]) ? " selected" : ""}${sang_count[0] && (sang_count[0] === sang_count[1]) ? " rep_mem_only" : ""}" id="rep_song_${rep_hits[i]}"><div class="rep_song_row1"><div class="rep_song_title">${song[rep_hits[i]][song_idx.name]} / ${song[rep_hits[i]][song_idx.artist]}</div><div class="rep_song_nooke">${oke_gone.includes(song[rep_hits[i]][song_idx.name]) ? "オケ消滅" : ""}</div></div><div class="rep_song_info grid_block-4"><div>${delta_last === 0 ? "今日" : delta_last === -1 ? "---" : `${delta_last}日前`}</div><div>${sang_count[0]}回${sang_count[1] > 0 ? (sang_count[0] === sang_count[1] ? " (メン限のみ)" : ` (${sang_count[1]}回メン限)`) : ""}</div><div class="rep_song_singer${key_valid ? " rep_singer_2rows" : ""}"><div${rep_hits_solo[rep_hits[i]].includes(4) ? ` class="singer_4"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(2) ? ` class="singer_2"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(1) ? ` class="singer_1"` : ""}></div>${key_valid ? `<div${rep_hits_solo[rep_hits[i]].includes(32) ? ` class="singer_32"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(16) ? ` class="singer_16"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(8) ? ` class="singer_8"` : ""}></div>` : ""}</div>${settings.rep_show_release.value ? `<div class="rep_extra_info"> (${display_date(to8601(song[rep_hits[i]][song_idx.release]))})</div>` : "<div></div>"}</div></div>`;
 		$("#rep_display").append(new_html);
 	}
 	// call itself again if not finished
@@ -411,16 +423,16 @@ function rep_display_loop() {
 
 function update_rep_sort_display() {
 	let temp = "";
-	switch (setting.rep_sort) {
+	switch (settings.rep_sort.value) {
 		case "50" : 
-			temp = setting.rep_sort_asd ? "正順 (⇌逆順)" : "逆順 (⇌正順)";
+			temp = settings.rep_sort_asd.value ? "正順 (⇌逆順)" : "逆順 (⇌正順)";
 			break;
 		case "count" : 
-			temp = setting.rep_sort_asd ? "多い順 (⇌少ない順)" : "少ない順 (⇌多い順)";
+			temp = settings.rep_sort_asd.value ? "多い順 (⇌少ない順)" : "少ない順 (⇌多い順)";
 			break;
 		case "date" : 
 		case "release" : 
-			temp = setting.rep_sort_asd ? "新しい順 (⇌古い順)" : "古い順 (⇌新しい順)";
+			temp = settings.rep_sort_asd.value ? "新しい順 (⇌古い順)" : "古い順 (⇌新しい順)";
 			break;
 		default : 
 			// error

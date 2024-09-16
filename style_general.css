@@ -896,7 +896,11 @@ body.post_switch {
 	filter: opacity(0.25);
 }
 
-
+#setting_extra_container>div:first-child,
+.settings_extra>div:first-child {
+	text-decoration: underline;
+	text-underline-offset: 0.6vw;
+}
 
 #copy_popup {
 	position : fixed;
