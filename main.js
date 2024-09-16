@@ -109,8 +109,7 @@ let settings = {
 	},
 	set_show_hidden: {				// setting: if hidden options are displayed
 		value: false,
-		req_LS: true,
-		prv_name: ["pcsl_s_show_extra"]
+		req_LS: true
 	},
 	ser_show_private: {				// setting: do display private video
 		value: true,
