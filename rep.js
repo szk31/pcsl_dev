@@ -73,6 +73,12 @@ $(function() {
 			$("#filter_content").toggleClass("hidden");
 		});
 		
+		// filter - union / inter
+		$(document).on("click", "#filter_set", function() {
+			settings.rep_is_union.value ^= 1;
+			$("#filter_set>span").toggleClass("selected");
+		})
+
 		// filter - entry - singer
 		$(document).on("click", ".filter_icon", function() {
 			let e = $(this).attr('class').split(/\s+/).find(x => x.startsWith("icon_")).replace("icon_", "");
@@ -345,8 +351,10 @@ function rep_search(force = false) {
 	inv_mask = ~inv_mask & 28;	// 28: 0b11100, the only 3 bits used in anisong filter 
 	// search
 	rep_hits = [];
+	const inter = selected_member.reduce((acc, num) => acc + num, 0);
 	for (i in song) {
-		if (rep_hits_solo[i].some(exist) &&		// has entry of selected member
+		const mem_check = settings.rep_is_union.value ? rep_hits_solo[i].some(exist) : rep_list[i] === inter;
+		if (mem_check &&						// has entry of selected member
 		    song[i][song_idx.attr] & mask &&	// satisflies filter mask
 		  !(song[i][song_idx.attr] & inv_mask)	// does not satisfly inverse filter mask
 		) {

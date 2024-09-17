@@ -181,6 +181,10 @@ let settings = {
 		value: false,
 		req_LS: true
 	},
+	rep_is_union: {
+		value: true,
+		req_LS: false
+	},
 	rep_sort_method: {				// rep: sort
 		value: "50",
 		req_LS: false
@@ -202,11 +206,12 @@ let settings = {
 
 function update_setting(key) {
 	ls(`pcsl_${key}`, settings[key].value);
+	return settings[key].value;
 }
 
 function toggle_setting(key) {
 	settings[key].value ^= 1;
-	update_setting(key);
+	return update_setting(key);
 }
 
 // ram for searching (entry_processed)
@@ -346,11 +351,7 @@ function load_setting_flags() {
 	$(`#three_way_${ls("theme") === "extra" ? "dark" : ls("theme")}`).addClass("selected");
 
 	function new_key(key, val) {
-		if (typeof val === "boolean") {
-			ls(key, val ? 1 : 0);
-		} else {
-			ls(key, val);
-		}
+		ls(key, typeof val === "number" ? val : val ? 1 : 0);
 	}
 
 	Object.entries(settings).forEach(([index, item]) => {
@@ -391,19 +392,17 @@ function load_setting_flags() {
 		result = settings[index].value;
 		const changed = settings[index].value !== dflt;
 		// change the selected option insetting menu as well
-		let target = index;
-		switch (target) {	// non-default: special case
+		let target = `#setting_${index}>div`;
+		switch (index) {	// non-default: special case
 			case "set_hidden_unlocked":
 				if (settings[index].value) {
 					$("#setting_extra_container").removeClass("hidden");
 				}
-				target = `#setting_${target}>div`;
 				return;
 			case "set_show_hidden":
 				if (changed) {
 					$(".settings_extra").removeClass("hidden");
 				}
-				target = `#setting_${target}>div`;
 				break;
 			case "rep_long_press_time":
 				if (changed) {
@@ -419,14 +418,11 @@ function load_setting_flags() {
 				$(".setting_req_random").toggleClass("disabled", !result);
 				break;
 			case "rep_long_press_copy":
-				$("#three_way_time").toggleClass("disabled", result);
+				$("#three_way_time").toggleClass("disabled", !result);
 				break;
 			case "rep_show_group":
 				$("#filter_set").toggleClass("hidden", !result)
-				target = `#setting_${target}>div`;
 				break;
-			default:
-				target = `#setting_${target}>div`;
 		}
 		if (changed) {
 			$(target).toggleClass("selected");
@@ -792,48 +788,47 @@ $(function() {
 		// settings - other options
 		$(document).on("click", ".two_way:not(.disabled)", function() {
 			$(this).children().toggleClass("selected");
-			switch (this.id) {
-				case "setting_set_show_hidden":
-					toggle_setting("set_show_hidden");
-					$(".settings_extra").toggleClass("hidden", settings.set_show_hidden.value);
+			const key = this.id.replace("setting_", "");
+			switch (key) {
+				case "set_show_hidden":
+					$(".settings_extra").toggleClass("hidden", toggle_setting(key));
 					break;
 				case "setting_dark":
 					let cur_state = $("#dark_extra").hasClass("selected") ? "extra" : "dark";
 					ls("theme", cur_state);
 					document.documentElement.setAttribute("theme", cur_state);
 					break;
-				case "setting_ser_show_private":
-					toggle_setting("ser_show_private");
+				case "ser_show_private":
+					toggle_setting(key);
 					update_display(1);
 					break;
-				case "setting_ser_rand_show":
-					toggle_setting("ser_rand_show");
-					$("#nav_search_random").toggleClass("blank", settings.ser_rand_show.value);
-					$(".setting_req_random").toggleClass("disabled", !settings.ser_rand_show.value);
+				case "ser_rand_show":
+					const rs = toggle_setting(key);	// *r*and_*s*how
+					$("#nav_search_random").toggleClass("blank", rs);
+					$(".setting_req_random").toggleClass("disabled", !rs);
 					break;
-				case "setting_ser_rand_req_empty":
-					toggle_setting("ser_rand_req_empty");
+				case "ser_rand_req_empty":
+					toggle_setting(key);
 					$("#nav_search_random").toggleClass("disabled", settings.ser_via_song_name.value ? (settings.ser_rand_req_empty.value ? false : search_memory !== "") : true);
 					break;
-				case "setting_rep_show_release":
-					toggle_setting("rep_show_release");
+				case "rep_show_release":
+					toggle_setting(key);
 					if (current_page === "repertoire") {
 						rep_display();
 					}
 					break;
-				case "setting_rep_long_press_copy":
-					toggle_setting("rep_long_press_copy");
-					$(".setting_copy_time").toggleClass("disabled", !settings.rep_long_press_copy.value);
+				case "rep_long_press_copy":
+					$(".setting_copy_time").toggleClass("disabled", !toggle_setting(key));
 					break;
-				case "setting_rep_show_group":
-					toggle_setting("rep_show_group");
-					$("#filter_set").toggleClass("hidden", !settings.rep_show_group.value);
-				case "setting_ser_select_input":
-				case "setting_pdt_on_change_only":
-				case "setting_pdt_reading":
-				case "setting_pdt_copy_on_select":
-				case "setting_rep_select":
-					toggle_setting(this.id.replace("setting_", ""));
+				case "rep_show_group":
+					$("#filter_set").toggleClass("hidden", !toggle_setting(key));
+					break;
+				case "ser_select_input":
+				case "pdt_on_change_only":
+				case "pdt_reading":
+				case "pdt_copy_on_select":
+				case "rep_select":
+					toggle_setting(key);
 					break;
 			}
 		})
@@ -876,8 +871,8 @@ $(function() {
 	
 	// key reset - yes
 	$(document).on("click", "#remove_key_yes", function() {
-		ls("pcsl_version_hash", "");
-		ls("pcsl_key", "");
+		localStorage.removeItem("pcsl_version_hash");
+		localStorage.removeItem("pcsl_key");
 		window.location = window.location.href.split("?")[0];
 	});
 	
