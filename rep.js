@@ -77,6 +77,7 @@ $(function() {
 		$(document).on("click", "#filter_set", function() {
 			settings.rep_is_union.value ^= 1;
 			$("#filter_set>span").toggleClass("selected");
+			rep_search(true);
 		})
 
 		// filter - entry - singer

@@ -855,7 +855,9 @@ $(function() {
 	// home - member icon
 	$(document).on("click", ".home_member_icon_bg", function() {
 		jump2page("rep");
-		$(".filter_icon.selected").click();
+
+		$(".filter_icon").removeClass("selected");
+		rep_singer.fill(0);
 		$(`.filter_icon.${$(this).children().attr("class")}`).click();
 	})
 
