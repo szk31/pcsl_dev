@@ -432,7 +432,7 @@ function rep_display_loop() {
 
 function update_rep_sort_display() {
 	let temp = "";
-	switch (settings.rep_sort.value) {
+	switch (settings.rep_sort_method.value) {
 		case "50" : 
 			temp = settings.rep_sort_asd.value ? "正順 (⇌逆順)" : "逆順 (⇌正順)";
 			break;
