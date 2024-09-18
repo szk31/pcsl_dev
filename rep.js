@@ -359,7 +359,7 @@ function rep_search(force = false) {
 		    song[i][song_idx.attr] & mask &&	// satisflies filter mask
 		  !(song[i][song_idx.attr] & inv_mask)	// does not satisfly inverse filter mask
 		) {
-			rep_hits.push(i);
+			rep_hits.push(Number(i));
 		}
 	}
 	rep_display();

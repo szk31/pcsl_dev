@@ -480,7 +480,7 @@ function process_data() {
 	
 	// process song names
 	for (let i = 1; i < song.length; ++i) {
-		processed_song_name.push(song[i][song_idx.name].toLowerCase().normalize("NFKC"));
+		processed_song_name.push(song[i][song_idx.name].toLowerCase().normalize("NFKC").trim());
 		if (i > 2 && song[i][song_idx.name].trim() === song[i - 1][song_idx.name].trim()) {
 			auto_skips.push(i);
 		}

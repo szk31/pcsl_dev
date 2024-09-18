@@ -344,6 +344,7 @@ function search() {
 		  attr_series = attr_idx.includes(search_value) ? attr_idx.indexOf(search_value) : 0;
 
 	hits = [];
+	let exact_counter = 0;
 	if (series_name) {	// get song with series
 		song.forEach((val, i) => (i ? ((attr_series ? val[song_idx.attr] & (1 << attr_series) : val[song_idx.reading].includes(search_value)) ? hits.push(i) : null) : null));
 	} else {			// get song by search
@@ -357,7 +358,7 @@ function search() {
 				song[i][song_idx.artist].toLowerCase().includes(search_value)
 			) {
 				// put in front if song name is exactly the same as searched value
-				processed_song_name[i] === search_value ? hits.unshift(i) : hits.push(i);
+				processed_song_name[i] === search_value ? hits.splice(exact_counter++, 0, i) : hits.push(i);
 			}
 		}
 	}
