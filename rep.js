@@ -373,6 +373,10 @@ function rep_display() {
 		// remove selected item in main array
 		rep_hits = rep_hits.filter(val => !rep_selected.includes(val));
 	}
+	if (!rep_hits.length) {
+		$("#rep_display").html(`<div class="search_no_result">検索結果なし</div>`);
+		return;
+	}
 	$("#rep_display").html("");
 	// sort record
 	switch (settings.rep_sort_method.value) {

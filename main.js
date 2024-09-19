@@ -354,13 +354,26 @@ function load_setting_flags() {
 		ls(key, typeof val === "number" ? val : val ? 1 : 0);
 	}
 
+	
+	let url_para = new URLSearchParams(window.location.search);
+	const do_default = url_para.has("reset_settings");
+	delete url_para;
+
+	if (do_default) {
+		ls("theme", "mixed");
+	}
 	Object.entries(settings).forEach(([index, item]) => {
 		if (!item.req_LS) {
 			return;
 		}
 		const key = `pcsl_${index}`;
-		let result = ls(key);
+		if (do_default) {
+			localStorage.removeItem(key);
+			ls(key, typeof item.value === "number" ? item.value : item.value ? 1 : 0);
+			return;
+		}
 
+		let result = ls(key);
 		if (!result) {
 			// check if no older key
 			if (!settings[index].prv_name?.length) {
@@ -831,6 +844,19 @@ $(function() {
 					toggle_setting(key);
 					break;
 			}
+		});
+
+		// settings - reset button, reset cancel
+		$(document).on("click", "#settings_reset_button, #settings_reset_nah", function() {
+			$(".settings_reset>span").toggleClass("hidden");
+			$("#settings_reset_confirm").toggleClass("blank");
+		});
+
+		// settings - reset confirm
+		$(document).on("click", "#settings_reset_yes", function() {
+			const currentUrl = new URL(window.location.href);
+			currentUrl.searchParams.set("reset_settings", "");
+			window.location.href = currentUrl.toString();
 		})
 	}
 
