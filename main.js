@@ -417,6 +417,10 @@ function load_setting_flags() {
 					$(".settings_extra").removeClass("hidden");
 				}
 				break;
+			case "ser_rand_show":
+				$("#nav_search_random").toggleClass("blank", !result);
+				$(".setting_req_random").toggleClass("disabled", !result);
+				break;
 			case "rep_long_press_time":
 				if (changed) {
 					$("#three_way_time>div").removeClass("selected");
@@ -425,10 +429,6 @@ function load_setting_flags() {
 				return;
 			case "rep_show_artist":
 				target = ".rep_tweet_a";
-				break;
-			case "ser_rand_show":
-				$("#nav_search_random").toggleClass("blank", !result);
-				$(".setting_req_random").toggleClass("disabled", !result);
 				break;
 			case "rep_long_press_copy":
 				$("#three_way_time").toggleClass("disabled", !result);
@@ -520,6 +520,7 @@ function load_url_para() {
 	let url_para = new URLSearchParams(window.location.search);
 	// remove key
 	url_para.delete("key");
+	url_para.delete("reset_settings");
 	window.history.pushState(null, null, `${document.location.href.split('?')[0]}${url_para.size ? `?${url_para}` : ""}`);
 	if (url_para.get("sfilter")) {
 		// extract member data
