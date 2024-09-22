@@ -162,7 +162,7 @@ $(function() {
 		});
 		
 		function update_ser_asd() {
-			$("#ser_opt_asd>.attr_name").html(new Array(
+			$("#ser_opt_asd>div:nth-child(2)").html(new Array(
 				"古い順&nbsp;(⇌新しい順)", "新しい順&nbsp;(⇌古い順)",
 				"正順&nbsp;(⇌逆順)", "逆順&nbsp;(⇌正順)"
 			)[(settings.ser_sort_by_date.value ? 0 : 2) + (settings.ser_sort_asd.value ? 0 : 1)]);
