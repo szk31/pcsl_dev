@@ -66,67 +66,33 @@
 	align-items: center;
 }
 
-#home_key_reset {
-	background-color : Crimson;
-	color : White;
-	border-radius : 2vw;
-	width : 20vw;
-	margin : 6vh auto 10vh auto;
-	padding : 2vw;
-	font-size : 3.6vw;
-	font-weight : bold;
-	text-align : center;
+#home_key {
+	font-size: 3.6vw;
 }
 
-#remove_key {
-	position : fixed;
-	left : 50%;
-	top : 50%;
-	transform: translate(-50%, -50%);
-	width : 80vw;
-	height : 30vh;
-	background-color : var(--dialog-back-alt);
-	font-weight : bold;
-	text-align : center;
-	color : var(--dialog-text-alt);
-	border-radius : 2vw;
-	border: 0.5vw solid var(--dialog-border);
+#home_key_comfirm {
+	margin: 7vw auto 2vw;
+	padding: 2vw;
+	text-align: center;
 }
 
-#remove_key_text {
-	margin : 8vh auto 0 auto;
-	font-size : 5.2vw;
+.home_key_reset {
+	margin: 0 auto 5vw;
+	text-align: center;
 }
 
-#remove_key_options {
-	position : absolute;
-	bottom : 0;
-	display : grid;
-	grid-template-columns: 50% 50%;
-	height : 10vh;
-	width : 100%;
-	vertical-align : center;
+.home_key_reset>span {
+	margin: 0 5vw;
+	border-radius: 2.4vw;
+	font-weight: 700;
+	padding: 1.2vw 2.4vw;
 }
 
-#remove_key_options>div {
-	display : flex;
-	justify-content : center;
-	align-items : center;
-	border-top : 0.8vw solid var(--dialog-border);
-	font-size : 4.8vw;
+#home_key_reset_nah {
+	border: green 0.6vw solid;
 }
 
-#remove_key_nah {
-	border-right : 0.4vw solid var(--dialog-border);
-	border-bottom-left-radius : 2vw;
-}
-
-#remove_key_yes {
-	border-left : 0.4vw solid var(--dialog-border);
-	background-color : DarkRed;
-	border-bottom-right-radius : 2vw;
-}
-
-[theme=light] #remove_key_yes {
-	background-color : rgb(242, 98, 98);
+#home_key_reset_yes,
+#home_key_reset_button {
+	border: crimson 0.6vw solid;
 }

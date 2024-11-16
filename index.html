@@ -9,11 +9,11 @@
 		<title>ぷちここ歌まとめ</title>
 		<link rel="icon" type="image/png" href="icon/icon.png">
 		<!-- css -->
-		<link rel="stylesheet" href="style_min.css">
-		<!--link rel="stylesheet" href="style_general.css">
+		<!--link rel="stylesheet" href="style_min.css"-->
+		<link rel="stylesheet" href="style_general.css">
 		<link rel="stylesheet" href="style_home.css">
 		<link rel="stylesheet" href="style_search.css">
-		<link rel="stylesheet" href="style_repertoire.css"-->
+		<link rel="stylesheet" href="style_repertoire.css">
 		<link rel="stylesheet" href="icon.css" defer>
 		<!-- using libraries -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
@@ -22,11 +22,11 @@
 		<script type="text/javascript" src="data.js"></script>
 		<script type="text/javascript" src="version_hash.js"></script>
 		<!-- script -->
-		<script type="text/javascript" src="scr_min.js"></script>
+		<!--script type="text/javascript" src="scr_min.js"></script-->
 		<script type="text/javascript" src="r2k_min.js"></script>
-		<!--script type="text/javascript" src="main.js"></script>
+		<script type="text/javascript" src="main.js"></script>
 		<script type="text/javascript" src="search.js"></script>
-		<script type="text/javascript" src="rep.js"></script-->
+		<script type="text/javascript" src="rep.js"></script>
 		<style>
 			#loading_overlay {
 				position: fixed;
@@ -175,7 +175,12 @@
 				</div>
 			</div>
 			<div id="home_key" class="hidden">
-				<div id="home_key_reset">キー削除</div>
+				<div id="home_key_comfirm" class="blank">本当にキーを削除しますか</div>
+				<div class="home_key_reset">
+					<span id="home_key_reset_button">キー削除</span>
+					<span id="home_key_reset_nah" class="hidden">消さない</span>
+					<span id="home_key_reset_yes" class="hidden">　消す　</span>
+				</div>
 			</div>
 		</div>
 		<div id="search_section" class="section_container hidden">
@@ -515,7 +520,7 @@
 					<div id="settings_reset_confirm" class="blank">本当に設定をリセットしますか</div>
 					<div class="settings_reset">
 						<span id="settings_reset_button">リセット</span>
-						<span id="settings_reset_nah" class="hidden">取り消し</span>
+						<span id="settings_reset_nah" class="hidden">&#8239;&nbsp;しない&nbsp;&#8239;</span>
 						<span id="settings_reset_yes" class="hidden">リセット</span>
 					</div>
 				</div>
@@ -565,13 +570,6 @@
 			<div id="memcount_rep" class="popup_frame memcount_subblock anti_extra hidden">
 				<h3>レパートリー曲数</h3>
 				<div id="memcount_rep_content"></div>
-			</div>
-			<div id="remove_key" class="popup_frame hidden">
-				<div id="remove_key_text">キーを削除しますか？</div>
-				<div id="remove_key_options">
-					<div id="remove_key_nah">削除しない</div>
-					<div id="remove_key_yes">削除する</div>
-				</div>
 			</div>
 		</div>
 		<div id="copy_popup" class="hidden">クリップボードに<br />保存しました</div>

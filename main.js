@@ -884,29 +884,17 @@ $(function() {
 		$(`.filter_icon.${$(this).children().attr("class")}`).click();
 	})
 
-	// key reset
-	$(document).on("click", "#home_key_reset", function() {
-		$("#popup_container").removeClass("hidden");
-		$("#remove_key").removeClass("hidden");
-		$("#menu_container").addClass("hidden");
-		$("#nav_menu").removeClass("menu_opened");
-		$(document.body).addClass("no_scroll");
-		prevent_menu_popup = true;
+	// home - delete key - button, cancel
+	$(document).on("click", "#home_key_reset_button, #home_key_reset_nah", function() {
+		$(".home_key_reset>span").toggleClass("hidden");
+		$("#home_key_comfirm").toggleClass("blank");
 	});
-	
-	// key reset - yes
-	$(document).on("click", "#remove_key_yes", function() {
+
+	// home - delete key - confirm
+	$(document).on("click", "#home_key_reset_yes", function() {
 		localStorage.removeItem("pcsl_version_hash");
 		localStorage.removeItem("pcsl_key");
 		window.location = window.location.href.split("?")[0];
-	});
-	
-	// key reset - no
-	$(document).on("click", "#remove_key_nah", function() {
-		$("#remove_key").addClass("hidden");
-		$("#popup_container").addClass("hidden");
-		$(document.body).removeClass("no_scroll");
-		prevent_menu_popup = false;
 	});
 });
 
