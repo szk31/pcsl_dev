@@ -912,18 +912,17 @@ body.post_switch {
 }
 
 .settings_reset>span {
+	margin: 0 5vw;
 	border-radius: 2.4vw;
 	font-weight: 700;
 	padding: 1.2vw 2.4vw;
 }
 #settings_reset_nah {
-	margin: 0 5vw;
 	border: green 0.6vw solid;
 }
 
 #settings_reset_yes,
 #settings_reset_button {
-	margin: 0 5vw;
 	border: crimson 0.6vw solid;
 }
 

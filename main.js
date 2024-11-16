@@ -354,11 +354,7 @@ function load_setting_flags() {
 		ls(key, typeof val === "number" ? val : val ? 1 : 0);
 	}
 
-	
-	let url_para = new URLSearchParams(window.location.search);
-	const do_default = url_para.has("reset_settings");
-	delete url_para;
-
+	const do_default = new URLSearchParams(window.location.search).has("reset_settings");
 	if (do_default) {
 		ls("theme", "mixed");
 	}
@@ -858,7 +854,7 @@ $(function() {
 			const currentUrl = new URL(window.location.href);
 			currentUrl.searchParams.set("reset_settings", "");
 			window.location.href = currentUrl.toString();
-		})
+		});
 	}
 
 	// memcount swap content
