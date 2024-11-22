@@ -17,7 +17,7 @@ const attr_idx = [
 // type of all songs
 let rep_list = [];
 // singer selection
-let rep_singer = [1, 1, 1, 1, 1, 1];
+let rep_singer = [1, 1, 1];
 
 // anisong selection
 let rep_anisong = {
@@ -422,8 +422,31 @@ function rep_display_loop() {
 		let sang_count = get_sang_count(rep_hits[i], selected_member);
 		let last_sang = get_last_sang(rep_hits[i], selected_member);
 		let delta_last = last_sang === 0 ? -1 : get_date_different(last_sang);
-		
-		let new_html = `<div class="rep_song_container${rep_selected.includes(rep_hits[i]) ? " selected" : ""}${sang_count[0] && (sang_count[0] === sang_count[1]) ? " rep_mem_only" : ""}" id="rep_song_${rep_hits[i]}"><div class="rep_song_row1"><div class="rep_song_title">${song[rep_hits[i]][song_idx.name]} / ${song[rep_hits[i]][song_idx.artist]}</div><div class="rep_song_nooke">${oke_gone.includes(song[rep_hits[i]][song_idx.name]) ? "オケ消滅" : ""}</div></div><div class="rep_song_info grid_block-4"><div>${delta_last === 0 ? "今日" : delta_last === -1 ? "---" : `${delta_last}日前`}</div><div>${sang_count[0]}回${sang_count[1] > 0 ? (sang_count[0] === sang_count[1] ? " (メン限のみ)" : ` (${sang_count[1]}回メン限)`) : ""}</div><div class="rep_song_singer${key_valid ? " rep_singer_2rows" : ""}"><div${rep_hits_solo[rep_hits[i]].includes(4) ? ` class="singer_4"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(2) ? ` class="singer_2"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(1) ? ` class="singer_1"` : ""}></div>${key_valid ? `<div${rep_hits_solo[rep_hits[i]].includes(32) ? ` class="singer_32"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(16) ? ` class="singer_16"` : ""}></div><div${rep_hits_solo[rep_hits[i]].includes(8) ? ` class="singer_8"` : ""}></div>` : ""}</div>${settings.rep_show_release.value ? `<div class="rep_extra_info"> (${display_date(to8601(song[rep_hits[i]][song_idx.release]))})</div>` : "<div></div>"}</div></div>`;
+
+		let new_html = 
+		`<div class="rep_song_container${rep_selected.includes(rep_hits[i]) ? " selected" : ""}${sang_count[0] && (sang_count[0] === sang_count[1]) ? " rep_mem_only" : ""}" id="rep_song_${rep_hits[i]}">` +
+			`<div class="rep_song_row1">` + 
+				`<div class="rep_song_title">${song[rep_hits[i]][song_idx.name]} / ${song[rep_hits[i]][song_idx.artist]}</div>` + 
+				`<div class="rep_song_nooke">${oke_gone.includes(song[rep_hits[i]][song_idx.name]) ? "オケ消滅" : ""}</div>` + 
+			`</div>` + 
+			`<div class="rep_song_info grid_block-4">` + 
+				`<div>${delta_last === 0 ? "今日" : delta_last === -1 ? "---" : `${delta_last}日前`}</div>` + 
+				`<div>${sang_count[0]}回${sang_count[1] > 0 ? (sang_count[0] === sang_count[1] ? " (メン限のみ)" : ` (${sang_count[1]}回メン限)`) : ""}</div>` + 
+				`<div class="rep_song_singer${key_valid ? " rep_singer_2rows" : ""}">` + 
+					`<div${rep_hits_solo[rep_hits[i]].includes(4) ? ` class="singer_4"` : ""}></div>` + 
+					`<div${rep_hits_solo[rep_hits[i]].includes(2) ? ` class="singer_2"` : ""}></div>` + 
+					`<div${rep_hits_solo[rep_hits[i]].includes(1) ? ` class="singer_1"` : ""}></div>` +
+					`${key_valid ? 
+						`<div${rep_hits_solo[rep_hits[i]].includes(32) ? ` class="singer_32"` : ""}></div>` + 
+						`<div${rep_hits_solo[rep_hits[i]].includes(16) ? ` class="singer_16"` : ""}></div>` + 
+						`<div${rep_hits_solo[rep_hits[i]].includes(8) ? ` class="singer_8"` : ""}></div>` : 
+					""}` + 
+				`</div>` + 
+				`${settings.rep_show_release.value ? 
+					`<div class="rep_extra_info"> (${display_date(to8601(song[rep_hits[i]][song_idx.release]))})</div>` : 
+					"<div></div>"}` + 
+				`</div>` + 
+			`</div>`;
 		$("#rep_display").append(new_html);
 	}
 	// call itself again if not finished

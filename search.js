@@ -37,7 +37,10 @@ $(function() {
 			if (random_song === random_last) {
 				continue;
 			}
-			if (rep_list[random_song] & sel_member && (settings.ser_show_private.value || entry_proc[random_song].some(x => entry[x][entry_idx.type] & sel_member && !is_private(x)))) {
+			if (rep_list[random_song] & sel_member && 
+			    (settings.ser_show_private.value || 
+				entry_proc[random_song].some(x => entry[x][entry_idx.type] & sel_member && !is_private(x)))
+			) {
 				break;
 			}
 		}
@@ -228,7 +231,8 @@ $(function() {
 				if (!entry[entry_id][entry_idx.time]) {
 					tweet = data.title + "\n(youtu.be/" + video[entry[entry_id][entry_idx.video]][video_idx.id] + ")";
 				} else {
-					tweet = song[entry[entry_id][entry_idx.song_id]][song_idx.name].trim() + " / " + song[entry[entry_id][entry_idx.song_id]][song_idx.artist] + " @" + data.title + "\n(youtu.be/" + video[entry[entry_id][entry_idx.video]][video_idx.id] + timestamp(entry_id) + ")";
+					tweet = song[entry[entry_id][entry_idx.song_id]][song_idx.name].trim() + " / " + song[entry[entry_id][entry_idx.song_id]][song_idx.artist] + 
+							" @" + data.title + "\n(youtu.be/" + video[entry[entry_id][entry_idx.video]][video_idx.id] + timestamp(entry_id) + ")";
 				}
 				window.open("https://twitter.com/intent/tweet?text=" + encodeURIComponent(tweet), "_blank");
 			});
@@ -304,13 +308,21 @@ function auto_search() {
 			song_name = song[auto_exact[i]][song_idx.name];
 			auto_display = bold(song_name, input);
 		}
-		new_html += `<div id="${to_html(song_name)}" class="auto_panel${auto_display_count++ === 0 ? " auto_first" : ""}"><div class="auto_reading${!auto_reading || !settings.pdt_reading.value ? " auto_no_reading" : ""}">${auto_reading}</div><div class="auto_display">${auto_display}</div></div>`;
+		new_html += 
+		`<div id="${to_html(song_name)}" class="auto_panel${auto_display_count++ === 0 ? " auto_first" : ""}">` + 
+			`<div class="auto_reading${!auto_reading || !settings.pdt_reading.value ? " auto_no_reading" : ""}">${auto_reading}</div>` + 
+			`<div class="auto_display">${auto_display}</div>` + 
+		`</div>`;
 	}
 	for (let i in auto_other) {
 		if (auto_display_count++ >= auto_display_max) {
 			break;
 		}
-		new_html += `<div id="${to_html(song[auto_other[i]][song_idx.name])}" class="auto_panel${(auto_display_count === 0 ? " auto_first" : "")}"><div class="auto_reading${settings.pdt_reading.value ? "" : " auto_no_reading"}">${song[auto_other[i]][song_idx.reading].split(" ")[0]}</div><div class="auto_display">${bold(song[auto_other[i]][song_idx.name], input)}</div></div>`;
+		new_html += 
+		`<div id="${to_html(song[auto_other[i]][song_idx.name])}" class="auto_panel${(auto_display_count === 0 ? " auto_first" : "")}">` + 
+			`<div class="auto_reading${settings.pdt_reading.value ? "" : " auto_no_reading"}">${song[auto_other[i]][song_idx.reading].split(" ")[0]}</div>` + 
+			`<div class="auto_display">${bold(song[auto_other[i]][song_idx.name], input)}</div>` + 
+		`</div>`;
 	}
 	$("#search_auto").html(new_html);
 	$("#search_auto").toggleClass("hidden", !new_html);
@@ -431,14 +443,35 @@ function update_display(force = false) {
 				if (/([^~]+~+[^~])/g.test(song_name) && song_name_length >= 28) {
 					song_name = song_name.substring(0, song_name.search(/~/g)) + "<br />" + song_name.substring(song_name.search(/~/g));
 				}
-				new_html += `<div class="song_name_container" id="${current_song}"><div class="song_rap"><div class="song_name">${song_name}</div><div class="song_credit${show ? "" : " hidden"}${song[current_song][song_idx.artist].length > 30 ? " long_credit" : ""} song_${current_song}">${song[current_song][song_idx.artist]}</div></div><div class="song_icon_container"><div id="fold_${current_song}" class="song_fold_icon${show ? "" : " closed"}"></div><div id="copy_name_${current_song}" class="song_copy_icon song_${current_song}${show ? "" : " hidden"}"></div></div></div>`;
+				new_html += 
+				`<div class="song_name_container" id="${current_song}">` + 
+					`<div class="song_rap"><div class="song_name">${song_name}</div>` + 
+					`<div class="song_credit${show ? "" : " hidden"}${song[current_song][song_idx.artist].length > 30 ? " long_credit" : ""} song_${current_song}">` + 
+						`${song[current_song][song_idx.artist]}` + 
+					`</div>` + 
+				`</div>` + 
+				`<div class="song_icon_container">` + 
+					`<div id="fold_${current_song}" class="song_fold_icon${show ? "" : " closed"}"></div>` + 
+					`<div id="copy_name_${current_song}" class="song_copy_icon song_${current_song}${show ? "" : " hidden"}"></div>` + 
+				`</div></div>`;		// open div is 1st line of this if
 			}
 			let note = entry[cur_entry][entry_idx.note];
 			const is_mem = note.includes("【メン限");
 			if (is_mem) {
 				note = note.replace(/【メン限アーカイブ】|【メン限】/g, "");
 			}
-			new_html += `<div class="entry_container singer_${entry[cur_entry][entry_idx.type]}${is_mem ? "m" : ""} song_${current_song}${hide_song.includes(current_song) ? " hidden" : ""}"><a href="https://youtu.be/${video[entry[cur_entry][entry_idx.video]][video_idx.id]}${timestamp(cur_entry)}" target="_blank"><div class="entry_primary"><div class="entry_date">${display_date(video[entry[cur_entry][entry_idx.video]][video_idx.date])}</div><div class="entry_singer">${singer_lookup[entry[cur_entry][entry_idx.type]]}</div><div class="mem_display">${is_mem ? "メン限" : ""}</div><div class="entry_share" id="entry_${cur_entry}"></div></div>${note ? `<div class="entry_note">${note}</div>` : ""}</a></div>`;
+			new_html += 
+			`<div class="entry_container singer_${entry[cur_entry][entry_idx.type]}${is_mem ? "m" : ""} song_${current_song}${hide_song.includes(current_song) ? " hidden" : ""}">` + 
+				`<a href="https://youtu.be/${video[entry[cur_entry][entry_idx.video]][video_idx.id]}${timestamp(cur_entry)}" target="_blank">` + 
+					`<div class="entry_primary">` + 
+						`<div class="entry_date">${display_date(video[entry[cur_entry][entry_idx.video]][video_idx.date])}</div>` + 
+						`<div class="entry_singer">${singer_lookup[entry[cur_entry][entry_idx.type]]}</div>` + 
+						`<div class="mem_display">${is_mem ? "メン限" : ""}</div>` + 
+						`<div class="entry_share" id="entry_${cur_entry}"></div>` + 
+					`</div>` + 
+					`${note ? `<div class="entry_note">${note}</div>` : ""}` + 
+				`</a>` + 
+			`</div>`;
 			if (++displayed >= 400) {	// hardcoded max_display
 				i = 200;
 				break;
