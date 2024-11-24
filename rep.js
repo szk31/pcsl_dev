@@ -66,6 +66,15 @@ $(function() {
 				$("#rep_input").blur();
 			}
 		});
+
+		// tab -> input::focus
+		$(document).on("keydown", function(e) {
+			if (e.keyCode === 9 && current_page === "repertoire") {
+				e.preventDefault();
+				$("#rep_input").click();
+				$("#rep_input").focus();
+			}
+		});
 		
 		// filter - hide_block
 		$(document).on("click", "#filter_display", function() {

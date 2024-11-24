@@ -80,6 +80,15 @@ $(function() {
 			$(`#search_auto>div:nth-child(${auto_pointer})`).addClass("selected");
 		});
 
+		// tab -> input::focus
+		$(document).on("keydown", function(e) {
+			if (e.keyCode === 9 && current_page === "search") {
+				e.preventDefault();
+				$("#search_input").click();
+				$("#search_input").focus();
+			}
+		});
+
 		// search - input - submit
 		$(document).on("blur", "#search_input", function() {
 			$("#search_auto").addClass("hidden");
