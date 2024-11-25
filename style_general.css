@@ -19,17 +19,17 @@
     --filter-border: #6a5fff;
     --filter-border-alt: #958dff;
 
-    --input-back: White;
-    --input-text: Black;
+    --input-back: #f7f7f7;
+    --input-text: #070707;
     --input-placeholder: Grey;
 
-    --radio-back: #00008b;
-    --radio-border: White;
+    --radio-back: #07078b;
+    --radio-border: #f7f7f7;
     --radio-outline: Teal;
 
-    --song-display: #ffffe0;
+    --song-display: #f7f7e0;
     --song-display-alt: #ffdab9;
-    --song-text: Black;
+    --song-text: #070707;
     --song-border: #b2a58f;
     --song-selected: #8b008b;
 
@@ -99,7 +99,7 @@
     --filter-border-alt: #331a58;
 
     --input-back: #545454;
-    --input-text: White;
+    --input-text: #f7f7f7;
     --input-placeholder: #a2a2a2;
 
     --radio-back: #c8c3ca;
@@ -170,7 +170,7 @@
     --dialog-border: #9186d8;
     --filter-back: #98fb98;
     --filter-back-alt: #dfdfdf;
-    --filter-text: Black;
+    --filter-text: #070707;
     --filter-border: #0000;
     --filter-border-alt: #3cb371;
 	
