@@ -38,9 +38,7 @@ let rep_genre = {
 	other : [1, 0]
 };
 // songs no longer have karaoke available
-const oke_gone = [
-	"ノーザンクロス"
-];
+const oke_gone = [];
 
 let selected_member = [4, 2, 1, 32, 16, 8];
 const selected_member_ram = [4, 2, 1, 32, 16, 8];

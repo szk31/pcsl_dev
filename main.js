@@ -523,7 +523,7 @@ function load_url_para() {
 	window.history.pushState(null, null, `${document.location.href.split('?')[0]}${url_para.size ? `?${url_para}` : ""}`);
 	if (url_para.get("sfilter")) {
 		// extract member data
-		let ext = parseInt(url_para.get("sfilter"));
+		let ext = Number(url_para.get("sfilter"));
 		// bit and = true => default 
 		const member_name = [
 			ext & 1 ? "" : "nia",
@@ -579,7 +579,7 @@ function load_url_para() {
 		}
 		// extract bits
 		let selected_bits = [];
-		let temp = parseInt(url_para.get("rfilter"));
+		let temp = Number(url_para.get("rfilter"));
 		let counter = 0;
 		while (temp) {
 			// test if last bit is 1
