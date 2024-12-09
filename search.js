@@ -284,6 +284,10 @@ function auto_search() {
 	// if input not consist of only hiragana, "ー" or "ヴ"
 	const auto_thru_name = /[^\u3040-\u309F\u30FC\u30F4]/.test(input);
 	const roman_kana = r2k(input);
+	let roman_double_down = roman_kana.replace(/[a-z]+$/, "");
+	if (roman_double_down === roman_kana) {
+		roman_double_down = "";
+	}
 	for (let i = 1; i < song.length && auto_exact.length < auto_display_max; ++i) {
 		// skip if same song name
 		if (auto_skips.includes(i)) {
@@ -300,6 +304,9 @@ function auto_search() {
 		}
 		if (name_pos === -1 && roman_kana) {
 			name_pos = song[i][song_idx.reading].indexOf(roman_kana);
+		}
+		if (name_pos === -1 && roman_double_down) {
+			name_pos = song[i][song_idx.reading].indexOf(roman_double_down);
 		}
 		add_song(i, name_pos);
 	}
@@ -371,11 +378,16 @@ function search() {
 	} else {			// get song by search
 		const max_hit = 200;
 		const roman_kana = r2k(search_value);
+		let roman_double_down = roman_kana.replace(/[a-z]+$/, "");
+		if (roman_double_down === roman_kana) {
+			roman_double_down = "";
+		}
 		for (var i = 1; i < song.length && hits.length < max_hit; ++i) {
 			if (settings.ser_via_song_name.value ? 
 				processed_song_name[i].includes(search_value) ||
 				song[i][song_idx.reading].toLowerCase().includes(search_value) ||
-				song[i][song_idx.reading].includes(roman_kana) :
+				song[i][song_idx.reading].includes(roman_kana) ||
+				roman_double_down && song[i][song_idx.reading].includes(roman_double_down) :
 				song[i][song_idx.artist].toLowerCase().includes(search_value)
 			) {
 				// put in front if song name is exactly the same as searched value
