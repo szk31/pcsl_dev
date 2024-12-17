@@ -334,6 +334,15 @@ document.addEventListener('DOMContentLoaded', async function() {
 	} else {
 		part_filter = [1, 1, 1, 0, 0, 0];
 	}
+
+	// **test**
+	if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+		const links = $("a.youtube");
+		for (let i in links) {
+			const inner = links[i].href.replace("https", "");
+			links[i].href = `intent${inner}#Intent;package=com.google.android.youtube;scheme=https;end`;
+		}
+	}
 });
 
 function init() {
