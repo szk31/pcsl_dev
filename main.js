@@ -111,7 +111,7 @@ let settings = {
 		value: false,
 		req_LS: true
 	},
-	set_use_intent: {				// setting: [mobile] if uses intent:// instead of https:// for URLs
+	use_intent: {					// setting: [mobile] if uses intent:// instead of https:// for URLs
 		value: false,
 		req_LS: true
 	},
@@ -823,7 +823,7 @@ $(function() {
 					ls("theme", cur_state);
 					document.documentElement.setAttribute("theme", cur_state);
 					break;
-				case "intent":
+				case "use_intent":
 					intent_update(toggle_setting(key));
 					break;
 				case "ser_show_private":
@@ -970,14 +970,15 @@ function memcount_load_rep() {
 
 // setting - intent switch
 function intent_update(use_intent) {
+	console.log(use_intent);
 	if (use_intent) {
 		$(`a[href*="youtu"], a[href*="twitter"]`).each(function() {
-			$(this).attr("href") = `${$(this).attr("href").replace("https", "intent")}#Intent;
-			package=com.example.app;scheme=https;S.browser_fallback_url=${$(this).attr("href")};end`;
+			$(this).attr("href", `${$(this).attr("href").replace("https", "intent")}#Intent;` +
+			`package=com.example.app;scheme=https;S.browser_fallback_url=${$(this).attr("href")};end`);
 		});
 	} else {
 		$(`a[href^="intent"]`).each(function() {
-			$(this).attr("href") = $(this).attr("href").replace("intent", "https").replace(/#Intent.*/, "");
+			$(this).attr("href", $(this).attr("href").replace("intent", "https").replace(/#Intent.*/, ""));
 		});
 	}
 }
