@@ -111,6 +111,10 @@ let settings = {
 		value: false,
 		req_LS: true
 	},
+	set_use_intent: {				// setting: [mobile] if uses intent:// instead of https:// for URLs
+		value: false,
+		req_LS: true
+	},
 	ser_show_private: {				// setting: do display private video
 		value: true,
 		req_LS: true,
@@ -414,6 +418,9 @@ function load_setting_flags() {
 			case "set_show_hidden":
 				if (changed) {
 					$(".settings_extra").removeClass("hidden");
+					if (!/Android/i.test(navigator.userAgent)) {
+						$("#setting_intent_container").addClass("hidden");
+					}
 				}
 				break;
 			case "ser_rand_show":
@@ -762,10 +769,12 @@ $(function() {
 		let title_clicked = 0;
 		$(document).on("click", function(e) {
 			if ($(e.target).closest(".settings_title").length) {
-				if (++title_clicked === 5) {
+				if (++title_clicked === 5 && ls("pcsl_set_hidden_unlocked") !== "1") {
 					ls("pcsl_set_hidden_unlocked", 1);
 					// show settings here
 					$("#setting_extra_container").removeClass("hidden");
+					// disable extra dark if not already in dark mode
+					$("#setting_dark").toggleClass("disabled", settings.theme !== "dark");
 				}
 			} else {
 				title_clicked = 0;
@@ -805,11 +814,17 @@ $(function() {
 			switch (key) {
 				case "set_show_hidden":
 					$(".settings_extra").toggleClass("hidden", toggle_setting(key));
+					if (!/Android/i.test(navigator.userAgent)) {
+						$("#setting_intent_container").addClass("hidden");
+					}
 					break;
 				case "dark":
 					let cur_state = $("#dark_extra").hasClass("selected") ? "extra" : "dark";
 					ls("theme", cur_state);
 					document.documentElement.setAttribute("theme", cur_state);
+					break;
+				case "intent":
+					intent_update(toggle_setting(key));
 					break;
 				case "ser_show_private":
 					toggle_setting(key);
@@ -951,6 +966,20 @@ function memcount_load_rep() {
 	}
 	$("#memcount_rep_content").toggleClass("extra_content", key_valid);
 	$("#memcount_rep_content").html(new_html);
+}
+
+// setting - intent switch
+function intent_update(use_intent) {
+	if (use_intent) {
+		$(`a[href*="youtu"], a[href*="twitter"]`).each(function() {
+			$(this).attr("href") = `${$(this).attr("href").replace("https", "intent")}#Intent;
+			package=com.example.app;scheme=https;S.browser_fallback_url=${$(this).attr("href")};end`;
+		});
+	} else {
+		$(`a[href^="intent"]`).each(function() {
+			$(this).attr("href") = $(this).attr("href").replace("intent", "https").replace(/#Intent.*/, "");
+		});
+	}
 }
 
 // functional functions
