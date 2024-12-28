@@ -74,6 +74,12 @@
 
     --trnsp: #0000;
     --empty-cell: #bbb;
+
+	--spr-check: var(--cbx-check);
+	--spr-cross: var(--cbx-cross);
+	--spr-minus: var(--cbx-minus);
+	--spr-switch: var(--cbx-switch);
+	--spr-empty: var(--cbx-minus);
 }
 
 [theme=dark],
@@ -152,6 +158,12 @@
     --share-icon: invert(100%);
 
     --empty-cell: #555;
+
+	--spr-check: var(--cbx-d-check);
+	--spr-cross: var(--cbx-d-cross);
+	--spr-minus: var(--cbx-d-minus);
+	--spr-switch: var(--cbx-d-switch);
+	--spr-empty: var(--cbx-d-empty);
 }
 
 [theme=mixed] {

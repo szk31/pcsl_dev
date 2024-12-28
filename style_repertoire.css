@@ -360,19 +360,23 @@ label div:nth-child(2) {
 }
 
 .checkbox.selected {
-	content : var(--cbx-check);
+	content : var(--spr-check);
 }
 
-.checkbox:not(.selected) {
-	content : var(--cbx-minus);
+.cbx_all.checkbox:not(.selected) {
+	content : var(--spr-minus);
+}
+
+.checkbox:not(cbx_all):not(.selected) {
+	content : var(--spr-empty);
 }
 
 #sort_selected .checkbox:not(.selected) {
-	content : var(--cbx-cross);
+	content : var(--spr-cross);
 }
 
 .switch {
-	content : var(--cbx-switch);
+	content : var(--spr-switch);
 }
 
 .radio {
