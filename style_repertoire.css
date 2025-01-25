@@ -361,22 +361,27 @@ label div:nth-child(2) {
 
 .checkbox.selected {
 	content : var(--spr-check);
+	filter: var(--cbx-icon);
 }
 
 .cbx_all.checkbox:not(.selected) {
 	content : var(--spr-minus);
+	filter: var(--cbx-icon);
 }
 
 .checkbox:not(cbx_all):not(.selected) {
 	content : var(--spr-empty);
+	filter: var(--cbx-icon);
 }
 
 #sort_selected .checkbox:not(.selected) {
 	content : var(--spr-cross);
+	filter: var(--cbx-icon);
 }
 
 .switch {
 	content : var(--spr-switch);
+	filter: var(--cbx-icon);
 }
 
 .radio {

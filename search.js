@@ -284,7 +284,7 @@ function auto_search() {
 	// if input not consist of only hiragana, "ー" or "ヴ"
 	const auto_thru_name = /[^\u3040-\u309F\u30FC\u30F4]/.test(input);
 	const roman_kana = r2k(input);
-	let roman_double_down = roman_kana.replace(/[a-z]+$/, "");
+	let roman_double_down = roman_kana ? roman_kana.replace(/[a-z]+$/, "") : "";
 	if (roman_double_down === roman_kana) {
 		roman_double_down = "";
 	}
@@ -378,7 +378,7 @@ function search() {
 	} else {			// get song by search
 		const max_hit = 200;
 		const roman_kana = r2k(search_value);
-		let roman_double_down = roman_kana.replace(/[a-z]+$/, "");
+		let roman_double_down = roman_kana ? roman_kana.replace(/[a-z]+$/, "") : "";
 		if (roman_double_down === roman_kana) {
 			roman_double_down = "";
 		}
