@@ -51,33 +51,33 @@ $(function() {
 	});
 	
 	{ // search
-		// search - input - autocomplete
+		// search - input - predict
 		$(document).on("input", "#search_input", function() {
 			auto_search();
 		});
 		
-		// search - input - autocomplete - selection
+		// search - input - predict - selection
 		$(document).on("mousedown", ".auto_panel", function() {
 			$("#search_input").val(to_non_html(this.id));
 			// input on blur fires after this so no need to run search here
 		});
 
-		let auto_pointer = 0;	// will be using for nth-child, 0: not using; 1+: pointer pos
-		// search - input - auto-complete - arrow keys
+		let predict_index = 0;	// will be using for nth-child, 0: not using; 1+: index pos
+		// search - input - predict - arrow keys
 		$(document).on("keydown", function(e) {
 			// 38: up-arrow, 40: down-arrow
 			let dir = Object({38 : -1, 40 : 1})[e.keyCode];
 			if ($("#search_auto").hasClass("hidden") ||		// not in search
 				dir === undefined ||						// wrong key
 				auto_input_memory !== get_search_input() ||	// still in ime
-				(!auto_pointer && dir === -1)				// pressing up first
+				(!predict_index && dir === -1)				// pressing up first
 			) {
 				return;
 			}
 			// such that 1 <= pointer_position <= max display
-			auto_pointer = Math.max(1, Math.min(auto_display_max, auto_display_count, auto_pointer + dir));
+			predict_index = Math.max(1, Math.min(auto_display_max, auto_display_count, predict_index + dir));
 			$("#search_auto>div").removeClass("selected");
-			$(`#search_auto>div:nth-child(${auto_pointer})`).addClass("selected");
+			$(`#search_auto>div:nth-child(${predict_index})`).addClass("selected");
 		});
 
 		// tab -> input::focus
@@ -100,11 +100,14 @@ $(function() {
 		// search - input::enter -> blur
 		$(document).on("keydown", function(e) {
 			if (e.keyCode === 13 && current_page === "search") {
-				if (auto_pointer) {
-					auto_pointer = 0;
+				if (predict_index) {
+					predict_index = 0;
 					const selected = $(".auto_panel.selected")[0].id;
 					$("#search_input").val(selected);
-					if (settings.pdt_copy_on_select.value) {
+					if (settings.pdt_copy_on_select.value &&
+						!(selected in series_lookup) &&		// does not copy series name
+						!(selected.trim() in auto_skips.map((x) => {song[x][song_idx.name].trim()}))
+					) {
 						navigator.clipboard.writeText(selected);
 						copy_popup();
 					}
@@ -342,7 +345,7 @@ function auto_search() {
 	}
 	$("#search_auto").html(new_html);
 	$("#search_auto").toggleClass("hidden", !new_html);
-	auto_pointer = 0;
+	predict_index = 0;
 	$("#search_auto>div").removeClass("selected");
 }
 
