@@ -23,9 +23,9 @@
     --input-text: Black;
     --input-placeholder: Grey;
 
-    --radio-back: #00008b;
-    --radio-border: White;
-    --radio-outline: Teal;
+    --radio-back: #000067;
+    --radio-border: #efefef;
+    --radio-outline: #003737;
 
     --song-display: #ffffe0;
     --song-display-alt: #ffdab9;
@@ -110,8 +110,8 @@
     --input-placeholder: #a2a2a2;
 
     --radio-back: #c8c3ca;
-    --radio-border: #1d003b;
-    --radio-outline: #28e2e2;
+    --radio-border: #211928;
+    --radio-outline: #a0c3c3;
 
     --song-display: #050a29;
     --song-display-alt: #160633;
