@@ -513,6 +513,10 @@ body.post_switch {
 	filter: var(--white-icon);
 }
 
+#menu_install.disabled {
+	opacity: 0.25;
+}
+
 #menu_install_icon {
 	content: var(--ico-install);
 }

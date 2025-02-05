@@ -45,7 +45,6 @@
 	width : 6vw;
 	height : 6vw;
 	margin: 1vw 2vw;
-	/* not checkbox but effect is correct */
 	filter: var(--mixed-icon);
 }
 

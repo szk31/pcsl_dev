@@ -84,7 +84,7 @@ const entry_idx = {
 
 let video, entry;
 
-const version = "1.8.4 test1";
+const version = "1.8.4 test2";
 const key_hash = [
 	"473c05c1ae8349a187d233a02c514ac73fe08ff4418429806a49f7b2fe4ba0b7a36ba95df1d58b8e84a602258af69194", //thereIsNoPassword
 	"3f01e53f1bcee58f6fb472b5d2cf8e00ce673b13599791d8d2d4ddcde3defbbb4e0ab7bc704538080d704d87d79d0410"
@@ -100,6 +100,8 @@ let current_page = "home";
 
 // key inputed check
 let key_valid = false;
+
+let deferred_prompt;
 
 /* setting section */
 let settings = {
@@ -346,6 +348,11 @@ function init() {
 	load_setting_flags();
 	process_data();
 	load_url_para();
+
+	// disable PWA install option on PWA mode
+	if (window.matchMedia("(display-mode: standalone)").matches) {
+		$("#menu_install").addClass("disabled");
+	}
 
 	// remove loading screen
 	$("#loading_text").html("Loading Complete.<br />You can't see this tho");
@@ -612,6 +619,19 @@ function load_url_para() {
 }
 
 $(function() {
+	{ // PWA
+		$(window).on("beforeinstallprompt", function(e) {
+			e.preventDefault();
+			deferred_prompt = e;
+			$("#menu_install").removeClass("disabled");
+		});
+
+		$(window).on("appinstalled", function() {
+			$("#menu_install").addClass("disabled");
+			deferred_prompt = null;
+		})
+	}
+
 	{ // nav
 		// nav - menu
 		$(document).on("click", "#nav_menu", function(e) {
@@ -670,6 +690,18 @@ $(function() {
 			$(document.body).removeClass("no_scroll");
 		});
 		
+		// menu - install
+		$(document).on("click", "#menu_install:not(.disabled)", async function() {
+			if (!deferred_prompt) {
+				return;
+			}
+
+			deferred_prompt.prompt();
+			const result = deferred_prompt.userChoice;
+			$("#menu_install").toggleClass("disabled", result.outcome === "accepted");
+			deferred_prompt = null;
+		});
+
 		// menu - setting
 		$(document).on("click", "#menu_setting", function() {
 			// hide / show things
