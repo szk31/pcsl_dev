@@ -1,42 +1,42 @@
 #search_section {
-	margin-top : 10vw;
+	margin-top: 10vw;
 }
 
 #search_input_container {
-	display : flex;
+	display: flex;
 }
 
 #search_input {
-	width : 86vw;
+	width: 86vw;
 	margin: 2vw 2vw .5vw;
 	padding: 5vw 2vw;
-	height : 10vw;
-	font-size : 5vw;
-	border-radius : 2vw;
+	height: 10vw;
+	font-size: 5vw;
+	border-radius: 2vw;
 }
 
 #ser_opt_button {
-	content : var(--ico-arrow);
-	width : 8vw;
-	height : 8vw;
-	margin-top : 3vw;
-	transform : rotate(180deg);
+	content: var(--ico-arrow);
+	width: 8vw;
+	height: 8vw;
+	margin-top: 3vw;
+	transform: rotate(180deg);
 	filter: var(--white-icon);
 }
 
 #ser_opt_button.opened {
-	transform : none;
+	transform: none;
 }
 
 #ser_opt_container {
 	width: 96vw;
-	margin : 1.5vw auto 0;
-	padding : 1vw 2vw;
-	background-color : var(--filter-back);
-	border-radius : 4vw;
+	margin: 1.5vw auto 0;
+	padding: 1vw 2vw;
+	background-color: var(--filter-back);
+	border-radius: 4vw;
 	border: 0.5vw solid var(--filter-border);
 	color: var(--filter-text);
-	font-size : 3.2vw;
+	font-size: 3.2vw;
 }
 
 #ser_opt_container label {
@@ -44,17 +44,17 @@
 }
 
 .ser_opt_title {
-	font-size : 5vw;
-	font-weight : bold;
+	font-size: 5vw;
+	font-weight: bold;
 	padding: 1vw 0 0 2.4vw;
-	border-bottom : 0.5vw solid var(--filter-text);
-	margin-bottom : 1vw;
-	width : 97.5%;
+	border-bottom: 0.5vw solid var(--filter-text);
+	margin-bottom: 1vw;
+	width: 97.5%;
 }
 
 .ser_opt_block {
-	display : grid;
-	margin-bottom : 1vw;
+	display: grid;
+	margin-bottom: 1vw;
 }
 
 .search_grid_2 {
@@ -66,13 +66,13 @@
 }
 
 .ser_opt_block>label {
-	display : grid;
+	display: grid;
 	grid-template-columns: 6vw auto;
 }
 
 .ser_opt_block div:not([class]) {
-	font-weight : bold;
-	display : flex;
+	font-weight: bold;
+	display: flex;
 	align-items: center;
 	padding-left: 0.4vw;
 	height: 6vw;
@@ -80,20 +80,20 @@
 
 /* singer section */
 .search_icon_container {
-	display : flex;
+	display: flex;
 }
 
 .search_icon_container div {
-	border-radius : 4vw;
-	width : 14.6vw;
-	height : 14.6vw;
+	border-radius: 4vw;
+	width: 14.6vw;
+	height: 14.6vw;
 	margin: 0 0.28vw;
 }
 
 .singer_icon {
-	border-radius : 3.4vw;
-	width : 13.4vw;
-	height : 13.4vw;
+	border-radius: 3.4vw;
+	width: 13.4vw;
+	height: 13.4vw;
 	margin: 0.6vw;
 }
 
@@ -105,24 +105,24 @@
 
 /* song title section */
 .song_name_container {
-	padding : 0 1vw;
-	margin : 1.5vw 1.5vw;
-	text-align : center;
-	display : flex;
-	border : .2vw solid var(--song-border);
-	border-radius : 2.4vw;
-	position : sticky;
-	position : -webkit-sticky;
-	top : 10vw;
+	padding: 0 1vw;
+	margin: 1.5vw 1.5vw;
+	text-align: center;
+	display: flex;
+	border: .2vw solid var(--song-border);
+	border-radius: 2.4vw;
+	position: sticky;
+	position: -webkit-sticky;
+	top: 10vw;
 	color: var(--song-text);
 }
 
 .song_container:nth-child(odd)>:nth-child(1) {
-	background-color : var(--song-display);
+	background-color: var(--song-display);
 }
 
 .song_container:nth-child(even)>:nth-child(1) {
-	background-color : var(--song-display-alt);
+	background-color: var(--song-display-alt);
 }
 
 .song_rap{
@@ -130,59 +130,59 @@
 }
 
 .song_name {
-	font-weight : bold;
-	font-size : 5.8vw;
+	font-weight: bold;
+	font-size: 5.8vw;
 }
 
 .song_credit:not(.long_credit) {
-	font-size : 3.2vw;
+	font-size: 3.2vw;
 }
 
 .song_credit.long_credit {
-	font-size : 2.4vw;
+	font-size: 2.4vw;
 }
 
 .song_icon_container {
-	flex-direction : column;
+	flex-direction: column;
 }
 
 .song_fold_icon {
-	content : var(--ico-arrow-alt);
-	width : 6vw;
-	height : 6vw;
+	content: var(--ico-arrow);
+	width: 6vw;
+	height: 6vw;
 	margin: 1.25vw 1vw 0 0;
-	filter: var(--black-icon);
+	filter: var(--white-icon);
 }
 
 .song_fold_icon:not(.closed) {
-	flex-grow : 1;
+	flex-grow: 1;
 }
 
 .song_fold_icon.closed {
-	transform : rotate(180deg);
+	transform: rotate(180deg);
 }
 
 .song_copy_icon {
-	content : var(--ico-copy);
-	width : 6vw;
-	height : 6vw;
-	z-index : 2;
-	filter: var(--black-icon);
+	content: var(--ico-copy);
+	width: 6vw;
+	height: 6vw;
+	z-index: 2;
+	filter: var(--white-icon);
 	margin: 0.6vw 0.6vw 1vw 0;
 }
 
 /* song entry section */
 .entry_container {
-	font-weight : bold;
-	font-size : 3.6vw;
-	padding : 1vw;
-	margin : 1.5vw 3.2vw;
-	border : .2vw solid color-mix(in srgb, currentColor 72%, Black);
-	border-radius : 1.6vw;
+	font-weight: bold;
+	font-size: 3.6vw;
+	padding: 1vw;
+	margin: 1.5vw 3.2vw;
+	border: .2vw solid color-mix(in srgb, currentColor 72%, Black);
+	border-radius: 1.6vw;
 }
 
 .entry_primary {
-	display : flex;
+	display: flex;
 }
 
 .entry_primary>div {
@@ -191,170 +191,170 @@
 }
 
 .entry_date {
-	flex-grow : 1;
-	width : 34vw;
-	margin : 0vw 2vw;
+	flex-grow: 1;
+	width: 34vw;
+	margin: 0vw 2vw;
 }
 
 .entry_singer {
-	flex-grow : 1;
-	width : 34vw;
+	flex-grow: 1;
+	width: 34vw;
 }
 
 .mem_display {
-	flex-grow : 1;
-	width : 14vw;
+	flex-grow: 1;
+	width: 14vw;
 }
 
 .entry_share {
-	content : var(--ico-share);
-	width : 6vw;
-	height : 6vw;
+	content: var(--ico-share);
+	width: 6vw;
+	height: 6vw;
 }
 
 .entry_note {
-	font-size : 2.7vw;
-	padding : 0vw 2.5vw;
+	font-size: 2.7vw;
+	padding: 0vw 2.5vw;
 }
 
 
 /* singer colour palette section */
-/* nia (1) cc : 11.86 */
+/* nia (1) cc: 11.86 */
 .singer_1m,
 *:is([theme=dark], [theme=extra]) .singer_1m.memcount_rep_name {
-	background-color : var(--s-nia-text);
-	color : var(--s-nia-back);
+	background-color: var(--s-nia-text);
+	color: var(--s-nia-back);
 }
 .singer_1,
 *:is([theme=dark], [theme=extra]) .singer_1m {
-	background-color : var(--s-nia-back);
-	color : var(--s-nia-text);
+	background-color: var(--s-nia-back);
+	color: var(--s-nia-text);
 }
-/* momo (2) cc : 5.14 */
+/* momo (2) cc: 5.14 */
 .singer_2m,
 *:is([theme=dark], [theme=extra]) .singer_2m.memcount_rep_name {
-	background-color : var(--s-momo-text);
-	color : var(--s-momo-back);
+	background-color: var(--s-momo-text);
+	color: var(--s-momo-back);
 }
 .singer_2,
 *:is([theme=dark], [theme=extra]) .singer_2m {
-	background-color : var(--s-momo-back);
-	color : var(--s-momo-text);
+	background-color: var(--s-momo-back);
+	color: var(--s-momo-text);
 }
-/* momonia (3) cc : 5.56 */
+/* momonia (3) cc: 5.56 */
 .singer_3 {
-	background-color : var(--s-mmna-back);
-	color : var(--s-mmna-text);
+	background-color: var(--s-mmna-back);
+	color: var(--s-mmna-text);
 }
-/* kirara (4) cc : 5.14 */
+/* kirara (4) cc: 5.14 */
 .singer_4m,
 *:is([theme=dark], [theme=extra]) .singer_4m.memcount_rep_name {
-	background-color : var(--s-krr-text);
-	color : var(--s-krr-back);
+	background-color: var(--s-krr-text);
+	color: var(--s-krr-back);
 }
 .singer_4,
 *:is([theme=dark], [theme=extra]) .singer_4m {
-	background-color : var(--s-krr-back);
-	color : var(--s-krr-text);
+	background-color: var(--s-krr-back);
+	color: var(--s-krr-text);
 }
-/* kirania (5) cc : 5.39 */
+/* kirania (5) cc: 5.39 */
 .singer_5 {
-	background-color : var(--s-krna-back);
-	color : var(--s-krna-text);
+	background-color: var(--s-krna-back);
+	color: var(--s-krna-text);
 }
-/* momokira (6) cc : 5.57 */
+/* momokira (6) cc: 5.57 */
 .singer_6 {
-	background-color : var(--s-mmkr-back);
-	color : var(--s-mmkr-text);
+	background-color: var(--s-mmkr-back);
+	color: var(--s-mmkr-text);
 }
-/* petitcoco (7) cc : 6.55 */
+/* petitcoco (7) cc: 6.55 */
 .singer_7 {
-	background-color : var(--s-ptcc-back);
-	color : var(--s-ptcc-text);
+	background-color: var(--s-ptcc-back);
+	color: var(--s-ptcc-text);
 }
 
-/* yuco (9) cc : 4.55 */
+/* yuco (9) cc: 4.55 */
 .singer_8m,
 *:is([theme=dark], [theme=extra]) .singer_8m.memcount_rep_name {
-	background-color : var(--s-yuco-text);
-	color : var(--s-yuco-back);
+	background-color: var(--s-yuco-text);
+	color: var(--s-yuco-back);
 }
 .singer_8,
 *:is([theme=dark], [theme=extra]) .singer_8m {
-	background-color : var(--s-yuco-back);
-	color : var(--s-yuco-text);
+	background-color: var(--s-yuco-back);
+	color: var(--s-yuco-text);
 }
 
 .singer_10 {
-	background-color : var(--s-ycmm-back);
-	color : var(--s-ycmm-text);
+	background-color: var(--s-ycmm-back);
+	color: var(--s-ycmm-text);
 }
 
 .singer_12 {
-	background-color : var(--s-yckr-back);
-	color : var(--s-yckr-text);
+	background-color: var(--s-yckr-back);
+	color: var(--s-yckr-text);
 }
-/* shiro (10) cc : 4.63 */
+/* shiro (10) cc: 4.63 */
 .singer_16m,
 *:is([theme=dark], [theme=extra]) .singer_16m.memcount_rep_name {
-	background-color : var(--s-siro-text);
-	color : var(--s-siro-back);
+	background-color: var(--s-siro-text);
+	color: var(--s-siro-back);
 }
 .singer_16,
 *:is([theme=dark], [theme=extra]) .singer_16m {
-	background-color : var(--s-siro-back);
-	color : var(--s-siro-text);
+	background-color: var(--s-siro-back);
+	color: var(--s-siro-text);
 }
-/* chui (12) cc : 5.31 */
+/* chui (12) cc: 5.31 */
 .singer_32m,
 *:is([theme=dark], [theme=extra]) .singer_32m.memcount_rep_name {
-	background-color : var(--s-chui-text);
-	color : var(--s-chui-back);
+	background-color: var(--s-chui-text);
+	color: var(--s-chui-back);
 }
 .singer_32,
 *:is([theme=dark], [theme=extra]) .singer_32m {
-	background-color : var(--s-chui-back);
-	color : var(--s-chui-text);
+	background-color: var(--s-chui-back);
+	color: var(--s-chui-text);
 }
 
 /* search autocomplete section */
 #search_auto {
-	position : absolute;
-	left : 2vw;
-	top : 22.25vw;
-	border : 1vw solid GhostWhite;
-	background-color : var(--filter-back);
+	position: absolute;
+	left: 2vw;
+	top: 22.25vw;
+	border: 1vw solid GhostWhite;
+	background-color: var(--filter-back);
 	border-radius: 1vw;
 }
 
 .auto_panel {
-	height : 12vw;
-	width : 84vw;
-	overflow : hidden;
-	white-space : nowrap;
+	height: 12vw;
+	width: 84vw;
+	overflow: hidden;
+	white-space: nowrap;
 }
 
 .auto_panel:not(.auto_first) {
-	border-top : 0.5vw solid GhostWhite;
+	border-top: 0.5vw solid GhostWhite;
 }
 
 .auto_panel.selected {
-	background-color : var(--song-display-alt);
-	color : var(--song-selected);
+	background-color: var(--song-display-alt);
+	color: var(--song-selected);
 }
 
 /* like i know theres aint no hover on a damn mobile site */
 .auto_panel:hover {
-	background-color : var(--filter-border-alt);
+	background-color: var(--filter-border-alt);
 }
 
 .auto_reading:not(.auto_no_reading) {
 	position: relative;
 	transform: translateY(36%);
-	padding : 0.5vw 1vw;
+	padding: 0.5vw 1vw;
 	margin: 0.4vw;
-	font-size : 3.2vw;
-	height : 4vw;
+	font-size: 3.2vw;
+	height: 4vw;
 }
 
 .auto_reading.auto_no_reading {
@@ -364,24 +364,24 @@
 .auto_display {
 	margin: 0.2vw 0.2vw 0.2vw 0.8vw;
 	padding: 0.4vw;
-	font-size : 4.8vw;
-	height : 6vw;
+	font-size: 4.8vw;
+	height: 6vw;
 }
 
 .auto_panel:has(.auto_no_reading) .auto_display {
-	font-size : 5.2vw;
+	font-size: 5.2vw;
 	margin-top: 4vw;
 }
 
 /* no result */
 .search_no_result {
-	margin : 4vw auto;
-	padding : 3vw 6vw;
-	width : fit-content;
-	background-color : #101B;
-	border-radius : 2vw;
-	font-size : 6vw;
-	font-weight : bold;
-	color : #EEF;
-	text-align : center;
+	margin: 4vw auto;
+	padding: 3vw 6vw;
+	width: fit-content;
+	background-color: #101B;
+	border-radius: 2vw;
+	font-size: 6vw;
+	font-weight: bold;
+	color: #EEF;
+	text-align: center;
 }

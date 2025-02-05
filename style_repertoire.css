@@ -41,11 +41,12 @@
 }
 
 #filter_close {
-	content : var(--ico-arrow-alt);
+	content : var(--ico-arrow);
 	width : 6vw;
 	height : 6vw;
 	margin: 1vw 2vw;
-	filter: var(--black-icon);
+	/* not checkbox but effect is correct */
+	filter: var(--mixed-icon);
 }
 
 #filter_close.closed {
@@ -216,8 +217,8 @@ label div:nth-child(2) {
 }
 
 .rep_share_icon {
-	margin: 0 2vw 0 12vw;
-	width: 6vw;
+	margin: 0 2vw 0 8vw;
+	width: 7.5vw;
 	padding: 0 1vw;
 }
 
@@ -233,11 +234,11 @@ label div:nth-child(2) {
 
 #rep_share_link .rep_share_icon {
 	content: var(--ico-link);
-	filter: var(--share-icon);
+	filter: var(--white-icon);
 }
 
 .rep_share_text {
-	font-size: 3.6vw;
+	font-size: 4vw;
 }
 
 #rep_tweet {
@@ -316,7 +317,7 @@ label div:nth-child(2) {
 	content: var(--ico-copy);
 	height: 4vw;
 	width: 4vw;
-	filter: var(--share-icon);
+	filter: var(--white-icon);
 }
 
 .rep_tweet_tag {
@@ -361,27 +362,27 @@ label div:nth-child(2) {
 
 .checkbox.selected {
 	content : var(--spr-check);
-	filter: var(--cbx-icon);
+	filter: var(--mixed-icon);
 }
 
 .cbx_all.checkbox:not(.selected) {
 	content : var(--spr-minus);
-	filter: var(--cbx-icon);
+	filter: var(--mixed-icon);
 }
 
 .checkbox:not(cbx_all):not(.selected) {
 	content : var(--spr-empty);
-	filter: var(--cbx-icon);
+	filter: var(--mixed-icon);
 }
 
 #sort_selected .checkbox:not(.selected) {
 	content : var(--spr-cross);
-	filter: var(--cbx-icon);
+	filter: var(--mixed-icon);
 }
 
 .switch {
 	content : var(--spr-switch);
-	filter: var(--cbx-icon);
+	filter: var(--mixed-icon);
 }
 
 .radio {
