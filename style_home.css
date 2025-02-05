@@ -105,6 +105,4 @@
     max-width: 100%; /* Prevents overflow */
     min-height: 50px; /* Ensures visibility even when empty */
     padding: 8px; /* Adds spacing for readability */
-    border: 1px solid #ccc; /* Optional: makes it easier to see */
-    background-color: #f9f9f9; /* Optional: improves visibility */
 }
