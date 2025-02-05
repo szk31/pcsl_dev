@@ -96,3 +96,15 @@
 #home_key_reset_button {
 	border: crimson 0.6vw solid;
 }
+
+#__log__ {
+    display: block; /* Ensures it's a block element */
+    white-space: pre-wrap; /* Preserves formatting and wraps long text */
+    word-wrap: break-word; /* Ensures long words break */
+    overflow-wrap: break-word; /* Compatibility */
+    max-width: 100%; /* Prevents overflow */
+    min-height: 50px; /* Ensures visibility even when empty */
+    padding: 8px; /* Adds spacing for readability */
+    border: 1px solid #ccc; /* Optional: makes it easier to see */
+    background-color: #f9f9f9; /* Optional: improves visibility */
+}
