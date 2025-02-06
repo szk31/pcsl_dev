@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 	// disable PWA install option if already installed
 	if ('getInstalledRelatedApps' in navigator) {
         const apps = await navigator.getInstalledRelatedApps();
-		window.alert(JSON.stringify(related_apps));
+		window.alert(JSON.stringify(apps));
         if (apps.some(app => app.platform === "webapp" && app.url.includes(location.origin))) {
             $("#menu_install").addClass("pwa_installed");
             return;
