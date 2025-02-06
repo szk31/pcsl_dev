@@ -84,7 +84,7 @@ const entry_idx = {
 
 let video, entry;
 
-const version = "1.8.4 test19";
+const version = "1.8.4 test20";
 const key_hash = [
 	"473c05c1ae8349a187d233a02c514ac73fe08ff4418429806a49f7b2fe4ba0b7a36ba95df1d58b8e84a602258af69194", //thereIsNoPassword
 	"3f01e53f1bcee58f6fb472b5d2cf8e00ce673b13599791d8d2d4ddcde3defbbb4e0ab7bc704538080d704d87d79d0410"
@@ -341,17 +341,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 		part_filter = [1, 1, 1, 0, 0, 0];
 	}
 
-	// disable PWA install option on PWA mode
-	if (window.matchMedia("(display-mode: standalone)").matches) {
+	// disable PWA install option on PWA mode, or installed flag exist in local storage
+	if (window.matchMedia("(display-mode: standalone)").matches || ls("pcsl_pwa_installed")) {
 		$("#menu_install").addClass("pwa_installed");
 		ls("pcsl_pwa_installed", 1);
-		//return;
 	}
-	// disable PWA install option if already installed
-	if (ls("pcsl_pwa_installed")) {	// exist
-		$("#menu_install").addClass("pwa_installed");
-	}
-
 });
 
 function init() {
@@ -632,12 +626,14 @@ $(function() {
 			localStorage.removeItem("pcsl_pwa_installed");
 			deferred_prompt = e.originalEvent || e;
 			$("#menu_install:not(.pwa_installed)").removeClass("disabled");
+			$("#menu_bottom").addClass("pwa_installable");
 		});
 
 		$(window).on("appinstalled", function() {
 			$("#menu_install").addClass("disabled pwa_installed");
 			ls("pcsl_pwa_installed", 1);
 			deferred_prompt = null;
+			$("#menu_bottom").removeClass("pwa_installable");
 		})
 	}
 
@@ -701,16 +697,12 @@ $(function() {
 		
 		// menu - install
 		$(document).on("click", "#menu_install:not(.disabled)", async function() {
-			if (!deferred_prompt) {
-				$("#menu_install").addClass("disabled");
-				return;
-			}
-
 			deferred_prompt.prompt();
 			const result = await deferred_prompt.userChoice;
-			$("#menu_install").toggleClass("disabled", result.outcome === "accepted");
-			ls("pcsl_pwa_installed", 1);
-			deferred_prompt = null;
+			if (result.outcome === "accepted") {
+				// fire the event for dry
+				window.dispatchEvent(new Event("appinstalled"));
+			}
 		});
 
 		// menu - setting
