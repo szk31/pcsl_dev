@@ -15,7 +15,14 @@
             "type": "image/png"
         }
     ],
-    "start_url": ".",
-    "display": "standalone"
+    "start_url": "/",
+    "display": "standalone",
+    "related_applications": [
+        {
+            "platform": "webapp",
+            "url": "https://szk31.github.io/pcsl_dev/manifest.json"
+        }
+    ],
+    "prefer_related_applications": false
 }
   
