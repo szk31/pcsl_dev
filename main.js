@@ -84,7 +84,7 @@ const entry_idx = {
 
 let video, entry;
 
-const version = "1.8.4 test16";
+const version = "1.8.4 test17";
 const key_hash = [
 	"473c05c1ae8349a187d233a02c514ac73fe08ff4418429806a49f7b2fe4ba0b7a36ba95df1d58b8e84a602258af69194", //thereIsNoPassword
 	"3f01e53f1bcee58f6fb472b5d2cf8e00ce673b13599791d8d2d4ddcde3defbbb4e0ab7bc704538080d704d87d79d0410"
@@ -349,6 +349,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 	// disable PWA install option if already installed
 	if ('getInstalledRelatedApps' in navigator) {
         navigator.getInstalledRelatedApps().then(apps => {
+			window.alert(JSON.stringify(apps));
 			if (apps.some(app => app.platform === "webapp" && app.url.includes(this.location.origin))) {
 				$("#menu_install").addClass("pwa_installed");
 				return;
