@@ -1,5 +1,5 @@
 #repertoire_section {
-	margin-top : 10vw;
+	margin-top: 10vw;
 }
 
 #rep_input {
@@ -8,7 +8,7 @@
     margin: 2vw 2vw 0;
     height: 10vw;
     font-size: 5vw;
-	border-radius : 2vw;
+	border-radius: 2vw;
 }
 
 #filter_container {
@@ -24,7 +24,7 @@
 }
 
 #filter_display {
-	display : flex;
+	display: flex;
 	align-items: center;
 }
 
@@ -41,29 +41,29 @@
 }
 
 #filter_close {
-	content : var(--ico-arrow);
-	width : 6vw;
-	height : 6vw;
+	content: var(--ico-arrow);
+	width: 6vw;
+	height: 6vw;
 	margin: 1vw 2vw;
 	filter: var(--mixed-icon);
 }
 
 #filter_close.closed {
-	transform : rotate(180deg);
+	transform: rotate(180deg);
 }
 
 .filter_title {
-	border-bottom : 0.5vw solid var(--filter-text);
+	border-bottom: 0.5vw solid var(--filter-text);
 	width: 88vw;
-	margin : 0.6vw;
-	padding-left : 2.6vw;
-	font-size : 3.6vw;
+	margin: 0.6vw;
+	padding-left: 2.6vw;
+	font-size: 3.6vw;
 }
 
 .filter_subblock {
-	background-color : var(--filter-back-alt);
-	border-radius : 2.4vw;
-	padding : 1.5vw;
+	background-color: var(--filter-back-alt);
+	border-radius: 2.4vw;
+	padding: 1.5vw;
 }
 
 #filter_set {
@@ -83,22 +83,22 @@
 }
 
 #filter_icon_container {
-	display : flex;
+	display: flex;
 	flex-wrap: wrap;
 }
 
 .filter_icon_bg {
-	margin : 0 0.29vw;
-	border-radius : 4vw;
-	width : 14.2vw;
-	height : 14.2vw;
+	margin: 0 0.29vw;
+	border-radius: 4vw;
+	width: 14.2vw;
+	height: 14.2vw;
 }
 
 .filter_icon {
 	margin: 0.4vw;
-	border-radius : 3.6vw;
-	width : 13.4vw;
-	height : 13.4vw;
+	border-radius: 3.6vw;
+	width: 13.4vw;
+	height: 13.4vw;
 }
 
 .filter_icon:not(.selected) {
@@ -108,7 +108,7 @@
 }
 
 .filter_subblock label {
-	display : flex;
+	display: flex;
 	align-items: center;
 	padding-left: 1.6vw;
 	height: 6vw;
@@ -119,22 +119,22 @@ label div:nth-child(2) {
 }
 
 .rep_song_container {
-	font-weight : bold;
-	font-size : 3.2vw;
-	margin : 1.6vw 3.2vw;
-	padding : 1.2vw 1.6vw 0.6vw;
-	border-radius : 2vw;
+	font-weight: bold;
+	font-size: 3.2vw;
+	margin: 1.6vw 3.2vw;
+	padding: 1.2vw 1.6vw 0.6vw;
+	border-radius: 2vw;
 	color: var(--song-text);
-	background-color : var(--song-display);
-	outline : 0.25vw solid var(--dialog-border);
+	background-color: var(--song-display);
+	outline: 0.25vw solid var(--dialog-border);
 }
 
 .rep_song_container.selected {
-	outline : 0.5vw solid var(--song-selected);
+	outline: 0.5vw solid var(--song-selected);
 }
 
 .rep_song_container.rep_mem_only {
-	background-color : var(--song-display-alt);
+	background-color: var(--song-display-alt);
 }
 
 .rep_song_row1 {
@@ -143,9 +143,9 @@ label div:nth-child(2) {
 }
 
 .rep_song_title {
-	height : 1.25em;
-	line-height : 1.25em;
-	overflow : hidden;
+	height: 1.25em;
+	line-height: 1.25em;
+	overflow: hidden;
 }
 
 .rep_song_nooke {
@@ -159,17 +159,17 @@ label div:nth-child(2) {
 }
 
 .rep_song_singer {
-	display : grid;
-	grid-template-columns : 33.3% 33.3% 33.3%;
+	display: grid;
+	grid-template-columns: 33.3% 33.3% 33.3%;
 }
 
 .rep_singer_2rows {
-	margin-top : -1.1vw;
+	margin-top: -1.1vw;
 }
 
 .rep_song_singer div[class] {
-	margin : 0.4vw;
-	border-radius : 0.6vw;
+	margin: 0.4vw;
+	border-radius: 0.6vw;
 	border: 0.4vw solid currentColor;
 	transform: rotate(45deg);
 	aspect-ratio: 1 / 1;
@@ -180,18 +180,18 @@ label div:nth-child(2) {
 }
 
 .rep_extra_info {
-	margin-left : 4vw;
+	margin-left: 4vw;
 }
 
 #rep_share {
-	position : absolute;
-	left : 50%;
-	top : 50%;
+	position: absolute;
+	left: 50%;
+	top: 50%;
 	transform: translate(-50%, -50%);
-	width : 70vw;
-	height : 39vh;
+	width: 70vw;
+	height: 39vh;
 	color: var(--dialog-text-alt);
-	background-color : var(--dialog-back);
+	background-color: var(--dialog-back);
 	border: 0.5vw solid var(--dialog-border);
 	border-radius: 2vw;
 }
@@ -241,14 +241,14 @@ label div:nth-child(2) {
 }
 
 #rep_tweet {
-	position : absolute;
-	left : 50%;
-	top : 50%;
+	position: absolute;
+	left: 50%;
+	top: 50%;
 	transform: translate(-50%, -50%);
-	width : 70vw;
-	height : 39vh;
+	width: 70vw;
+	height: 39vh;
 	color: var(--dialog-text-alt);
-	background-color : var(--dialog-back);
+	background-color: var(--dialog-back);
 	border: 0.5vw solid var(--dialog-border);
 	border-radius: 2vw;
 }
@@ -325,78 +325,78 @@ label div:nth-child(2) {
 
 /* general stuff */
 .grid_block-2 {
-	display : grid;
+	display: grid;
 	grid-template-columns: 45% 45%;
 }
 
 .grid_block-3 {
-	display : grid;
+	display: grid;
 	grid-template-columns: 32% 32% 30%;
 }
 
 .grid_block-4 {
-	display : grid;
+	display: grid;
 	grid-template-columns: 20% 35% 9.875% 35%;
 }
 
 .rowspan-2 {
-	grid-column : 1 / 2 span;
+	grid-column: 1 / 2 span;
 }
 
 .rowspan-3 {
-	grid-column : 1 / 3 span;
+	grid-column: 1 / 3 span;
 }
 
 /* used in memcount */
 .colspan-2 {
-	grid-row : 1 / span 2;
+	grid-row: 1 / span 2;
 }
 
 .checkbox,
 .switch {
-	width : 5vw;
-	height : 5vw;
-	margin : 0.6vw;
+	width: 5vw;
+	height: 5vw;
+	margin: 0.6vw;
 }
 
 .checkbox.selected {
-	content : var(--spr-check);
+	content: var(--spr-check);
 	filter: var(--mixed-icon);
 }
 
 .cbx_all.checkbox:not(.selected) {
-	content : var(--spr-minus);
+	content: var(--spr-minus);
 	filter: var(--mixed-icon);
 }
 
 .checkbox:not(cbx_all):not(.selected) {
-	content : var(--spr-empty);
+	content: var(--spr-empty);
 	filter: var(--mixed-icon);
 }
 
 #sort_selected .checkbox:not(.selected) {
-	content : var(--spr-cross);
+	content: var(--spr-cross);
 	filter: var(--mixed-icon);
 }
 
 .switch {
-	content : var(--spr-switch);
+	content: var(--spr-switch);
 	filter: var(--mixed-icon);
 }
 
 .radio {
-	margin : 0.8vw 1vw;
-	width : 4.4vw;
-	height : 4.4vw;
-	border-radius : 3vw;
-	border : 0.8vw solid var(--radio-border);
-	outline : 0.3vw solid var(--radio-outline);
+	margin: 0.8vw 1vw;
+	width: 4.4vw;
+	height: 4.4vw;
+	border-radius: 3vw;
+	border: 0.8vw solid var(--radio-border);
+	outline: 0.3vw solid var(--radio-outline);
 }
 
 .radio.selected {
-	background-color : var(--radio-back);
+	background-color: var(--radio-back);
 }
 
 .radio:not(.selected) {
-	background-color : var(--radio-border);
+	background-color: var(--radio-border);
 }
