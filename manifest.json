@@ -15,7 +15,8 @@
             "type": "image/png"
         }
     ],
-    "start_url": "/",
+    "start_url": "/pcsl_dev/",
+    "scope": "/pcsl_dev",
     "display": "standalone",
     "related_applications": [
         {
