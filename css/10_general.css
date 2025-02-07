@@ -422,15 +422,15 @@ body.post_switch {
 }
 
 .icon_kirara {
-	content: url(icon/kirara.webp);
+	content: url(../icon/kirara.webp);
 }
 
 .icon_momo {
-	content: url(icon/momo.webp);
+	content: url(../icon/momo.webp);
 }
 
 .icon_nia {
-	content: url(icon/nia.webp);
+	content: url(../icon/nia.webp);
 }
 
 .icon_chui {

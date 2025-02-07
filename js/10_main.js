@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 	} else {
 		// need to refresh data
 		$("#loading_text").html("Downloading data...");
-		fetch(`data_${content_level}.txt`)
+		fetch(`data/data_${content_level}.txt`)
 		.then(response => {
 			if (!response.ok) {
 				console.log(`failed to load data_${content_level}.txt`);
