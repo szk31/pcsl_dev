@@ -457,7 +457,6 @@ body.post_switch {
 }
 
 #menu_panel {
-	left: 0;
 	height: 100%;
 	width: 75vw;
 	background-color: var(--menu-back);

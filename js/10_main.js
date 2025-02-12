@@ -1,4 +1,4 @@
-//"use strict";
+"use strict";
 // display string, refered in entry[].type
 const singer_lookup = [
 	,					// 0b 0000 0x 0
@@ -84,7 +84,7 @@ const entry_idx = {
 
 let video, entry;
 
-const version = "1.8.4";
+const version = "1.8.5 test1";
 const key_hash = [
 	"473c05c1ae8349a187d233a02c514ac73fe08ff4418429806a49f7b2fe4ba0b7a36ba95df1d58b8e84a602258af69194", //thereIsNoPassword
 	"3f01e53f1bcee58f6fb472b5d2cf8e00ce673b13599791d8d2d4ddcde3defbbb4e0ab7bc704538080d704d87d79d0410"
@@ -343,7 +343,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 	// disable PWA install option on PWA mode, or installed flag exist in local storage
 	if (window.matchMedia("(display-mode: standalone)").matches || ls("pcsl_pwa_installed")) {
-		$("#menu_install").addClass("pwa_installed");
 		ls("pcsl_pwa_installed", 1);
 	}
 });
@@ -625,14 +624,14 @@ $(function() {
 			e.preventDefault();
 			localStorage.removeItem("pcsl_pwa_installed");
 			deferred_prompt = e.originalEvent || e;
-			$("#menu_install:not(.pwa_installed)").removeClass("disabled");
+			$("#menu_install").removeClass("disabled");
 			$("#menu_bottom").addClass("pwa_installable");
 		});
 
 		$(window).on("appinstalled", function() {
-			$("#menu_install").addClass("disabled pwa_installed");
 			ls("pcsl_pwa_installed", 1);
 			deferred_prompt = null;
+			$("#menu_install").addClass("disabled");
 			$("#menu_bottom").removeClass("pwa_installable");
 		})
 	}
