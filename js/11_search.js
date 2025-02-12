@@ -485,7 +485,7 @@ function update_display(force = false) {
 				note = note.replace(/【メン限アーカイブ】|【メン限】/g, "");
 			}
 			new_html += 
-			`<div class="entry_container singer_${entry[cur_entry][entry_idx.type]}${is_mem ? "m" : ""} song_${current_song}${hide_song.includes(current_song) ? " hidden" : ""}">` + 
+			`<div class="entry_container singer_${entry[cur_entry][entry_idx.type]}${is_mem ? " mem" : ""} song_${current_song}${hide_song.includes(current_song) ? " hidden" : ""}">` + 
 				`<a href="https://youtu.be/${video[entry[cur_entry][entry_idx.video]][video_idx.id]}${timestamp(cur_entry)}" target="_blank">` + 
 					`<div class="entry_primary">` + 
 						`<div class="entry_date">${display_date(video[entry[cur_entry][entry_idx.video]][video_idx.date])}</div>` + 

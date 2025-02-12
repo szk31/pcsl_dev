@@ -84,7 +84,7 @@ const entry_idx = {
 
 let video, entry;
 
-const version = "1.8.5 test1";
+const version = "1.8.5 test2";
 const key_hash = [
 	"473c05c1ae8349a187d233a02c514ac73fe08ff4418429806a49f7b2fe4ba0b7a36ba95df1d58b8e84a602258af69194", //thereIsNoPassword
 	"3f01e53f1bcee58f6fb472b5d2cf8e00ce673b13599791d8d2d4ddcde3defbbb4e0ab7bc704538080d704d87d79d0410"
@@ -461,7 +461,16 @@ function load_setting_flags() {
 			break;
 		case "extra":
 			$("#setting_dark").click();
-	}	  
+	}
+	
+	// remove old flags
+	for (let i = localStorage.length - 1; i >= 0; --i) {
+		const key = localStorage.key(i);
+		if (key && key.startsWith("pcsl_s_")) {
+			localStorage.removeItem(key);
+		}
+	}
+
 }
 
 function process_data() {
@@ -994,7 +1003,7 @@ function memcount_load_rep() {
 	// display
 	let new_html = "";
 	for (let i = 0; i < (key_valid ? 6 : 3); ++i) {
-		new_html += `<div class="memcount_rep_block"><div class="singer_${display_lookup[i]}m memcount_rep_name">${singer_lookup[display_lookup[i]]}</div><div class="singer_${display_lookup[i]}">${display_number[i]}</div></div>`;
+		new_html += `<div class="memcount_rep_block"><div class="singer_${display_lookup[i]} memcount_rep_name">${singer_lookup[display_lookup[i]]}</div><div class="singer_${display_lookup[i]}">${display_number[i]}</div></div>`;
 	}
 	if (key_valid) {
 		new_html += `<div></div><div class="memcount_rep_sum"></div><div></div>`;
