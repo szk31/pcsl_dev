@@ -58,6 +58,7 @@ $(function() {
 		
 		// search - input - predict - selection
 		$(document).on("mousedown", ".auto_panel", function() {
+			$(document.body).removeClass("no_scroll");
 			$("#search_input").val(to_non_html(this.id));
 			// input on blur fires after this so no need to run search here
 		});
@@ -89,8 +90,18 @@ $(function() {
 			}
 		});
 
+		// esc -> input::blur
+		$(document).on("keydown", function(e) {
+			if (e.key === "Escape" && current_page === "search") {
+				e.preventDefault();
+				$(document.body).removeClass("no_scroll");
+				$("#search_auto").addClass("hidden");
+			}
+		});
+
 		// search - input - submit
 		$(document).on("blur", "#search_input", function() {
+			$(document.body).removeClass("no_scroll");
 			$("#search_auto").addClass("hidden");
 			input_focused = false;
 			is_searching_from_rep ? is_searching_from_rep = 0 : $("#nav_share").toggleClass("disabled", !is_searching_from_rep);
@@ -347,6 +358,7 @@ function auto_search() {
 	$("#search_auto").toggleClass("hidden", !new_html);
 	predict_index = 0;
 	$("#search_auto>div").removeClass("selected");
+	$(document.body).toggleClass("no_scroll");
 }
 
 function search() {

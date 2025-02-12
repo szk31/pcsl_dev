@@ -454,6 +454,7 @@ body.post_switch {
 	height: calc(100% - 10vw);
 	width: 100%;
 	background: rgba(30, 30, 30, 0.5);
+	z-index: 3;
 }
 
 #menu_panel {
@@ -543,7 +544,7 @@ body.post_switch {
 	height: calc(100% - 10vw);
 	width: 100%;
 	background-color: #2228;
-	z-index: 1;
+	z-index: 3;
 }
 
 /* info section */
@@ -560,7 +561,6 @@ body.post_switch {
 	text-align: center;
 	border: 0.5vw solid var(--dialog-border);
 	border-radius: 5.6vw;
-	z-index: 10;
 }
 
 #information>div {
@@ -951,6 +951,7 @@ body.post_switch {
 	border-radius: 2vw;
 	text-align: center;
 	font-weight: bold;
+	z-index: 3;
 }
 
 #copy_popup.fade_out {

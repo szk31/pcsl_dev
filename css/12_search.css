@@ -115,6 +115,9 @@
 	position: -webkit-sticky;
 	top: 10vw;
 	color: var(--song-text);
+
+	/* this is here ONLY to counter z-index problem for inverted share button*/
+	z-index: 1;
 }
 
 .song_container:nth-child(odd)>:nth-child(1) {
@@ -166,7 +169,6 @@
 	content: var(--ico-copy);
 	width: 6vw;
 	height: 6vw;
-	z-index: 2;
 	filter: var(--mixed-icon);
 	margin: 0.6vw 0.6vw 1vw 0;
 }
@@ -286,7 +288,7 @@
 	--text: var(--s-chui-text);
 }
 
-[class*="singer_"]	{
+[class*="singer_"] {
 	background-color: var(--back);
 	color: var(--text);
 }
@@ -305,6 +307,7 @@
 	border: 1vw solid GhostWhite;
 	background-color: var(--filter-back);
 	border-radius: 1vw;
+	z-index: 3;
 }
 
 .auto_panel {
