@@ -209,13 +209,19 @@
 }
 
 .entry_share {
-	content: var(--ico-share);
 	width: 6vw;
 	height: 6vw;
-}
+	background-color: currentColor;
 
-*:is([theme=light], [theme=mixed]) [class*="singer_"]:not(.mem):not(.singer_7) .entry_share {
-	filter: var(--mixed-icon);
+	mask-image: var(--ico-share);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: contain;
+
+	-webkit-mask-image: var(--ico-share);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	-webkit-mask-size: contain;
 }
 
 .entry_note {

@@ -84,7 +84,7 @@ const entry_idx = {
 
 let video, entry;
 
-const version = "1.8.5 test3";
+const version = "1.8.5 test4";
 const key_hash = [
 	"473c05c1ae8349a187d233a02c514ac73fe08ff4418429806a49f7b2fe4ba0b7a36ba95df1d58b8e84a602258af69194", //thereIsNoPassword
 	"3f01e53f1bcee58f6fb472b5d2cf8e00ce673b13599791d8d2d4ddcde3defbbb4e0ab7bc704538080d704d87d79d0410"
@@ -1096,7 +1096,8 @@ function get_date_different(date1, date2 = today) {
 
 // get entry count of all entry and member-only entry that fufills mask
 function get_sang_count(id, mask = [4, 2, 1, 32, 16, 8]) {
-	let count = mem_count = 0;
+	let count = 0,
+		mem_count = 0;
 	for (let i in entry_proc[id]) {
 		if (mask.some((x) => (x & entry[entry_proc[id][i]][entry_idx.type]) === x)) {
 			count++;
@@ -1134,7 +1135,7 @@ function jump2page(target) {
 			$("#nav_search_random").removeClass("hidden");
 			$("#nav_title").html("曲検索");
 			// reset input -> reload
-			$("#input").val("");
+			search_memory = "";
 			search();
 			break;
 		case "repertoire" : 
