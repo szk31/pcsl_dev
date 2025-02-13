@@ -1,3 +1,4 @@
+"use strict";
 // stores whats currently looking up
 let search_memory = "";
 
@@ -16,6 +17,8 @@ let auto_display_count;
 let is_searching_from_rep = false;
 
 let input_focused = false;
+
+let predict_index = 0;	// will be using for nth-child, 0: not using; 1+: index pos
 
 $(function() {
 	// nav - random
@@ -63,7 +66,6 @@ $(function() {
 			// input on blur fires after this so no need to run search here
 		});
 
-		let predict_index = 0;	// will be using for nth-child, 0: not using; 1+: index pos
 		// search - input - predict - arrow keys
 		$(document).on("keydown", function(e) {
 			// 38: up-arrow, 40: down-arrow
@@ -329,7 +331,9 @@ function auto_search() {
 	let new_html = "";
 	for (let i in auto_exact) {
 		// data being number (song id) or string (series name)
-		let auto_reading = auto_display = song_name = "";
+		let auto_reading = "",
+			auto_display = "",
+			song_name = "";
 		if (typeof auto_exact[i] === "string") {
 			// series name
 			auto_display = song_name = auto_exact[i];
@@ -423,9 +427,10 @@ function update_display(force = false) {
 	}
 	let current_song = -1;
 	// record loaded song (for un-hiding song thats no longer loaded)
-	let loaded_song = [];
-	let displayed = found_entries = 0;
-	let new_html = "";
+	let loaded_song = [],
+		displayed = 0,
+		found_entries = 0,
+		new_html = "";
 	for (let i = 0; i < hits.length && i <= 200; ++i) {
 		// sort according to settings
 		let sorted_enrties = [];

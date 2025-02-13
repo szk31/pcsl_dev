@@ -1,3 +1,4 @@
+"use strict";
 // repertoire section
 // attr lookup
 const attr_idx = [
@@ -352,7 +353,8 @@ function rep_search(force = false) {
 		return;
 	}
 	// get mask
-	let mask = inv_mask = 0;
+	let mask = 0,
+		inv_mask = 0;
 	// combine both mask_object and create binary mask
 	Object.values(rep_anisong).concat(Object.values(rep_genre)).forEach(x => mask += x[0] << x[1]);
 	Object.values(rep_anisong).forEach(x => inv_mask += x[0] << x[1]);
@@ -360,7 +362,7 @@ function rep_search(force = false) {
 	// search
 	rep_hits = [];
 	const inter = selected_member.reduce((acc, num) => acc + num, 0);
-	for (i in song) {
+	for (let i in song) {
 		const mem_check = settings.rep_is_union.value ? rep_hits_solo[i].some(exist) : rep_list[i] === inter;
 		if (mem_check &&						// has entry of selected member
 		    song[i][song_idx.attr] & mask &&	// satisflies filter mask
